@@ -13,7 +13,7 @@ class PdfConfig {
   final GridType gridType;
   final Orientation orientation;
 
-  PdfConfig({
+  const PdfConfig({
     required this.gridType,
     required this.orientation,
   });
@@ -40,5 +40,23 @@ class PdfConfig {
       gridType: gridType ?? this.gridType,
       orientation: orientation ?? this.orientation,
     );
+  }
+
+  @override
+  String toString() {
+    return 'PdfConfig(gridType: $gridType, orientation: $orientation)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is PdfConfig &&
+        other.gridType == gridType &&
+        other.orientation == orientation;
+  }
+
+  @override
+  int get hashCode {
+    return Object.hash(gridType, orientation);
   }
 }

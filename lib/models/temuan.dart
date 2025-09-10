@@ -10,7 +10,7 @@ class Temuan {
   final String deskripsi;
   final String? fotoPath;
 
-  Temuan({
+  const Temuan({
     this.id,
     required this.tanggal,
     required this.jenisTemuan,
@@ -76,6 +76,46 @@ class Temuan {
       longitude: longitude ?? this.longitude,
       deskripsi: deskripsi ?? this.deskripsi,
       fotoPath: fotoPath ?? this.fotoPath,
+    );
+  }
+
+  @override
+  String toString() {
+    return 'Temuan(id: $id, tanggal: $tanggal, jenisTemuan: $jenisTemuan, '
+        'jalur: $jalur, lajur: $lajur, kilometer: $kilometer, '
+        'latitude: $latitude, longitude: $longitude, deskripsi: $deskripsi, '
+        'fotoPath: $fotoPath)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Temuan &&
+        other.id == id &&
+        other.tanggal == tanggal &&
+        other.jenisTemuan == jenisTemuan &&
+        other.jalur == jalur &&
+        other.lajur == lajur &&
+        other.kilometer == kilometer &&
+        other.latitude == latitude &&
+        other.longitude == longitude &&
+        other.deskripsi == deskripsi &&
+        other.fotoPath == fotoPath;
+  }
+
+  @override
+  int get hashCode {
+    return Object.hash(
+      id,
+      tanggal,
+      jenisTemuan,
+      jalur,
+      lajur,
+      kilometer,
+      latitude,
+      longitude,
+      deskripsi,
+      fotoPath,
     );
   }
 }

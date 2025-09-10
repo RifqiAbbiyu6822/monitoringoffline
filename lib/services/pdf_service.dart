@@ -9,73 +9,72 @@ import '../models/perbaikan.dart';
 import '../models/pdf_config.dart' as pdf_config;
 
 class PdfService {
+  static const String _appTitle = 'LAPORAN JALAN TOL MBZ';
+  static const String _dateFormat = 'dd MMMM yyyy';
+  static const String _fileNameFormat = 'yyyyMMdd';
+
   Future<void> generateTemuanPdf(List<Temuan> temuanList, pdf_config.PdfConfig config) async {
     final pdf = pw.Document();
     
-    // Header
-    final header = pw.Header(
-      level: 0,
-      child: pw.Text(
-        'LAPORAN TEMUAN JALAN TOL MBZ',
-        style: pw.TextStyle(
-          fontSize: 18,
-          fontWeight: pw.FontWeight.bold,
-        ),
-        textAlign: pw.TextAlign.center,
-      ),
-    );
-
-    // Date info
-    final dateInfo = pw.Text(
-      'Tanggal: ${DateFormat('dd MMMM yyyy').format(DateTime.now())}',
-      style: const pw.TextStyle(fontSize: 12),
-    );
-
-    // Tampilkan grid foto untuk semua data (dengan atau tanpa foto)
     if (temuanList.isNotEmpty) {
       await _addPhotoGridPages(pdf, temuanList, config, 'TEMUAN');
     } else {
-      // Jika tidak ada data sama sekali, tampilkan halaman kosong
-      pdf.addPage(
-        pw.Page(
-          pageFormat: config.orientation == pdf_config.Orientation.portrait 
-              ? PdfPageFormat.a4 
-              : PdfPageFormat.a4.landscape,
-          build: (pw.Context context) {
-            return pw.Column(
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
-              children: [
-                header,
-                pw.SizedBox(height: 20),
-                dateInfo,
-                pw.SizedBox(height: 20),
-                pw.Expanded(
-                  child: pw.Center(
-                    child: pw.Text(
-                      'Tidak ada data temuan untuk tanggal ini',
-                      style: pw.TextStyle(fontSize: 16, color: PdfColors.grey600),
-                    ),
-                  ),
-                ),
-              ],
-            );
-          },
-        ),
-      );
+      _addEmptyPage(pdf, config, 'TEMUAN', 'Tidak ada data temuan untuk tanggal ini');
     }
 
-    // Save and open PDF
-    await _saveAndOpenPdf(pdf, 'temuan_${DateFormat('yyyyMMdd').format(DateTime.now())}.pdf');
+    await _saveAndOpenPdf(pdf, 'temuan_${DateFormat(_fileNameFormat).format(DateTime.now())}.pdf');
   }
 
   Future<void> generatePerbaikanPdf(List<Perbaikan> perbaikanList, pdf_config.PdfConfig config) async {
     final pdf = pw.Document();
     
-    // Header
-    final header = pw.Header(
+    if (perbaikanList.isNotEmpty) {
+      await _addPhotoGridPages(pdf, perbaikanList, config, 'PERBAIKAN');
+    } else {
+      _addEmptyPage(pdf, config, 'PERBAIKAN', 'Tidak ada data perbaikan untuk tanggal ini');
+    }
+
+    await _saveAndOpenPdf(pdf, 'perbaikan_${DateFormat(_fileNameFormat).format(DateTime.now())}.pdf');
+  }
+
+  void _addEmptyPage(pw.Document pdf, pdf_config.PdfConfig config, String type, String message) {
+    pdf.addPage(
+      pw.Page(
+        pageFormat: _getPageFormat(config),
+        build: (pw.Context context) {
+          return pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              _buildHeader(type),
+              pw.SizedBox(height: 20),
+              _buildDateInfo(),
+              pw.SizedBox(height: 20),
+              pw.Expanded(
+                child: pw.Center(
+                  child: pw.Text(
+                    message,
+                    style: pw.TextStyle(fontSize: 16, color: PdfColors.grey600),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  PdfPageFormat _getPageFormat(pdf_config.PdfConfig config) {
+    return config.orientation == pdf_config.Orientation.portrait 
+        ? PdfPageFormat.a4 
+        : PdfPageFormat.a4.landscape;
+  }
+
+  pw.Widget _buildHeader(String type) {
+    return pw.Header(
       level: 0,
       child: pw.Text(
-        'LAPORAN PERBAIKAN JALAN TOL MBZ',
+        '$_appTitle $type',
         style: pw.TextStyle(
           fontSize: 18,
           fontWeight: pw.FontWeight.bold,
@@ -83,50 +82,14 @@ class PdfService {
         textAlign: pw.TextAlign.center,
       ),
     );
-
-    // Date info
-    final dateInfo = pw.Text(
-      'Tanggal: ${DateFormat('dd MMMM yyyy').format(DateTime.now())}',
-      style: const pw.TextStyle(fontSize: 12),
-    );
-
-    // Tampilkan grid foto untuk semua data (dengan atau tanpa foto)
-    if (perbaikanList.isNotEmpty) {
-      await _addPhotoGridPages(pdf, perbaikanList, config, 'PERBAIKAN');
-    } else {
-      // Jika tidak ada data sama sekali, tampilkan halaman kosong
-      pdf.addPage(
-        pw.Page(
-          pageFormat: config.orientation == pdf_config.Orientation.portrait 
-              ? PdfPageFormat.a4 
-              : PdfPageFormat.a4.landscape,
-          build: (pw.Context context) {
-            return pw.Column(
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
-              children: [
-                header,
-                pw.SizedBox(height: 20),
-                dateInfo,
-                pw.SizedBox(height: 20),
-                pw.Expanded(
-                  child: pw.Center(
-                    child: pw.Text(
-                      'Tidak ada data perbaikan untuk tanggal ini',
-                      style: pw.TextStyle(fontSize: 16, color: PdfColors.grey600),
-                    ),
-                  ),
-                ),
-              ],
-            );
-          },
-        ),
-      );
-    }
-
-    // Save and open PDF
-    await _saveAndOpenPdf(pdf, 'perbaikan_${DateFormat('yyyyMMdd').format(DateTime.now())}.pdf');
   }
 
+  pw.Widget _buildDateInfo() {
+    return pw.Text(
+      'Tanggal: ${DateFormat(_dateFormat).format(DateTime.now())}',
+      style: const pw.TextStyle(fontSize: 12),
+    );
+  }
 
   Future<void> _addPhotoGridPages(pw.Document pdf, List<dynamic> dataList, pdf_config.PdfConfig config, String type) async {
     // Tentukan jumlah kolom berdasarkan grid type
@@ -164,32 +127,15 @@ class PdfService {
       
       pdf.addPage(
         pw.Page(
-          pageFormat: config.orientation == pdf_config.Orientation.portrait 
-              ? PdfPageFormat.a4 
-              : PdfPageFormat.a4.landscape,
+          pageFormat: _getPageFormat(config),
           build: (pw.Context context) {
             return pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
-                // Header
-                pw.Text(
-                  'LAPORAN $type JALAN TOL MBZ',
-                  style: pw.TextStyle(
-                    fontSize: 18,
-                    fontWeight: pw.FontWeight.bold,
-                  ),
-                  textAlign: pw.TextAlign.center,
-                ),
+                _buildHeader(type),
                 pw.SizedBox(height: 10),
-                
-                // Date info
-                pw.Text(
-                  'Tanggal: ${DateFormat('dd MMMM yyyy').format(DateTime.now())}',
-                  style: const pw.TextStyle(fontSize: 12),
-                ),
+                _buildDateInfo(),
                 pw.SizedBox(height: 20),
-                
-                // Grid foto
                 pw.Expanded(
                   child: _buildPhotoGridFromWidgets(photoWidgets, columnsPerRow),
                 ),
@@ -239,50 +185,51 @@ class PdfService {
   }
 
   Future<pw.Widget> _buildPhotoItem(dynamic item, String type) async {
-    String? fotoPath;
-    String tanggal;
-    String jenis;
-    String jalur;
-    String lajur;
-    String kilometer;
-    String latitude;
-    String longitude;
-    String deskripsi;
-    String? statusPerbaikan;
+    final itemData = _extractItemData(item, type);
+    final fotoWidget = await _buildFotoWidget(itemData['fotoPath']);
+    
+    return _buildPhotoContainer(fotoWidget, itemData);
+  }
 
+  Map<String, dynamic> _extractItemData(dynamic item, String type) {
     if (type == 'TEMUAN') {
       final temuan = item as Temuan;
-      fotoPath = temuan.fotoPath;
-      tanggal = DateFormat('dd/MM/yyyy').format(temuan.tanggal);
-      jenis = temuan.jenisTemuan;
-      jalur = temuan.jalur;
-      lajur = temuan.lajur;
-      kilometer = temuan.kilometer;
-      latitude = temuan.latitude;
-      longitude = temuan.longitude;
-      deskripsi = temuan.deskripsi;
+      return {
+        'fotoPath': temuan.fotoPath,
+        'tanggal': DateFormat('dd/MM/yyyy').format(temuan.tanggal),
+        'jenis': temuan.jenisTemuan,
+        'jalur': temuan.jalur,
+        'lajur': temuan.lajur,
+        'kilometer': temuan.kilometer,
+        'latitude': temuan.latitude,
+        'longitude': temuan.longitude,
+        'deskripsi': temuan.deskripsi,
+        'statusPerbaikan': null,
+      };
     } else {
       final perbaikan = item as Perbaikan;
-      fotoPath = perbaikan.fotoPath;
-      tanggal = DateFormat('dd/MM/yyyy').format(perbaikan.tanggal);
-      jenis = perbaikan.jenisPerbaikan;
-      jalur = perbaikan.jalur;
-      lajur = perbaikan.lajur;
-      kilometer = perbaikan.kilometer;
-      latitude = perbaikan.latitude;
-      longitude = perbaikan.longitude;
-      deskripsi = perbaikan.deskripsi;
-      statusPerbaikan = perbaikan.statusPerbaikan;
+      return {
+        'fotoPath': perbaikan.fotoPath,
+        'tanggal': DateFormat('dd/MM/yyyy').format(perbaikan.tanggal),
+        'jenis': perbaikan.jenisPerbaikan,
+        'jalur': perbaikan.jalur,
+        'lajur': perbaikan.lajur,
+        'kilometer': perbaikan.kilometer,
+        'latitude': perbaikan.latitude,
+        'longitude': perbaikan.longitude,
+        'deskripsi': perbaikan.deskripsi,
+        'statusPerbaikan': perbaikan.statusPerbaikan,
+      };
     }
+  }
 
-    // Cek apakah file foto ada dan bisa dibaca
-    pw.Widget fotoWidget;
+  Future<pw.Widget> _buildFotoWidget(String? fotoPath) async {
     if (fotoPath != null && fotoPath.isNotEmpty) {
       try {
         final file = File(fotoPath);
         if (await file.exists()) {
           final imageBytes = await file.readAsBytes();
-          fotoWidget = pw.Container(
+          return pw.Container(
             height: 120,
             width: double.infinity,
             decoration: pw.BoxDecoration(
@@ -295,86 +242,71 @@ class PdfService {
             ),
           );
         } else {
-          // File tidak ada, tampilkan placeholder
-          fotoWidget = _buildPhotoPlaceholder('File tidak ditemukan');
+          return _buildPhotoPlaceholder('File tidak ditemukan');
         }
       } catch (e) {
-        // Error membaca file, tampilkan placeholder
-        fotoWidget = _buildPhotoPlaceholder('Error: ${e.toString()}');
+        return _buildPhotoPlaceholder('Error: ${e.toString()}');
       }
     } else {
-      // Tidak ada path foto, tampilkan placeholder
-      fotoWidget = _buildPhotoPlaceholder('Tidak ada foto');
+      return _buildPhotoPlaceholder('Tidak ada foto');
     }
+  }
 
+  pw.Widget _buildPhotoContainer(pw.Widget fotoWidget, Map<String, dynamic> itemData) {
     return pw.Container(
       margin: const pw.EdgeInsets.all(5),
       child: pw.Column(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
-          // Foto atau Placeholder
           fotoWidget,
-          
           pw.SizedBox(height: 8),
-          
-          // Keterangan
-          pw.Container(
-            padding: const pw.EdgeInsets.all(8),
-            decoration: pw.BoxDecoration(
-              color: PdfColors.grey100,
-              borderRadius: pw.BorderRadius.circular(4),
-            ),
-            child: pw.Column(
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
-              children: [
-                pw.Text(
-                  'Tanggal: $tanggal',
-                  style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold),
-                ),
-                pw.Text(
-                  'Jenis: $jenis',
-                  style: pw.TextStyle(fontSize: 8),
-                ),
-                pw.Text(
-                  'Jalur: $jalur',
-                  style: pw.TextStyle(fontSize: 8),
-                ),
-                pw.Text(
-                  'Lajur: $lajur',
-                  style: pw.TextStyle(fontSize: 8),
-                ),
-                pw.Text(
-                  'Km: $kilometer',
-                  style: pw.TextStyle(fontSize: 8),
-                ),
-                pw.Text(
-                  'Lat: $latitude',
-                  style: pw.TextStyle(fontSize: 8),
-                ),
-                pw.Text(
-                  'Lng: $longitude',
-                  style: pw.TextStyle(fontSize: 8),
-                ),
-                if (statusPerbaikan != null)
-                  pw.Text(
-                    'Status: $statusPerbaikan',
-                    style: pw.TextStyle(fontSize: 8),
-                  ),
-                pw.SizedBox(height: 4),
-                pw.Text(
-                  'Deskripsi:',
-                  style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold),
-                ),
-                pw.Text(
-                  deskripsi,
-                  style: pw.TextStyle(fontSize: 8),
-                  maxLines: 3,
-                  overflow: pw.TextOverflow.clip,
-                ),
-              ],
-            ),
+          _buildItemInfo(itemData),
+        ],
+      ),
+    );
+  }
+
+  pw.Widget _buildItemInfo(Map<String, dynamic> itemData) {
+    return pw.Container(
+      padding: const pw.EdgeInsets.all(8),
+      decoration: pw.BoxDecoration(
+        color: PdfColors.grey100,
+        borderRadius: pw.BorderRadius.circular(4),
+      ),
+      child: pw.Column(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          _buildInfoText('Tanggal', itemData['tanggal'], isBold: true),
+          _buildInfoText('Jenis', itemData['jenis']),
+          _buildInfoText('Jalur', itemData['jalur']),
+          _buildInfoText('Lajur', itemData['lajur']),
+          _buildInfoText('Km', itemData['kilometer']),
+          _buildInfoText('Lat', itemData['latitude']),
+          _buildInfoText('Lng', itemData['longitude']),
+          if (itemData['statusPerbaikan'] != null)
+            _buildInfoText('Status', itemData['statusPerbaikan']),
+          pw.SizedBox(height: 4),
+          pw.Text(
+            'Deskripsi:',
+            style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold),
+          ),
+          pw.Text(
+            itemData['deskripsi'],
+            style: pw.TextStyle(fontSize: 8),
+            maxLines: 3,
+            overflow: pw.TextOverflow.clip,
           ),
         ],
+      ),
+    );
+  }
+
+  pw.Widget _buildInfoText(String label, String value, {bool isBold = false}) {
+    return pw.Text(
+      '$label: $value',
+      style: pw.TextStyle(
+        fontSize: 8,
+        fontWeight: isBold ? pw.FontWeight.bold : pw.FontWeight.normal,
       ),
     );
   }
@@ -413,14 +345,18 @@ class PdfService {
   }
 
   Future<void> _saveAndOpenPdf(pw.Document pdf, String fileName) async {
-    final output = await getTemporaryDirectory();
-    final file = File('${output.path}/$fileName');
-    await file.writeAsBytes(await pdf.save());
-    
-    // Open PDF
-    await Printing.layoutPdf(
-      onLayout: (PdfPageFormat format) async => pdf.save(),
-      name: fileName,
-    );
+    try {
+      final output = await getTemporaryDirectory();
+      final file = File('${output.path}/$fileName');
+      await file.writeAsBytes(await pdf.save());
+      
+      // Open PDF
+      await Printing.layoutPdf(
+        onLayout: (PdfPageFormat format) async => pdf.save(),
+        name: fileName,
+      );
+    } catch (e) {
+      throw Exception('Gagal menyimpan atau membuka PDF: $e');
+    }
   }
 }

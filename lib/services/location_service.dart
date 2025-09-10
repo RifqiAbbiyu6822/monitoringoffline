@@ -6,6 +6,11 @@ class LocationService {
   factory LocationService() => _instance;
   LocationService._internal();
 
+  // Cache untuk lokasi terakhir
+  Position? _cachedPosition;
+  DateTime? _lastLocationTime;
+  static const Duration _cacheExpiry = Duration(minutes: 5);
+
   Future<bool> _checkLocationPermission() async {
     final status = await Permission.location.status;
     if (status.isGranted) {
@@ -30,33 +35,37 @@ class LocationService {
 
   Future<Map<String, dynamic>> getCurrentLocation() async {
     try {
+      // Cek cache terlebih dahulu
+      if (_isCacheValid()) {
+        return {
+          'success': true,
+          'error': null,
+          'latitude': _cachedPosition!.latitude.toString(),
+          'longitude': _cachedPosition!.longitude.toString(),
+        };
+      }
+
       // Cek permission
       final hasPermission = await _checkLocationPermission();
       if (!hasPermission) {
-        return {
-          'success': false,
-          'error': 'Permission lokasi tidak diberikan',
-          'latitude': null,
-          'longitude': null,
-        };
+        return _createErrorResponse('Permission lokasi tidak diberikan');
       }
 
       // Cek service GPS
       final serviceEnabled = await _checkLocationService();
       if (!serviceEnabled) {
-        return {
-          'success': false,
-          'error': 'GPS tidak aktif. Silakan aktifkan GPS terlebih dahulu.',
-          'latitude': null,
-          'longitude': null,
-        };
+        return _createErrorResponse('GPS tidak aktif. Silakan aktifkan GPS terlebih dahulu.');
       }
 
       // Ambil posisi saat ini
       final position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
-        timeLimit: const Duration(seconds: 10),
+        timeLimit: const Duration(seconds: 15),
       );
+
+      // Update cache
+      _cachedPosition = position;
+      _lastLocationTime = DateTime.now();
 
       return {
         'success': true,
@@ -65,35 +74,36 @@ class LocationService {
         'longitude': position.longitude.toString(),
       };
     } catch (e) {
-      return {
-        'success': false,
-        'error': 'Gagal mendapatkan lokasi: ${e.toString()}',
-        'latitude': null,
-        'longitude': null,
-      };
+      return _createErrorResponse('Gagal mendapatkan lokasi: ${e.toString()}');
     }
+  }
+
+  bool _isCacheValid() {
+    if (_cachedPosition == null || _lastLocationTime == null) {
+      return false;
+    }
+    return DateTime.now().difference(_lastLocationTime!) < _cacheExpiry;
+  }
+
+  Map<String, dynamic> _createErrorResponse(String error) {
+    return {
+      'success': false,
+      'error': error,
+      'latitude': null,
+      'longitude': null,
+    };
   }
 
   Future<Map<String, dynamic>> getLastKnownLocation() async {
     try {
       final hasPermission = await _checkLocationPermission();
       if (!hasPermission) {
-        return {
-          'success': false,
-          'error': 'Permission lokasi tidak diberikan',
-          'latitude': null,
-          'longitude': null,
-        };
+        return _createErrorResponse('Permission lokasi tidak diberikan');
       }
 
       final position = await Geolocator.getLastKnownPosition();
       if (position == null) {
-        return {
-          'success': false,
-          'error': 'Tidak ada lokasi terakhir yang tersimpan',
-          'latitude': null,
-          'longitude': null,
-        };
+        return _createErrorResponse('Tidak ada lokasi terakhir yang tersimpan');
       }
 
       return {
@@ -103,12 +113,17 @@ class LocationService {
         'longitude': position.longitude.toString(),
       };
     } catch (e) {
-      return {
-        'success': false,
-        'error': 'Gagal mendapatkan lokasi terakhir: ${e.toString()}',
-        'latitude': null,
-        'longitude': null,
-      };
+      return _createErrorResponse('Gagal mendapatkan lokasi terakhir: ${e.toString()}');
     }
   }
+
+  // Method untuk clear cache jika diperlukan
+  void clearCache() {
+    _cachedPosition = null;
+    _lastLocationTime = null;
+  }
+
+  // Method untuk mendapatkan status cache
+  bool get hasValidCache => _isCacheValid();
 }
+

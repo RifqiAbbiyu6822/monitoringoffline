@@ -11,7 +11,7 @@ class Perbaikan {
   final String statusPerbaikan;
   final String? fotoPath;
 
-  Perbaikan({
+  const Perbaikan({
     this.id,
     required this.tanggal,
     required this.jenisPerbaikan,
@@ -82,6 +82,48 @@ class Perbaikan {
       deskripsi: deskripsi ?? this.deskripsi,
       statusPerbaikan: statusPerbaikan ?? this.statusPerbaikan,
       fotoPath: fotoPath ?? this.fotoPath,
+    );
+  }
+
+  @override
+  String toString() {
+    return 'Perbaikan(id: $id, tanggal: $tanggal, jenisPerbaikan: $jenisPerbaikan, '
+        'jalur: $jalur, lajur: $lajur, kilometer: $kilometer, '
+        'latitude: $latitude, longitude: $longitude, deskripsi: $deskripsi, '
+        'statusPerbaikan: $statusPerbaikan, fotoPath: $fotoPath)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Perbaikan &&
+        other.id == id &&
+        other.tanggal == tanggal &&
+        other.jenisPerbaikan == jenisPerbaikan &&
+        other.jalur == jalur &&
+        other.lajur == lajur &&
+        other.kilometer == kilometer &&
+        other.latitude == latitude &&
+        other.longitude == longitude &&
+        other.deskripsi == deskripsi &&
+        other.statusPerbaikan == statusPerbaikan &&
+        other.fotoPath == fotoPath;
+  }
+
+  @override
+  int get hashCode {
+    return Object.hash(
+      id,
+      tanggal,
+      jenisPerbaikan,
+      jalur,
+      lajur,
+      kilometer,
+      latitude,
+      longitude,
+      deskripsi,
+      statusPerbaikan,
+      fotoPath,
     );
   }
 }

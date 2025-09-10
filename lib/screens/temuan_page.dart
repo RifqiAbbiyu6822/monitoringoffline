@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'dart:io';
@@ -8,6 +9,7 @@ import '../services/pdf_service.dart';
 import '../widgets/pdf_config_dialog.dart';
 import '../models/pdf_config.dart' as pdf_config;
 import '../services/location_service.dart';
+import '../constants/theme_constants.dart';
 
 class TemuanPage extends StatefulWidget {
   const TemuanPage({super.key});
@@ -59,65 +61,56 @@ class _TemuanPageState extends State<TemuanPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Input Data Temuan',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
+      backgroundColor: ThemeConstants.backgroundWhite,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(80),
+        child: AppBar(
+          title: const Text(
+            'Input Data Temuan',
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: ThemeConstants.backgroundWhite,
+              fontSize: 20,
+            ),
           ),
+          backgroundColor: ThemeConstants.primaryBlue,
+          centerTitle: true,
+          elevation: 0,
+          systemOverlayStyle: SystemUiOverlayStyle.light,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.picture_as_pdf, color: ThemeConstants.backgroundWhite),
+              onPressed: _exportToPdf,
+              tooltip: 'Ekspor ke PDF',
+            ),
+          ],
         ),
-        backgroundColor: Colors.blue[800],
-        centerTitle: true,
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.picture_as_pdf, color: Colors.white),
-            onPressed: _exportToPdf,
-            tooltip: 'Ekspor ke PDF',
-          ),
-        ],
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Colors.blue[800]!,
-              Colors.blue[600]!,
-              Colors.blue[400]!,
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(20.0),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: ThemeConstants.spacingL, vertical: ThemeConstants.spacingM),
             child: Form(
               key: _formKey,
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Header Section
+                  _buildHeaderSection(),
+                  
+                  const SizedBox(height: ThemeConstants.spacingXL),
+                  
                   // Form Card
                   Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(15),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.1),
-                          blurRadius: 10,
-                          offset: const Offset(0, 5),
-                        ),
-                      ],
-                    ),
+                    padding: const EdgeInsets.all(ThemeConstants.spacingL),
+                    decoration: ThemeConstants.cardDecoration,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // Tanggal
                         _buildDateField(),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: ThemeConstants.spacingL),
                         
                         // Jenis Temuan
                         _buildDropdownField(
@@ -130,7 +123,7 @@ class _TemuanPageState extends State<TemuanPage> {
                             });
                           },
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: ThemeConstants.spacingL),
                         
                         // Jalur
                         _buildDropdownField(
@@ -143,7 +136,7 @@ class _TemuanPageState extends State<TemuanPage> {
                             });
                           },
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: ThemeConstants.spacingL),
                         
                         // Lajur
                         _buildDropdownField(
@@ -156,7 +149,7 @@ class _TemuanPageState extends State<TemuanPage> {
                             });
                           },
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: ThemeConstants.spacingL),
                         
                         // Kilometer
                         _buildTextField(
@@ -169,7 +162,7 @@ class _TemuanPageState extends State<TemuanPage> {
                             return null;
                           },
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: ThemeConstants.spacingL),
                         
                         // Koordinat
                         Column(
@@ -179,11 +172,7 @@ class _TemuanPageState extends State<TemuanPage> {
                               children: [
                                 const Text(
                                   'Koordinat GPS',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black87,
-                                  ),
+                                  style: ThemeConstants.bodyLarge,
                                 ),
                                 const Spacer(),
                                 ElevatedButton.icon(
@@ -191,17 +180,17 @@ class _TemuanPageState extends State<TemuanPage> {
                                   icon: const Icon(Icons.my_location, size: 16),
                                   label: const Text('Ambil GPS'),
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.green[600],
-                                    foregroundColor: Colors.white,
-                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                    backgroundColor: ThemeConstants.secondaryGreen,
+                                    foregroundColor: ThemeConstants.backgroundWhite,
+                                    padding: const EdgeInsets.symmetric(horizontal: ThemeConstants.spacingM, vertical: ThemeConstants.spacingS),
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(6),
+                                      borderRadius: BorderRadius.circular(ThemeConstants.radiusS),
                                     ),
                                   ),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 8),
+                            const SizedBox(height: ThemeConstants.spacingS),
                             Row(
                               children: [
                                 Expanded(
@@ -219,7 +208,7 @@ class _TemuanPageState extends State<TemuanPage> {
                                     },
                                   ),
                                 ),
-                                const SizedBox(width: 10),
+                                const SizedBox(width: ThemeConstants.spacingM),
                                 Expanded(
                                   child: _buildTextField(
                                     label: 'Longitude',
@@ -239,7 +228,7 @@ class _TemuanPageState extends State<TemuanPage> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: ThemeConstants.spacingL),
                         
                         // Deskripsi
                         _buildTextField(
@@ -253,7 +242,7 @@ class _TemuanPageState extends State<TemuanPage> {
                             return null;
                           },
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: ThemeConstants.spacingL),
                         
                         // Foto
                         _buildPhotoSection(),
@@ -261,25 +250,20 @@ class _TemuanPageState extends State<TemuanPage> {
                     ),
                   ),
                   
-                  const SizedBox(height: 30),
+                  const SizedBox(height: ThemeConstants.spacingXL),
                   
                   // Tombol Simpan
-                  ElevatedButton(
-                    onPressed: _saveTemuan,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green[600],
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 15),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      elevation: 5,
-                    ),
-                    child: const Text(
-                      'Simpan Data Temuan',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: _saveTemuan,
+                      style: ThemeConstants.primaryButtonStyle,
+                      child: const Text(
+                        'Simpan Data Temuan',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),
@@ -292,34 +276,72 @@ class _TemuanPageState extends State<TemuanPage> {
     );
   }
 
+  Widget _buildHeaderSection() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(ThemeConstants.spacingL),
+      decoration: ThemeConstants.surfaceDecoration,
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(ThemeConstants.spacingM),
+            decoration: BoxDecoration(
+              color: ThemeConstants.primaryBlue,
+              borderRadius: BorderRadius.circular(ThemeConstants.radiusL),
+            ),
+            child: const Icon(
+              Icons.search_outlined,
+              size: 32,
+              color: ThemeConstants.backgroundWhite,
+            ),
+          ),
+          const SizedBox(height: ThemeConstants.spacingM),
+          const Text(
+            'Input Data Temuan',
+            style: ThemeConstants.heading2,
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: ThemeConstants.spacingXS),
+          Text(
+            'Pencatatan temuan atau anomali jalan tol',
+            style: TextStyle(
+              fontSize: 14,
+              color: ThemeConstants.primaryBlue.withOpacity(0.7),
+              fontWeight: FontWeight.w400,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildDateField() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
           'Tanggal',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-          ),
+          style: ThemeConstants.bodyLarge,
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: ThemeConstants.spacingS),
         InkWell(
           onTap: _selectDate,
+          borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
           child: Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(ThemeConstants.spacingM),
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey[300]!),
-              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: ThemeConstants.primaryBlue.withOpacity(0.3)),
+              borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
+              color: ThemeConstants.backgroundWhite,
             ),
             child: Row(
               children: [
-                Icon(Icons.calendar_today, color: Colors.grey[600]),
-                const SizedBox(width: 10),
+                Icon(Icons.calendar_today, color: ThemeConstants.primaryBlue.withOpacity(0.7)),
+                const SizedBox(width: ThemeConstants.spacingM),
                 Text(
                   DateFormat('dd MMMM yyyy').format(_tanggal),
-                  style: const TextStyle(fontSize: 16),
+                  style: ThemeConstants.bodyMedium,
                 ),
               ],
             ),
@@ -340,25 +362,16 @@ class _TemuanPageState extends State<TemuanPage> {
       children: [
         Text(
           label,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-          ),
+          style: ThemeConstants.bodyLarge,
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: ThemeConstants.spacingS),
         DropdownButtonFormField<String>(
           value: value,
-          decoration: InputDecoration(
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          ),
+          decoration: ThemeConstants.inputDecoration(label),
           items: items.map((String item) {
             return DropdownMenuItem<String>(
               value: item,
-              child: Text(item),
+              child: Text(item, style: ThemeConstants.bodyMedium),
             );
           }).toList(),
           onChanged: onChanged,
@@ -378,22 +391,14 @@ class _TemuanPageState extends State<TemuanPage> {
       children: [
         Text(
           label,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-          ),
+          style: ThemeConstants.bodyLarge,
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: ThemeConstants.spacingS),
         TextFormField(
           controller: controller,
           maxLines: maxLines,
-          decoration: InputDecoration(
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            contentPadding: const EdgeInsets.all(12),
-          ),
+          style: ThemeConstants.bodyMedium,
+          decoration: ThemeConstants.inputDecoration(label),
           validator: validator,
         ),
       ],
@@ -406,13 +411,9 @@ class _TemuanPageState extends State<TemuanPage> {
       children: [
         const Text(
           'Foto Temuan',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-          ),
+          style: ThemeConstants.bodyLarge,
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: ThemeConstants.spacingS),
         Row(
           children: [
             Expanded(
@@ -421,28 +422,28 @@ class _TemuanPageState extends State<TemuanPage> {
                 icon: const Icon(Icons.camera_alt),
                 label: const Text('Ambil Foto'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue[600],
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  backgroundColor: ThemeConstants.primaryBlue,
+                  foregroundColor: ThemeConstants.backgroundWhite,
+                  padding: const EdgeInsets.symmetric(vertical: ThemeConstants.spacingM),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
                   ),
                 ),
               ),
             ),
             if (_fotoPath != null) ...[
-              const SizedBox(width: 10),
+              const SizedBox(width: ThemeConstants.spacingM),
               Expanded(
                 child: ElevatedButton.icon(
                   onPressed: _removeImage,
                   icon: const Icon(Icons.delete),
                   label: const Text('Hapus'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red[600],
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    backgroundColor: ThemeConstants.errorRed,
+                    foregroundColor: ThemeConstants.backgroundWhite,
+                    padding: const EdgeInsets.symmetric(vertical: ThemeConstants.spacingM),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
                     ),
                   ),
                 ),
@@ -451,16 +452,16 @@ class _TemuanPageState extends State<TemuanPage> {
           ],
         ),
         if (_fotoPath != null) ...[
-          const SizedBox(height: 10),
+          const SizedBox(height: ThemeConstants.spacingM),
           Container(
             height: 200,
             width: double.infinity,
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey[300]!),
-              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: ThemeConstants.primaryBlue.withOpacity(0.3)),
+              borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
             ),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
               child: Image.file(
                 File(_fotoPath!),
                 fit: BoxFit.cover,
@@ -507,12 +508,16 @@ class _TemuanPageState extends State<TemuanPage> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const AlertDialog(
+      builder: (context) => AlertDialog(
+        backgroundColor: ThemeConstants.backgroundWhite,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(ThemeConstants.radiusL),
+        ),
         content: Row(
           children: [
-            CircularProgressIndicator(),
-            SizedBox(width: 20),
-            Text('Mengambil lokasi GPS...'),
+            const CircularProgressIndicator(color: ThemeConstants.primaryBlue),
+            const SizedBox(width: ThemeConstants.spacingL),
+            const Text('Mengambil lokasi GPS...', style: ThemeConstants.bodyMedium),
           ],
         ),
       ),
@@ -534,9 +539,13 @@ class _TemuanPageState extends State<TemuanPage> {
         
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Lokasi GPS berhasil diambil'),
-              backgroundColor: Colors.green,
+            SnackBar(
+              content: const Text('Lokasi GPS berhasil diambil'),
+              backgroundColor: ThemeConstants.successGreen,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
+              ),
             ),
           );
         }
@@ -545,7 +554,11 @@ class _TemuanPageState extends State<TemuanPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(result['error']),
-              backgroundColor: Colors.red,
+              backgroundColor: ThemeConstants.errorRed,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
+              ),
             ),
           );
         }
@@ -560,7 +573,11 @@ class _TemuanPageState extends State<TemuanPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error: $e'),
-            backgroundColor: Colors.red,
+            backgroundColor: ThemeConstants.errorRed,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
+            ),
           ),
         );
       }
@@ -586,9 +603,13 @@ class _TemuanPageState extends State<TemuanPage> {
         
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Data temuan berhasil disimpan'),
-              backgroundColor: Colors.green,
+            SnackBar(
+              content: const Text('Data temuan berhasil disimpan'),
+              backgroundColor: ThemeConstants.successGreen,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
+              ),
             ),
           );
           
@@ -600,7 +621,11 @@ class _TemuanPageState extends State<TemuanPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Error: $e'),
-              backgroundColor: Colors.red,
+              backgroundColor: ThemeConstants.errorRed,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
+              ),
             ),
           );
         }
@@ -635,9 +660,13 @@ class _TemuanPageState extends State<TemuanPage> {
         
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('PDF berhasil diekspor'),
-              backgroundColor: Colors.green,
+            SnackBar(
+              content: const Text('PDF berhasil diekspor'),
+              backgroundColor: ThemeConstants.successGreen,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
+              ),
             ),
           );
         }
@@ -646,7 +675,11 @@ class _TemuanPageState extends State<TemuanPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Error: $e'),
-              backgroundColor: Colors.red,
+              backgroundColor: ThemeConstants.errorRed,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
+              ),
             ),
           );
         }

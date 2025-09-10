@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'temuan_page.dart';
 import 'perbaikan_page.dart';
+import 'history_page.dart';
+import '../constants/theme_constants.dart';
 
 class MainMenuPage extends StatelessWidget {
   const MainMenuPage({super.key});
@@ -9,129 +11,44 @@ class MainMenuPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Jasa Marga Mobile Offline',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
+      backgroundColor: ThemeConstants.backgroundWhite,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(80),
+        child: AppBar(
+          title: const Text(
+            'Jasa Marga Mobile',
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: ThemeConstants.backgroundWhite,
+              fontSize: 20,
+            ),
           ),
+          backgroundColor: ThemeConstants.primaryBlue,
+          centerTitle: true,
+          elevation: 0,
+          systemOverlayStyle: SystemUiOverlayStyle.light,
         ),
-        backgroundColor: Colors.blue[800],
-        centerTitle: true,
-        elevation: 0,
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Colors.blue[800]!,
-              Colors.blue[600]!,
-              Colors.blue[400]!,
-            ],
-          ),
-        ),
-        child: SafeArea(
+      body: SafeArea(
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
           child: Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: const EdgeInsets.symmetric(horizontal: ThemeConstants.spacingL, vertical: ThemeConstants.spacingM),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Logo atau Header
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.3),
-                      width: 1,
-                    ),
-                  ),
-                  child: Column(
-                    children: [
-                      Icon(
-                        Icons.construction,
-                        size: 60,
-                        color: Colors.white,
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        'Monitoring Jalan Tol MBZ',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        'Aplikasi Offline',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.white.withValues(alpha: 0.8),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                // Header Section
+                _buildHeaderSection(),
                 
-                const SizedBox(height: 40),
+                const SizedBox(height: ThemeConstants.spacingXL),
                 
-                // Menu Options
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _buildMenuButton(
-                        context,
-                        icon: Icons.search,
-                        title: 'Temuan',
-                        subtitle: 'Pencatatan temuan atau anomali',
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const TemuanPage(),
-                            ),
-                          );
-                        },
-                      ),
-                      
-                      const SizedBox(height: 20),
-                      
-                      _buildMenuButton(
-                        context,
-                        icon: Icons.build,
-                        title: 'Perbaikan',
-                        subtitle: 'Pencatatan perbaikan yang telah dilakukan',
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const PerbaikanPage(),
-                            ),
-                          );
-                        },
-                      ),
-                      
-                      const SizedBox(height: 20),
-                      
-                      _buildMenuButton(
-                        context,
-                        icon: Icons.exit_to_app,
-                        title: 'Keluar',
-                        subtitle: 'Menutup aplikasi',
-                        onTap: () {
-                          _showExitDialog(context);
-                        },
-                      ),
-                    ],
-                  ),
-                ),
+                // Menu Cards
+                _buildMenuCards(context),
+                
+                const SizedBox(height: ThemeConstants.spacingL),
+                
+                // Footer
+                _buildFooter(),
               ],
             ),
           ),
@@ -140,71 +57,219 @@ class MainMenuPage extends StatelessWidget {
     );
   }
 
-  Widget _buildMenuButton(
+  Widget _buildHeaderSection() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(ThemeConstants.spacingL),
+      decoration: ThemeConstants.surfaceDecoration,
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(ThemeConstants.spacingM),
+            decoration: BoxDecoration(
+              color: ThemeConstants.primaryBlue,
+              borderRadius: BorderRadius.circular(ThemeConstants.radiusL),
+            ),
+            child: const Icon(
+              Icons.engineering_outlined,
+              size: 32,
+              color: ThemeConstants.backgroundWhite,
+            ),
+          ),
+          const SizedBox(height: ThemeConstants.spacingM),
+          const Text(
+            'Monitoring Jalan Tol MBZ',
+            style: ThemeConstants.heading2,
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: ThemeConstants.spacingXS),
+          Text(
+            'Aplikasi Offline untuk Pencatatan',
+            style: TextStyle(
+              fontSize: 14,
+              color: ThemeConstants.primaryBlue.withOpacity(0.7),
+              fontWeight: FontWeight.w400,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMenuCards(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Menu Utama',
+          style: ThemeConstants.heading3,
+        ),
+        const SizedBox(height: ThemeConstants.spacingM),
+        
+        _buildMenuCard(
+          context,
+          icon: Icons.search_outlined,
+          title: 'Temuan',
+          subtitle: 'Pencatatan temuan atau anomali',
+          color: ThemeConstants.primaryBlue,
+          onTap: () => _navigateWithAnimation(context, const TemuanPage()),
+        ),
+        
+        const SizedBox(height: ThemeConstants.spacingM),
+        
+        _buildMenuCard(
+          context,
+          icon: Icons.build_outlined,
+          title: 'Perbaikan',
+          subtitle: 'Pencatatan perbaikan yang telah dilakukan',
+          color: ThemeConstants.secondaryGreen,
+          onTap: () => _navigateWithAnimation(context, const PerbaikanPage()),
+        ),
+        
+        const SizedBox(height: ThemeConstants.spacingM),
+        
+        _buildMenuCard(
+          context,
+          icon: Icons.history_outlined,
+          title: 'History',
+          subtitle: 'Lihat riwayat data temuan dan perbaikan',
+          color: ThemeConstants.accentYellow,
+          onTap: () => _navigateWithAnimation(context, const HistoryPage()),
+        ),
+        
+        const SizedBox(height: ThemeConstants.spacingM),
+        
+        _buildMenuCard(
+          context,
+          icon: Icons.exit_to_app_outlined,
+          title: 'Keluar',
+          subtitle: 'Menutup aplikasi',
+          color: ThemeConstants.errorRed,
+          onTap: () => _showExitDialog(context),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMenuCard(
     BuildContext context, {
     required IconData icon,
     required String title,
     required String subtitle,
+    required Color color,
     required VoidCallback onTap,
   }) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: onTap,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.blue[800],
-          padding: const EdgeInsets.all(20),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(ThemeConstants.radiusL),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(ThemeConstants.spacingM),
+          decoration: BoxDecoration(
+            color: ThemeConstants.backgroundWhite,
+            borderRadius: BorderRadius.circular(ThemeConstants.radiusL),
+            border: Border.all(color: color.withOpacity(0.2)),
+            boxShadow: [
+              BoxShadow(
+                color: color.withOpacity(0.08),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
-          elevation: 5,
-          shadowColor: Colors.black.withValues(alpha: 0.3),
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.blue[800],
-                borderRadius: BorderRadius.circular(10),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(ThemeConstants.spacingM),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
+                ),
+                child: Icon(
+                  icon,
+                  color: color,
+                  size: 24,
+                ),
               ),
-              child: Icon(
-                icon,
-                color: Colors.white,
-                size: 30,
-              ),
-            ),
-            const SizedBox(width: 20),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+              const SizedBox(width: ThemeConstants.spacingM),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: color,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 5),
-                  Text(
-                    subtitle,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
+                    const SizedBox(height: ThemeConstants.spacingXS),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: ThemeConstants.primaryBlue.withOpacity(0.6),
+                        fontWeight: FontWeight.w400,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            Icon(
-              Icons.arrow_forward_ios,
-              color: Colors.blue[800],
-              size: 20,
-            ),
-          ],
+              Icon(
+                Icons.arrow_forward_ios_rounded,
+                color: color.withOpacity(0.6),
+                size: 16,
+              ),
+            ],
+          ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildFooter() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(ThemeConstants.spacingM),
+      decoration: BoxDecoration(
+        color: ThemeConstants.primaryBlue.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
+      ),
+      child: Text(
+        '© 2024 Jasa Marga - Monitoring Jalan Tol',
+        style: TextStyle(
+          fontSize: 12,
+          color: ThemeConstants.primaryBlue.withOpacity(0.6),
+          fontWeight: FontWeight.w400,
+        ),
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
+  void _navigateWithAnimation(BuildContext context, Widget page) {
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) => page,
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          const begin = Offset(1.0, 0.0);
+          const end = Offset.zero;
+          const curve = Curves.easeInOutCubic;
+
+          var tween = Tween(begin: begin, end: end).chain(
+            CurveTween(curve: curve),
+          );
+
+          return SlideTransition(
+            position: animation.drive(tween),
+            child: child,
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 300),
       ),
     );
   }
@@ -212,22 +277,48 @@ class MainMenuPage extends StatelessWidget {
   void _showExitDialog(BuildContext context) {
     showDialog(
       context: context,
+      barrierColor: Colors.black.withOpacity(0.5),
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Konfirmasi Keluar'),
-          content: const Text('Apakah Anda yakin ingin keluar dari aplikasi?'),
+          backgroundColor: ThemeConstants.backgroundWhite,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(ThemeConstants.radiusL),
+          ),
+          title: const Text(
+            'Konfirmasi Keluar',
+            style: ThemeConstants.heading3,
+          ),
+          content: Text(
+            'Apakah Anda yakin ingin keluar dari aplikasi?',
+            style: TextStyle(
+              color: ThemeConstants.primaryBlue.withOpacity(0.8),
+            ),
+          ),
           actions: [
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Batal'),
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(
+                'Batal',
+                style: TextStyle(
+                  color: ThemeConstants.primaryBlue.withOpacity(0.6),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
             ),
-            TextButton(
-              onPressed: () {
-                SystemNavigator.pop();
-              },
-              child: const Text('Keluar'),
+            ElevatedButton(
+              onPressed: () => SystemNavigator.pop(),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: ThemeConstants.errorRed,
+                foregroundColor: ThemeConstants.backgroundWhite,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: ThemeConstants.spacingL, vertical: ThemeConstants.spacingM),
+              ),
+              child: const Text(
+                'Keluar',
+                style: TextStyle(fontWeight: FontWeight.w500),
+              ),
             ),
           ],
         );
