@@ -3,11 +3,14 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import '../models/temuan.dart';
 import '../models/perbaikan.dart';
+import '../models/pdf_config.dart' as pdf_config;
 import '../database/database_helper.dart';
 import '../utils/error_handler.dart';
 import '../widgets/export_dialog.dart';
+import '../widgets/pdf_config_dialog.dart';
+import '../services/pdf_service.dart';
 import '../constants/theme_constants.dart';
-import 'detail_history_page.dart';
+import 'date_history_page.dart';
 
 class HistoryPage extends StatefulWidget {
   const HistoryPage({super.key});
@@ -69,6 +72,31 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
         _isLoading = false;
       });
     }
+  }
+
+  // Group data by date
+  Map<String, List<Temuan>> _groupTemuanByDate(List<Temuan> temuanList) {
+    Map<String, List<Temuan>> grouped = {};
+    for (var temuan in temuanList) {
+      String dateKey = DateFormat('yyyy-MM-dd').format(temuan.tanggal);
+      if (!grouped.containsKey(dateKey)) {
+        grouped[dateKey] = [];
+      }
+      grouped[dateKey]!.add(temuan);
+    }
+    return grouped;
+  }
+
+  Map<String, List<Perbaikan>> _groupPerbaikanByDate(List<Perbaikan> perbaikanList) {
+    Map<String, List<Perbaikan>> grouped = {};
+    for (var perbaikan in perbaikanList) {
+      String dateKey = DateFormat('yyyy-MM-dd').format(perbaikan.tanggal);
+      if (!grouped.containsKey(dateKey)) {
+        grouped[dateKey] = [];
+      }
+      grouped[dateKey]!.add(perbaikan);
+    }
+    return grouped;
   }
 
   void _applyFilters() {
@@ -183,19 +211,39 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(120),
         child: AppBar(
-          title: const Text(
-            'History Data',
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-              color: ThemeConstants.backgroundWhite,
-              fontSize: 20,
-            ),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(
+                'lib/assets/logoJJCWhite.png',
+                height: 24,
+                width: 24,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) {
+                  return const SizedBox.shrink();
+                },
+              ),
+              const SizedBox(width: 8),
+              const Text(
+                'History Data',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: ThemeConstants.backgroundWhite,
+                  fontSize: 20,
+                ),
+              ),
+            ],
           ),
           backgroundColor: ThemeConstants.primaryBlue,
           centerTitle: true,
           elevation: 0,
           systemOverlayStyle: SystemUiOverlayStyle.light,
           actions: [
+            IconButton(
+              icon: const Icon(Icons.picture_as_pdf, color: ThemeConstants.backgroundWhite),
+              onPressed: _exportToPdf,
+              tooltip: 'Export PDF',
+            ),
             IconButton(
               icon: const Icon(Icons.file_download, color: ThemeConstants.backgroundWhite),
               onPressed: _showExportDialog,
@@ -320,12 +368,19 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
       );
     }
 
+    // Group temuan by date
+    final groupedTemuan = _groupTemuanByDate(_filteredTemuanList);
+    final sortedDates = groupedTemuan.keys.toList()..sort((a, b) => b.compareTo(a)); // Sort descending
+
     return ListView.builder(
       padding: const EdgeInsets.all(ThemeConstants.spacingM),
-      itemCount: _filteredTemuanList.length,
+      itemCount: sortedDates.length,
       itemBuilder: (context, index) {
-        final temuan = _filteredTemuanList[index];
-        return _buildTemuanCard(temuan);
+        final dateKey = sortedDates[index];
+        final temuanList = groupedTemuan[dateKey]!;
+        final date = DateTime.parse(dateKey);
+        
+        return _buildDateCard(date, temuanList.length, 'temuan');
       },
     );
   }
@@ -360,163 +415,124 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
       );
     }
 
+    // Group perbaikan by date
+    final groupedPerbaikan = _groupPerbaikanByDate(_filteredPerbaikanList);
+    final sortedDates = groupedPerbaikan.keys.toList()..sort((a, b) => b.compareTo(a)); // Sort descending
+
     return ListView.builder(
       padding: const EdgeInsets.all(ThemeConstants.spacingM),
-      itemCount: _filteredPerbaikanList.length,
+      itemCount: sortedDates.length,
       itemBuilder: (context, index) {
-        final perbaikan = _filteredPerbaikanList[index];
-        return _buildPerbaikanCard(perbaikan);
+        final dateKey = sortedDates[index];
+        final perbaikanList = groupedPerbaikan[dateKey]!;
+        final date = DateTime.parse(dateKey);
+        
+        return _buildDateCard(date, perbaikanList.length, 'perbaikan');
       },
     );
   }
 
-  Widget _buildTemuanCard(Temuan temuan) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: ThemeConstants.spacingM),
-      decoration: ThemeConstants.cardDecoration,
-      child: ListTile(
-        contentPadding: const EdgeInsets.all(ThemeConstants.spacingM),
-        leading: Container(
-          padding: const EdgeInsets.all(ThemeConstants.spacingM),
-          decoration: BoxDecoration(
-            color: ThemeConstants.primaryBlue.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
-          ),
-          child: const Icon(
-            Icons.search_outlined,
-            color: ThemeConstants.primaryBlue,
-            size: 24,
-          ),
-        ),
-        title: Text(
-          temuan.jenisTemuan,
-          style: ThemeConstants.bodyLarge,
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: ThemeConstants.spacingXS),
-            Text(
-              '${temuan.jalur} - ${temuan.lajur}',
-              style: ThemeConstants.bodyMedium.copyWith(color: ThemeConstants.textSecondary),
-            ),
-            Text(
-              'KM ${temuan.kilometer}',
-              style: ThemeConstants.bodySmall,
-            ),
-            Text(
-              DateFormat('dd MMM yyyy').format(temuan.tanggal),
-              style: ThemeConstants.caption,
-            ),
-          ],
-        ),
-        trailing: const Icon(
-          Icons.arrow_forward_ios,
-          color: ThemeConstants.primaryBlue,
-          size: 16,
-        ),
-        onTap: () => _navigateToDetail('temuan', temuan.id!),
-      ),
-    );
-  }
+  Widget _buildDateCard(DateTime date, int count, String type) {
+    final dateFormat = DateFormat('EEEE, dd MMMM yyyy', 'id_ID');
+    final isToday = DateFormat('yyyy-MM-dd').format(date) == DateFormat('yyyy-MM-dd').format(DateTime.now());
+    final isYesterday = DateFormat('yyyy-MM-dd').format(date) == DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(const Duration(days: 1)));
+    
+    String dateText;
+    if (isToday) {
+      dateText = 'Hari Ini';
+    } else if (isYesterday) {
+      dateText = 'Kemarin';
+    } else {
+      dateText = dateFormat.format(date);
+    }
 
-  Widget _buildPerbaikanCard(Perbaikan perbaikan) {
     return Container(
       margin: const EdgeInsets.only(bottom: ThemeConstants.spacingM),
       decoration: ThemeConstants.cardDecoration,
-      child: ListTile(
-        contentPadding: const EdgeInsets.all(ThemeConstants.spacingM),
-        leading: Container(
-          padding: const EdgeInsets.all(ThemeConstants.spacingM),
-          decoration: BoxDecoration(
-            color: ThemeConstants.secondaryGreen.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
-          ),
-          child: const Icon(
-            Icons.build_outlined,
-            color: ThemeConstants.secondaryGreen,
-            size: 24,
-          ),
-        ),
-        title: Text(
-          perbaikan.jenisPerbaikan,
-          style: ThemeConstants.bodyLarge,
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: ThemeConstants.spacingXS),
-            Text(
-              '${perbaikan.jalur} - ${perbaikan.lajur}',
-              style: ThemeConstants.bodyMedium.copyWith(color: ThemeConstants.textSecondary),
-            ),
-            Text(
-              'KM ${perbaikan.kilometer}',
-              style: ThemeConstants.bodySmall,
-            ),
-            Row(
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => DateHistoryPage(
+                  selectedDate: date,
+                  type: type,
+                ),
+              ),
+            );
+          },
+          borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
+          child: Container(
+            padding: const EdgeInsets.all(ThemeConstants.spacingM),
+            child: Row(
               children: [
-                Text(
-                  'Status: ',
-                  style: ThemeConstants.bodySmall,
+                Container(
+                  padding: const EdgeInsets.all(ThemeConstants.spacingM),
+                  decoration: BoxDecoration(
+                    color: type == 'temuan' 
+                        ? ThemeConstants.primaryBlue.withOpacity(0.1)
+                        : ThemeConstants.secondaryGreen.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
+                  ),
+                  child: Icon(
+                    type == 'temuan' ? Icons.search_outlined : Icons.build_outlined,
+                    color: type == 'temuan' ? ThemeConstants.primaryBlue : ThemeConstants.secondaryGreen,
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(width: ThemeConstants.spacingM),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        dateText,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: type == 'temuan' ? ThemeConstants.primaryBlue : ThemeConstants.secondaryGreen,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '$count ${type == 'temuan' ? 'temuan' : 'perbaikan'} ditemukan',
+                        style: ThemeConstants.bodyMedium.copyWith(color: ThemeConstants.textSecondary),
+                      ),
+                    ],
+                  ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: ThemeConstants.spacingS, vertical: ThemeConstants.spacingXS),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: _getStatusColor(perbaikan.statusPerbaikan).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(ThemeConstants.radiusS),
+                    color: type == 'temuan' ? ThemeConstants.primaryBlue : ThemeConstants.secondaryGreen,
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    perbaikan.statusPerbaikan,
-                    style: ThemeConstants.caption.copyWith(
-                      color: _getStatusColor(perbaikan.statusPerbaikan),
+                    '$count',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
+                const SizedBox(width: ThemeConstants.spacingS),
+                Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  size: 16,
+                  color: ThemeConstants.textSecondary,
+                ),
               ],
             ),
-            Text(
-              DateFormat('dd MMM yyyy').format(perbaikan.tanggal),
-              style: ThemeConstants.caption,
-            ),
-          ],
+          ),
         ),
-        trailing: const Icon(
-          Icons.arrow_forward_ios,
-          color: ThemeConstants.secondaryGreen,
-          size: 16,
-        ),
-        onTap: () => _navigateToDetail('perbaikan', perbaikan.id!),
       ),
     );
   }
 
-  Color _getStatusColor(String status) {
-    switch (status) {
-      case '25%':
-        return ThemeConstants.warningOrange;
-      case '50%':
-        return ThemeConstants.accentYellow;
-      case '75%':
-        return Colors.orange;
-      case '100%':
-        return ThemeConstants.successGreen;
-      default:
-        return ThemeConstants.textSecondary;
-    }
-  }
 
-  void _navigateToDetail(String type, int id) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => DetailHistoryPage(type: type, id: id),
-      ),
-    ).then((_) {
-      _loadData(); // Refresh data when returning from detail page
-    });
-  }
 
   void _showExportDialog() {
     showDialog(
@@ -524,6 +540,118 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
       builder: (context) => ExportDialog(
         temuanList: _filteredTemuanList,
         perbaikanList: _filteredPerbaikanList,
+      ),
+    );
+  }
+
+  Future<void> _exportToPdf() async {
+    final config = await showDialog<pdf_config.PdfConfig>(
+      context: context,
+      builder: (context) => const PdfConfigDialog(),
+    );
+
+    if (config != null) {
+      try {
+        // Buat informasi tanggal dan filter
+        final dateRange = _getDateRangeInfo();
+        final filterInfo = _getFilterInfo();
+        
+        // Export data sesuai dengan tab yang sedang aktif
+        if (_tabController.index == 0) {
+          // Tab Temuan
+          if (_filteredTemuanList.isNotEmpty) {
+            await PdfService().generateTemuanPdf(_filteredTemuanList, config, dateRange: dateRange, filterInfo: filterInfo);
+          } else {
+            _showNoDataMessage('Tidak ada data temuan untuk diekspor');
+            return;
+          }
+        } else {
+          // Tab Perbaikan
+          if (_filteredPerbaikanList.isNotEmpty) {
+            await PdfService().generatePerbaikanPdf(_filteredPerbaikanList, config, dateRange: dateRange, filterInfo: filterInfo);
+          } else {
+            _showNoDataMessage('Tidak ada data perbaikan untuk diekspor');
+            return;
+          }
+        }
+        
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('PDF berhasil diekspor'),
+              backgroundColor: ThemeConstants.successGreen,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(ThemeConstants.radiusM)),
+              ),
+            ),
+          );
+        }
+      } catch (e) {
+        ErrorHandler.handleError(context, e, customMessage: 'Gagal membuat PDF');
+      }
+    }
+  }
+
+  String? _getDateRangeInfo() {
+    if (_tabController.index == 0) {
+      // Tab Temuan
+      if (_filteredTemuanList.isEmpty) return null;
+      final dates = _filteredTemuanList.map((item) => item.tanggal).toList();
+      dates.sort();
+      
+      final startDate = DateFormat('dd/MM/yyyy').format(dates.first);
+      final endDate = DateFormat('dd/MM/yyyy').format(dates.last);
+      
+      if (startDate == endDate) {
+        return startDate;
+      } else {
+        return '$startDate - $endDate';
+      }
+    } else {
+      // Tab Perbaikan
+      if (_filteredPerbaikanList.isEmpty) return null;
+      final dates = _filteredPerbaikanList.map((item) => item.tanggal).toList();
+      dates.sort();
+      
+      final startDate = DateFormat('dd/MM/yyyy').format(dates.first);
+      final endDate = DateFormat('dd/MM/yyyy').format(dates.last);
+      
+      if (startDate == endDate) {
+        return startDate;
+      } else {
+        return '$startDate - $endDate';
+      }
+    }
+  }
+
+  String? _getFilterInfo() {
+    final List<String> filters = [];
+    
+    if (_searchQuery.isNotEmpty) {
+      filters.add('Pencarian: "$_searchQuery"');
+    }
+    
+    if (_sortBy != 'tanggal') {
+      filters.add('Urutkan: $_sortBy');
+    }
+    
+    if (!_sortAscending) {
+      filters.add('Urutan: Menurun');
+    }
+    
+    return filters.isNotEmpty ? filters.join(', ') : null;
+  }
+
+  void _showNoDataMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: ThemeConstants.warningOrange,
+        behavior: SnackBarBehavior.floating,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(ThemeConstants.radiusM)),
+        ),
       ),
     );
   }

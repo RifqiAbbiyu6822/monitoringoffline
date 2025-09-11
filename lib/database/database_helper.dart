@@ -3,6 +3,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import '../models/temuan.dart';
 import '../models/perbaikan.dart';
+import '../models/perbaikan_progress.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper _instance = DatabaseHelper._internal();
@@ -21,7 +22,7 @@ class DatabaseHelper {
     String path = join(await getDatabasesPath(), 'monitoring_offline.db');
     return await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -62,12 +63,29 @@ class DatabaseHelper {
         )
       ''');
 
+      // Tabel Perbaikan Progress
+      await db.execute('''
+        CREATE TABLE perbaikan_progress(
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          perbaikan_id INTEGER NOT NULL,
+          tanggal INTEGER NOT NULL,
+          status_progress TEXT NOT NULL,
+          deskripsi_progress TEXT NOT NULL,
+          foto_path TEXT,
+          latitude TEXT NOT NULL,
+          longitude TEXT NOT NULL,
+          FOREIGN KEY (perbaikan_id) REFERENCES perbaikan (id) ON DELETE CASCADE
+        )
+      ''');
+
       // Tambahkan index untuk performa query yang lebih baik
       await db.execute('CREATE INDEX idx_temuan_tanggal ON temuan(tanggal)');
       await db.execute('CREATE INDEX idx_temuan_jalur ON temuan(jalur)');
       await db.execute('CREATE INDEX idx_perbaikan_tanggal ON perbaikan(tanggal)');
       await db.execute('CREATE INDEX idx_perbaikan_jalur ON perbaikan(jalur)');
       await db.execute('CREATE INDEX idx_perbaikan_status ON perbaikan(status_perbaikan)');
+      await db.execute('CREATE INDEX idx_perbaikan_progress_perbaikan_id ON perbaikan_progress(perbaikan_id)');
+      await db.execute('CREATE INDEX idx_perbaikan_progress_tanggal ON perbaikan_progress(tanggal)');
     } catch (e) {
       throw Exception('Gagal membuat database: $e');
     }
@@ -92,6 +110,27 @@ class DatabaseHelper {
         await db.execute('CREATE INDEX idx_perbaikan_tanggal ON perbaikan(tanggal)');
         await db.execute('CREATE INDEX idx_perbaikan_jalur ON perbaikan(jalur)');
         await db.execute('CREATE INDEX idx_perbaikan_status ON perbaikan(status_perbaikan)');
+      }
+      
+      if (oldVersion < 3) {
+        // Tambahkan tabel perbaikan_progress
+        await db.execute('''
+          CREATE TABLE perbaikan_progress(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            perbaikan_id INTEGER NOT NULL,
+            tanggal INTEGER NOT NULL,
+            status_progress TEXT NOT NULL,
+            deskripsi_progress TEXT NOT NULL,
+            foto_path TEXT,
+            latitude TEXT NOT NULL,
+            longitude TEXT NOT NULL,
+            FOREIGN KEY (perbaikan_id) REFERENCES perbaikan (id) ON DELETE CASCADE
+          )
+        ''');
+        
+        // Tambahkan index untuk tabel perbaikan_progress
+        await db.execute('CREATE INDEX idx_perbaikan_progress_perbaikan_id ON perbaikan_progress(perbaikan_id)');
+        await db.execute('CREATE INDEX idx_perbaikan_progress_tanggal ON perbaikan_progress(tanggal)');
       }
     } catch (e) {
       throw Exception('Gagal mengupgrade database: $e');
@@ -452,6 +491,75 @@ class DatabaseHelper {
       return List.generate(maps.length, (i) => Perbaikan.fromMap(maps[i]));
     } catch (e) {
       throw Exception('Gagal mengambil data perbaikan berdasarkan range tanggal: $e');
+    }
+  }
+
+  // CRUD Operations untuk Perbaikan Progress
+  Future<int> insertPerbaikanProgress(PerbaikanProgress progress) async {
+    try {
+      final db = await database;
+      return await db.insert('perbaikan_progress', progress.toMap());
+    } catch (e) {
+      throw Exception('Gagal menyimpan progress perbaikan: $e');
+    }
+  }
+
+  Future<List<PerbaikanProgress>> getPerbaikanProgressByPerbaikanId(int perbaikanId) async {
+    try {
+      final db = await database;
+      final List<Map<String, dynamic>> maps = await db.query(
+        'perbaikan_progress',
+        where: 'perbaikan_id = ?',
+        whereArgs: [perbaikanId],
+        orderBy: 'tanggal ASC',
+      );
+      return List.generate(maps.length, (i) => PerbaikanProgress.fromMap(maps[i]));
+    } catch (e) {
+      throw Exception('Gagal mengambil progress perbaikan: $e');
+    }
+  }
+
+  Future<PerbaikanProgress?> getPerbaikanProgressById(int id) async {
+    try {
+      final db = await database;
+      final List<Map<String, dynamic>> maps = await db.query(
+        'perbaikan_progress',
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+      if (maps.isNotEmpty) {
+        return PerbaikanProgress.fromMap(maps.first);
+      }
+      return null;
+    } catch (e) {
+      throw Exception('Gagal mengambil progress perbaikan: $e');
+    }
+  }
+
+  Future<int> updatePerbaikanProgress(PerbaikanProgress progress) async {
+    try {
+      final db = await database;
+      return await db.update(
+        'perbaikan_progress',
+        progress.toMap(),
+        where: 'id = ?',
+        whereArgs: [progress.id],
+      );
+    } catch (e) {
+      throw Exception('Gagal memperbarui progress perbaikan: $e');
+    }
+  }
+
+  Future<int> deletePerbaikanProgress(int id) async {
+    try {
+      final db = await database;
+      return await db.delete(
+        'perbaikan_progress',
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+    } catch (e) {
+      throw Exception('Gagal menghapus progress perbaikan: $e');
     }
   }
 

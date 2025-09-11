@@ -2,42 +2,56 @@ import 'dart:io';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:intl/intl.dart';
 import '../models/temuan.dart';
 import '../models/perbaikan.dart';
 import '../models/pdf_config.dart' as pdf_config;
 
 class PdfService {
-  static const String _appTitle = 'LAPORAN JALAN TOL MBZ';
   static const String _dateFormat = 'dd MMMM yyyy';
   static const String _fileNameFormat = 'yyyyMMdd';
 
-  Future<void> generateTemuanPdf(List<Temuan> temuanList, pdf_config.PdfConfig config) async {
-    final pdf = pw.Document();
-    
-    if (temuanList.isNotEmpty) {
-      await _addPhotoGridPages(pdf, temuanList, config, 'TEMUAN');
-    } else {
-      _addEmptyPage(pdf, config, 'TEMUAN', 'Tidak ada data temuan untuk tanggal ini');
-    }
+  Future<void> generateTemuanPdf(List<Temuan> temuanList, pdf_config.PdfConfig config, {String? dateRange, String? filterInfo}) async {
+    try {
+      final pdf = pw.Document();
+      
+      if (temuanList.isNotEmpty) {
+        await _addPhotoGridPages(pdf, temuanList, config, 'TEMUAN', dateRange: dateRange, filterInfo: filterInfo);
+      } else {
+        _addEmptyPage(pdf, config, 'TEMUAN', 'Tidak ada data temuan untuk diekspor', dateRange: dateRange, filterInfo: filterInfo);
+      }
 
-    await _saveAndOpenPdf(pdf, 'temuan_${DateFormat(_fileNameFormat).format(DateTime.now())}.pdf');
+      final fileName = dateRange != null 
+          ? 'temuan_${dateRange}_${DateFormat(_fileNameFormat).format(DateTime.now())}.pdf'
+          : 'temuan_${DateFormat(_fileNameFormat).format(DateTime.now())}.pdf';
+      
+      await _saveAndOpenPdf(pdf, fileName);
+    } catch (e) {
+      throw Exception('Gagal membuat PDF temuan: ${e.toString()}');
+    }
   }
 
-  Future<void> generatePerbaikanPdf(List<Perbaikan> perbaikanList, pdf_config.PdfConfig config) async {
-    final pdf = pw.Document();
-    
-    if (perbaikanList.isNotEmpty) {
-      await _addPhotoGridPages(pdf, perbaikanList, config, 'PERBAIKAN');
-    } else {
-      _addEmptyPage(pdf, config, 'PERBAIKAN', 'Tidak ada data perbaikan untuk tanggal ini');
-    }
+  Future<void> generatePerbaikanPdf(List<Perbaikan> perbaikanList, pdf_config.PdfConfig config, {String? dateRange, String? filterInfo}) async {
+    try {
+      final pdf = pw.Document();
+      
+      if (perbaikanList.isNotEmpty) {
+        await _addPhotoGridPages(pdf, perbaikanList, config, 'PERBAIKAN', dateRange: dateRange, filterInfo: filterInfo);
+      } else {
+        _addEmptyPage(pdf, config, 'PERBAIKAN', 'Tidak ada data perbaikan untuk diekspor', dateRange: dateRange, filterInfo: filterInfo);
+      }
 
-    await _saveAndOpenPdf(pdf, 'perbaikan_${DateFormat(_fileNameFormat).format(DateTime.now())}.pdf');
+      final fileName = dateRange != null 
+          ? 'perbaikan_${dateRange}_${DateFormat(_fileNameFormat).format(DateTime.now())}.pdf'
+          : 'perbaikan_${DateFormat(_fileNameFormat).format(DateTime.now())}.pdf';
+      
+      await _saveAndOpenPdf(pdf, fileName);
+    } catch (e) {
+      throw Exception('Gagal membuat PDF perbaikan: ${e.toString()}');
+    }
   }
 
-  void _addEmptyPage(pw.Document pdf, pdf_config.PdfConfig config, String type, String message) {
+  void _addEmptyPage(pw.Document pdf, pdf_config.PdfConfig config, String type, String message, {String? dateRange, String? filterInfo}) {
     pdf.addPage(
       pw.Page(
         pageFormat: _getPageFormat(config),
@@ -45,9 +59,7 @@ class PdfService {
           return pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
-              _buildHeader(type),
-              pw.SizedBox(height: 20),
-              _buildDateInfo(),
+              _buildHeader(type, dateRange: dateRange, filterInfo: filterInfo),
               pw.SizedBox(height: 20),
               pw.Expanded(
                 child: pw.Center(
@@ -70,80 +82,166 @@ class PdfService {
         : PdfPageFormat.a4.landscape;
   }
 
-  pw.Widget _buildHeader(String type) {
-    return pw.Header(
-      level: 0,
-      child: pw.Text(
-        '$_appTitle $type',
-        style: pw.TextStyle(
-          fontSize: 18,
-          fontWeight: pw.FontWeight.bold,
+  pw.Widget _buildHeader(String type, {String? dateRange, String? filterInfo}) {
+    return pw.Container(
+      width: double.infinity,
+      padding: const pw.EdgeInsets.all(20),
+      decoration: pw.BoxDecoration(
+        color: PdfColors.blue50,
+        border: pw.Border(
+          bottom: pw.BorderSide(color: PdfColors.blue200, width: 2),
         ),
-        textAlign: pw.TextAlign.center,
+      ),
+      child: pw.Column(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          // Baris 1: Logo (placeholder untuk logo JJC)
+          pw.Row(
+            children: [
+              pw.Container(
+                width: 60,
+                height: 60,
+                decoration: pw.BoxDecoration(
+                  color: PdfColors.blue600,
+                  borderRadius: pw.BorderRadius.circular(8),
+                ),
+                child: pw.Center(
+                  child: pw.Text(
+                    'JJC',
+                    style: pw.TextStyle(
+                      color: PdfColors.white,
+                      fontSize: 16,
+                      fontWeight: pw.FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+              pw.SizedBox(width: 15),
+              pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  pw.Text(
+                    'JASAMARGA',
+                    style: pw.TextStyle(
+                      fontSize: 20,
+                      fontWeight: pw.FontWeight.bold,
+                      color: PdfColors.blue800,
+                    ),
+                  ),
+                  pw.Text(
+                    'JALAN LAYANG CIKAMPEK',
+                    style: pw.TextStyle(
+                      fontSize: 12,
+                      color: PdfColors.blue600,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          pw.SizedBox(height: 15),
+          
+          // Baris 2: Judul Laporan
+          pw.Text(
+            type == 'TEMUAN' ? 'LAPORAN TEMUAN JALAN LAYANG MBZ' : 'LAPORAN PERBAIKAN JALAN LAYANG MBZ',
+            style: pw.TextStyle(
+              fontSize: 16,
+              fontWeight: pw.FontWeight.bold,
+              color: PdfColors.grey800,
+            ),
+          ),
+          pw.SizedBox(height: 10),
+          
+          // Baris 3: Tanggal dan Filter
+          pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Text(
+                'Tanggal Laporan: ${DateFormat(_dateFormat).format(DateTime.now())}',
+                style: const pw.TextStyle(fontSize: 11, color: PdfColors.grey700),
+              ),
+              if (dateRange != null) ...[
+                pw.SizedBox(height: 2),
+                pw.Text(
+                  'Periode Data: $dateRange',
+                  style: const pw.TextStyle(fontSize: 11, color: PdfColors.grey700),
+                ),
+              ],
+              if (filterInfo != null) ...[
+                pw.SizedBox(height: 2),
+                pw.Text(
+                  'Filter: $filterInfo',
+                  style: const pw.TextStyle(fontSize: 11, color: PdfColors.grey700),
+                ),
+              ],
+            ],
+          ),
+        ],
       ),
     );
   }
 
-  pw.Widget _buildDateInfo() {
-    return pw.Text(
-      'Tanggal: ${DateFormat(_dateFormat).format(DateTime.now())}',
-      style: const pw.TextStyle(fontSize: 12),
-    );
-  }
 
-  Future<void> _addPhotoGridPages(pw.Document pdf, List<dynamic> dataList, pdf_config.PdfConfig config, String type) async {
-    // Tentukan jumlah kolom berdasarkan grid type
-    int columnsPerRow;
-    switch (config.gridType) {
-      case pdf_config.GridType.fullA4:
-        columnsPerRow = 1;
-        break;
-      case pdf_config.GridType.twoColumns:
-        columnsPerRow = 2;
-        break;
-      case pdf_config.GridType.fourColumns:
-        columnsPerRow = 4;
-        break;
-    }
-
-    // Bagi data menjadi chunks untuk setiap halaman
-    final itemsPerPage = columnsPerRow * 2; // 2 baris per halaman
-    final pages = <List<dynamic>>[];
-    
-    for (int i = 0; i < dataList.length; i += itemsPerPage) {
-      final end = (i + itemsPerPage < dataList.length) ? i + itemsPerPage : dataList.length;
-      pages.add(dataList.sublist(i, end));
-    }
-
-    // Buat halaman untuk setiap chunk
-    for (int pageIndex = 0; pageIndex < pages.length; pageIndex++) {
-      final pageData = pages[pageIndex];
-      
-      // Pre-load semua gambar untuk halaman ini
-      final photoWidgets = <pw.Widget>[];
-      for (final item in pageData) {
-        photoWidgets.add(await _buildPhotoItem(item, type));
+  Future<void> _addPhotoGridPages(pw.Document pdf, List<dynamic> dataList, pdf_config.PdfConfig config, String type, {String? dateRange, String? filterInfo}) async {
+    try {
+      // Tentukan jumlah kolom berdasarkan grid type
+      int columnsPerRow;
+      switch (config.gridType) {
+        case pdf_config.GridType.fullA4:
+          columnsPerRow = 1;
+          break;
+        case pdf_config.GridType.twoColumns:
+          columnsPerRow = 2;
+          break;
+        case pdf_config.GridType.fourColumns:
+          columnsPerRow = 4;
+          break;
       }
+
+      // Bagi data menjadi chunks untuk setiap halaman
+      final itemsPerPage = columnsPerRow * 2; // 2 baris per halaman
+      final pages = <List<dynamic>>[];
       
-      pdf.addPage(
-        pw.Page(
-          pageFormat: _getPageFormat(config),
-          build: (pw.Context context) {
-            return pw.Column(
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
+      for (int i = 0; i < dataList.length; i += itemsPerPage) {
+        final end = (i + itemsPerPage < dataList.length) ? i + itemsPerPage : dataList.length;
+        pages.add(dataList.sublist(i, end));
+      }
+
+      // Buat halaman untuk setiap chunk
+      for (int pageIndex = 0; pageIndex < pages.length; pageIndex++) {
+        final pageData = pages[pageIndex];
+        
+        // Pre-load semua gambar untuk halaman ini
+        final photoWidgets = <pw.Widget>[];
+        for (final item in pageData) {
+          try {
+            photoWidgets.add(await _buildPhotoItem(item, type));
+          } catch (e) {
+            // Jika ada error pada item tertentu, buat placeholder
+            photoWidgets.add(_buildPhotoPlaceholder('Error memuat item'));
+          }
+        }
+        
+        pdf.addPage(
+          pw.Page(
+            pageFormat: _getPageFormat(config),
+            build: (pw.Context context) {
+              return pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
-                _buildHeader(type),
-                pw.SizedBox(height: 10),
-                _buildDateInfo(),
+                _buildHeader(type, dateRange: dateRange, filterInfo: filterInfo),
                 pw.SizedBox(height: 20),
-                pw.Expanded(
-                  child: _buildPhotoGridFromWidgets(photoWidgets, columnsPerRow),
-                ),
-              ],
-            );
-          },
-        ),
-      );
+                  pw.Expanded(
+                    child: _buildPhotoGridFromWidgets(photoWidgets, columnsPerRow),
+                  ),
+                ],
+              );
+            },
+          ),
+        );
+      }
+    } catch (e) {
+      throw Exception('Gagal membuat halaman PDF: ${e.toString()}');
     }
   }
 
@@ -229,23 +327,27 @@ class PdfService {
         final file = File(fotoPath);
         if (await file.exists()) {
           final imageBytes = await file.readAsBytes();
-          return pw.Container(
-            height: 120,
-            width: double.infinity,
-            decoration: pw.BoxDecoration(
-              border: pw.Border.all(color: PdfColors.grey300),
-              borderRadius: pw.BorderRadius.circular(8),
-            ),
-            child: pw.Image(
-              pw.MemoryImage(imageBytes),
-              fit: pw.BoxFit.cover,
-            ),
-          );
+          if (imageBytes.isNotEmpty) {
+            return pw.Container(
+              height: 120,
+              width: double.infinity,
+              decoration: pw.BoxDecoration(
+                border: pw.Border.all(color: PdfColors.grey300),
+                borderRadius: pw.BorderRadius.circular(8),
+              ),
+              child: pw.Image(
+                pw.MemoryImage(imageBytes),
+                fit: pw.BoxFit.cover,
+              ),
+            );
+          } else {
+            return _buildPhotoPlaceholder('File foto kosong');
+          }
         } else {
           return _buildPhotoPlaceholder('File tidak ditemukan');
         }
       } catch (e) {
-        return _buildPhotoPlaceholder('Error: ${e.toString()}');
+        return _buildPhotoPlaceholder('Error memuat foto');
       }
     } else {
       return _buildPhotoPlaceholder('Tidak ada foto');
@@ -346,17 +448,20 @@ class PdfService {
 
   Future<void> _saveAndOpenPdf(pw.Document pdf, String fileName) async {
     try {
-      final output = await getTemporaryDirectory();
-      final file = File('${output.path}/$fileName');
-      await file.writeAsBytes(await pdf.save());
+      // Generate PDF bytes
+      final pdfBytes = await pdf.save();
       
-      // Open PDF
+      if (pdfBytes.isEmpty) {
+        throw Exception('PDF bytes kosong');
+      }
+      
+      // Open PDF directly without saving to file
       await Printing.layoutPdf(
-        onLayout: (PdfPageFormat format) async => pdf.save(),
+        onLayout: (PdfPageFormat format) async => pdfBytes,
         name: fileName,
       );
     } catch (e) {
-      throw Exception('Gagal menyimpan atau membuka PDF: $e');
+      throw Exception('Gagal membuat PDF: ${e.toString()}');
     }
   }
 }

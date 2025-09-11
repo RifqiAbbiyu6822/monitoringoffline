@@ -65,13 +65,28 @@ class _TemuanPageState extends State<TemuanPage> {
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(80),
         child: AppBar(
-          title: const Text(
-            'Input Data Temuan',
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-              color: ThemeConstants.backgroundWhite,
-              fontSize: 20,
-            ),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(
+                'lib/assets/logoJJCWhite.png',
+                height: 24,
+                width: 24,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) {
+                  return const SizedBox.shrink();
+                },
+              ),
+              const SizedBox(width: 8),
+              const Text(
+                'Input Data Temuan',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: ThemeConstants.backgroundWhite,
+                  fontSize: 20,
+                ),
+              ),
+            ],
           ),
           backgroundColor: ThemeConstants.primaryBlue,
           centerTitle: true,

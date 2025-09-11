@@ -10,9 +10,12 @@ import '../widgets/pdf_config_dialog.dart';
 import '../models/pdf_config.dart' as pdf_config;
 import '../services/location_service.dart';
 import '../constants/theme_constants.dart';
+import '../constants/app_constants.dart';
 
 class PerbaikanPage extends StatefulWidget {
-  const PerbaikanPage({super.key});
+  final Perbaikan? existingPerbaikan; // For continuing existing perbaikan
+  
+  const PerbaikanPage({super.key, this.existingPerbaikan});
 
   @override
   State<PerbaikanPage> createState() => _PerbaikanPageState();
@@ -29,8 +32,9 @@ class _PerbaikanPageState extends State<PerbaikanPage> {
   DateTime _tanggal = DateTime.now();
   String _jalur = 'Jalur A';
   String _lajur = 'Lajur 1';
-  String _statusPerbaikan = '25%';
+  String _statusPerbaikan = AppConstants.defaultStatusPerbaikan;
   String? _fotoPath;
+  int? _editingId; // ID of perbaikan being edited
   
   final List<String> _jalurOptions = [
     'Jalur A',
@@ -44,12 +48,15 @@ class _PerbaikanPageState extends State<PerbaikanPage> {
     'Bahu Luar',
   ];
 
-  final List<String> _statusOptions = [
-    '25%',
-    '50%',
-    '75%',
-    '100%',
-  ];
+  final List<String> _statusOptions = AppConstants.statusPerbaikanOptions;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.existingPerbaikan != null) {
+      _loadExistingPerbaikan();
+    }
+  }
 
   @override
   void dispose() {
@@ -61,6 +68,24 @@ class _PerbaikanPageState extends State<PerbaikanPage> {
     super.dispose();
   }
 
+  void _loadExistingPerbaikan() {
+    final perbaikan = widget.existingPerbaikan!;
+    setState(() {
+      _editingId = perbaikan.id;
+      _tanggal = perbaikan.tanggal;
+      _jalur = perbaikan.jalur;
+      _lajur = perbaikan.lajur;
+      _statusPerbaikan = perbaikan.statusPerbaikan;
+      _fotoPath = perbaikan.fotoPath;
+    });
+    
+    _deskripsiController.text = perbaikan.deskripsi;
+    _jenisPerbaikanController.text = perbaikan.jenisPerbaikan;
+    _kilometerController.text = perbaikan.kilometer;
+    _latitudeController.text = perbaikan.latitude;
+    _longitudeController.text = perbaikan.longitude;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -68,13 +93,28 @@ class _PerbaikanPageState extends State<PerbaikanPage> {
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(80),
         child: AppBar(
-          title: const Text(
-            'Input Data Perbaikan',
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-              color: ThemeConstants.backgroundWhite,
-              fontSize: 20,
-            ),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(
+                'lib/assets/logoJJCWhite.png',
+                height: 24,
+                width: 24,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) {
+                  return const SizedBox.shrink();
+                },
+              ),
+              const SizedBox(width: 8),
+              Text(
+                _editingId != null ? 'Lanjutkan Perbaikan' : 'Input Data Perbaikan',
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: ThemeConstants.backgroundWhite,
+                  fontSize: 20,
+                ),
+              ),
+            ],
           ),
           backgroundColor: ThemeConstants.secondaryGreen,
           centerTitle: true,
@@ -603,6 +643,7 @@ class _PerbaikanPageState extends State<PerbaikanPage> {
   Future<void> _savePerbaikan() async {
     if (_formKey.currentState!.validate()) {
       final perbaikan = Perbaikan(
+        id: _editingId, // Include ID if editing
         tanggal: _tanggal,
         jenisPerbaikan: _jenisPerbaikanController.text,
         jalur: _jalur,
@@ -616,12 +657,20 @@ class _PerbaikanPageState extends State<PerbaikanPage> {
       );
 
       try {
-        await DatabaseHelper().insertPerbaikan(perbaikan);
+        if (_editingId != null) {
+          // Update existing perbaikan
+          await DatabaseHelper().updatePerbaikan(perbaikan);
+        } else {
+          // Insert new perbaikan
+          await DatabaseHelper().insertPerbaikan(perbaikan);
+        }
         
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('Data perbaikan berhasil disimpan'),
+              content: Text(_editingId != null 
+                  ? 'Data perbaikan berhasil diperbarui' 
+                  : 'Data perbaikan berhasil disimpan'),
               backgroundColor: ThemeConstants.successGreen,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
@@ -630,8 +679,12 @@ class _PerbaikanPageState extends State<PerbaikanPage> {
             ),
           );
           
-          // Reset form
-          _resetForm();
+          // Navigate back if editing, reset form if creating new
+          if (_editingId != null) {
+            Navigator.pop(context);
+          } else {
+            _resetForm();
+          }
         }
       } catch (e) {
         if (mounted) {
@@ -655,7 +708,7 @@ class _PerbaikanPageState extends State<PerbaikanPage> {
       _tanggal = DateTime.now();
       _jalur = 'Jalur A';
       _lajur = 'Lajur 1';
-      _statusPerbaikan = '25%';
+      _statusPerbaikan = AppConstants.defaultStatusPerbaikan;
       _fotoPath = null;
     });
     _deskripsiController.clear();

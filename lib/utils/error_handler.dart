@@ -130,11 +130,27 @@ class ErrorHandler {
         barrierDismissible: false,
         builder: (BuildContext context) {
           return AlertDialog(
-            content: Row(
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                const CircularProgressIndicator(),
-                const SizedBox(width: 20),
-                Text(message),
+                Image.asset(
+                  'lib/assets/logo_jjcnormal.png',
+                  height: 40,
+                  width: 40,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    return const SizedBox.shrink();
+                  },
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const CircularProgressIndicator(),
+                    const SizedBox(width: 20),
+                    Text(message),
+                  ],
+                ),
               ],
             ),
           );

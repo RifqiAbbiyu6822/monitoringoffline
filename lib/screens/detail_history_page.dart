@@ -79,13 +79,28 @@ class _DetailHistoryPageState extends State<DetailHistoryPage> {
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(80),
         child: AppBar(
-          title: Text(
-            'Detail ${widget.type == 'temuan' ? 'Temuan' : 'Perbaikan'}',
-            style: const TextStyle(
-              fontWeight: FontWeight.w600,
-              color: ThemeConstants.backgroundWhite,
-              fontSize: 20,
-            ),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(
+                'lib/assets/logoJJCWhite.png',
+                height: 24,
+                width: 24,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) {
+                  return const SizedBox.shrink();
+                },
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Detail ${widget.type == 'temuan' ? 'Temuan' : 'Perbaikan'}',
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: ThemeConstants.backgroundWhite,
+                  fontSize: 20,
+                ),
+              ),
+            ],
           ),
           backgroundColor: widget.type == 'temuan' ? ThemeConstants.primaryBlue : ThemeConstants.secondaryGreen,
           centerTitle: true,
@@ -117,8 +132,23 @@ class _DetailHistoryPageState extends State<DetailHistoryPage> {
         ),
       ),
       body: _isLoading
-          ? const Center(
-              child: CircularProgressIndicator(color: ThemeConstants.primaryBlue),
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    'lib/assets/logo_jjcnormal.png',
+                    height: 60,
+                    width: 60,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) {
+                      return const SizedBox.shrink();
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  const CircularProgressIndicator(color: ThemeConstants.primaryBlue),
+                ],
+              ),
             )
           : _data == null
               ? Center(
@@ -382,4 +412,5 @@ class _DetailHistoryPageState extends State<DetailHistoryPage> {
       ),
     );
   }
+
 }

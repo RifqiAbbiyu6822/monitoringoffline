@@ -38,6 +38,7 @@ class AppConstants {
   ];
 
   static const List<String> statusPerbaikanOptions = [
+    '0%',
     '25%',
     '50%',
     '75%',
@@ -90,5 +91,5 @@ class AppConstants {
   static const String defaultJalur = 'Jalur A';
   static const String defaultLajur = 'Lajur 1';
   static const String defaultJenisTemuan = 'Kerusakan jalan';
-  static const String defaultStatusPerbaikan = '25%';
+  static const String defaultStatusPerbaikan = '0%';
 }
