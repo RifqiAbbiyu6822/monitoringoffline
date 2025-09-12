@@ -16,66 +16,74 @@ class MainMenuPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ThemeConstants.backgroundWhite,
-       appBar: PreferredSize(
-         preferredSize: const Size.fromHeight(70),
-         child: AppBar(
-           title: Row(
-             mainAxisAlignment: MainAxisAlignment.center,
-             children: [
-               Image.asset(
-                 'lib/assets/logoJJCWhite.png',
-                 height: 24,
-                 width: 24,
-                 fit: BoxFit.contain,
-                 errorBuilder: (context, error, stackTrace) {
-                   return const SizedBox.shrink();
-                 },
-               ),
-               const SizedBox(width: 8),
-               const Text(
-                 'Jasa Marga Mobile',
-                 style: TextStyle(
-                   fontWeight: FontWeight.w500,
-                   color: ThemeConstants.backgroundWhite,
-                   fontSize: 18,
-                   letterSpacing: 0.2,
-                 ),
-               ),
-             ],
-           ),
-           backgroundColor: ThemeConstants.primaryBlue,
-           centerTitle: true,
-           elevation: 0,
-           systemOverlayStyle: SystemUiOverlayStyle.light,
-         ),
-       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Padding(
-            padding: const EdgeInsets.all(ThemeConstants.spacingL),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: ThemeConstants.spacingM),
-                
-                // Header Section
-                _buildHeaderSection(),
-                
-                const SizedBox(height: 32),
-                
-                // Menu Cards
-                _buildMenuCards(context),
-                
-                const SizedBox(height: 40),
-                
-                // Footer
-                _buildFooter(),
-              ],
+      body: Column(
+        children: [
+          // Custom Header
+          Container(
+            color: ThemeConstants.primaryBlue,
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      'lib/assets/logoJJCWhite.png',
+                      height: 24,
+                      width: 24,
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) {
+                        return const SizedBox.shrink();
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    const Text(
+                      'Jasa Marga Mobile',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        color: ThemeConstants.backgroundWhite,
+                        fontSize: 18,
+                        letterSpacing: 0.2,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
-        ),
+          // Content
+          Expanded(
+            child: SafeArea(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: Padding(
+                  padding: const EdgeInsets.all(ThemeConstants.spacingL),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: ThemeConstants.spacingM),
+                      
+                      // Header Section
+                      _buildHeaderSection(),
+                      
+                      const SizedBox(height: 32),
+                      
+                      // Menu Cards
+                      _buildMenuCards(context),
+                      
+                      const SizedBox(height: 40),
+                      
+                      // Footer
+                      _buildFooter(),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
+      floatingActionButton: _buildNavigationButtons(),
     );
   }
 
@@ -454,6 +462,27 @@ class MainMenuPage extends StatelessWidget {
           ],
         );
       },
+    );
+  }
+
+  Widget _buildNavigationButtons() {
+    return Positioned(
+      left: 16,
+      bottom: 16,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Back Button
+          FloatingActionButton(
+            heroTag: "back_button",
+            onPressed: () => SystemNavigator.pop(),
+            backgroundColor: ThemeConstants.textSecondary,
+            mini: true,
+            child: const Icon(Icons.arrow_back, color: ThemeConstants.backgroundWhite),
+            tooltip: 'Kembali',
+          ),
+        ],
+      ),
     );
   }
 }

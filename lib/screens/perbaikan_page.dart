@@ -7,6 +7,7 @@ import '../models/perbaikan.dart';
 import '../database/database_helper.dart';
 import '../services/pdf_service.dart';
 import '../widgets/pdf_config_dialog.dart';
+import '../widgets/export_confirmation_dialog.dart';
 import '../models/pdf_config.dart' as pdf_config;
 import '../services/location_service.dart';
 import '../constants/theme_constants.dart';
@@ -28,11 +29,12 @@ class _PerbaikanPageState extends State<PerbaikanPage> {
   final _kilometerController = TextEditingController();
   final _latitudeController = TextEditingController();
   final _longitudeController = TextEditingController();
+  final _objectIdController = TextEditingController();
   
   DateTime _tanggal = DateTime.now();
   String _jalur = 'Jalur A';
   String _lajur = 'Lajur 1';
-  String _statusPerbaikan = AppConstants.defaultStatusPerbaikan;
+  String _statusPerbaikan = '0%'; // Always start at 0%
   String? _fotoPath;
   int? _editingId; // ID of perbaikan being edited
   
@@ -65,6 +67,7 @@ class _PerbaikanPageState extends State<PerbaikanPage> {
     _kilometerController.dispose();
     _latitudeController.dispose();
     _longitudeController.dispose();
+    _objectIdController.dispose();
     super.dispose();
   }
 
@@ -84,251 +87,266 @@ class _PerbaikanPageState extends State<PerbaikanPage> {
     _kilometerController.text = perbaikan.kilometer;
     _latitudeController.text = perbaikan.latitude;
     _longitudeController.text = perbaikan.longitude;
+    _objectIdController.text = perbaikan.objectId;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ThemeConstants.backgroundWhite,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(80),
-        child: AppBar(
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset(
-                'lib/assets/logoJJCWhite.png',
-                height: 24,
-                width: 24,
-                fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) {
-                  return const SizedBox.shrink();
-                },
-              ),
-              const SizedBox(width: 8),
-              Text(
-                _editingId != null ? 'Lanjutkan Perbaikan' : 'Input Data Perbaikan',
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  color: ThemeConstants.backgroundWhite,
-                  fontSize: 20,
+      body: Column(
+        children: [
+          // Custom Header
+          Container(
+            color: ThemeConstants.secondaryGreen,
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      'lib/assets/logoJJCWhite.png',
+                      height: 24,
+                      width: 24,
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) {
+                        return const SizedBox.shrink();
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      _editingId != null ? 'Lanjutkan Perbaikan' : 'Input Data Perbaikan',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: ThemeConstants.backgroundWhite,
+                        fontSize: 20,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
-          backgroundColor: ThemeConstants.secondaryGreen,
-          centerTitle: true,
-          elevation: 0,
-          systemOverlayStyle: SystemUiOverlayStyle.light,
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.picture_as_pdf, color: ThemeConstants.backgroundWhite),
-              onPressed: _exportToPdf,
-              tooltip: 'Ekspor ke PDF',
             ),
-          ],
-        ),
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: ThemeConstants.spacingL, vertical: ThemeConstants.spacingM),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Header Section
-                  _buildHeaderSection(),
-                  
-                  const SizedBox(height: ThemeConstants.spacingXL),
-                  
-                  // Form Card
-                  Container(
-                    padding: const EdgeInsets.all(ThemeConstants.spacingL),
-                    decoration: ThemeConstants.cardDecoration,
+          ),
+          // Content
+          Expanded(
+            child: SafeArea(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: ThemeConstants.spacingL, vertical: ThemeConstants.spacingM),
+                  child: Form(
+                    key: _formKey,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Tanggal
-                        _buildDateField(),
-                        const SizedBox(height: ThemeConstants.spacingL),
+                        // Header Section
+                        _buildHeaderSection(),
                         
-                        // Jenis Perbaikan
-                        _buildTextField(
-                          label: 'Jenis Perbaikan',
-                          controller: _jenisPerbaikanController,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Jenis perbaikan harus diisi';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: ThemeConstants.spacingL),
+                        const SizedBox(height: ThemeConstants.spacingXL),
                         
-                        // Jalur
-                        _buildDropdownField(
-                          label: 'Jalur',
-                          value: _jalur,
-                          items: _jalurOptions,
-                          onChanged: (value) {
-                            setState(() {
-                              _jalur = value!;
-                            });
-                          },
-                        ),
-                        const SizedBox(height: ThemeConstants.spacingL),
-                        
-                        // Lajur
-                        _buildDropdownField(
-                          label: 'Lajur',
-                          value: _lajur,
-                          items: _lajurOptions,
-                          onChanged: (value) {
-                            setState(() {
-                              _lajur = value!;
-                            });
-                          },
-                        ),
-                        const SizedBox(height: ThemeConstants.spacingL),
-                        
-                        // Kilometer
-                        _buildTextField(
-                          label: 'Kilometer',
-                          controller: _kilometerController,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Kilometer harus diisi';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: ThemeConstants.spacingL),
-                        
-                        // Status Perbaikan
-                        _buildDropdownField(
-                          label: 'Status Perbaikan',
-                          value: _statusPerbaikan,
-                          items: _statusOptions,
-                          onChanged: (value) {
-                            setState(() {
-                              _statusPerbaikan = value!;
-                            });
-                          },
-                        ),
-                        const SizedBox(height: ThemeConstants.spacingL),
-                        
-                        // Koordinat
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                const Text(
-                                  'Koordinat GPS',
-                                  style: ThemeConstants.bodyLarge,
-                                ),
-                                const Spacer(),
-                                ElevatedButton.icon(
-                                  onPressed: _getCurrentLocation,
-                                  icon: const Icon(Icons.my_location, size: 16),
-                                  label: const Text('Ambil GPS'),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: ThemeConstants.secondaryGreen,
-                                    foregroundColor: ThemeConstants.backgroundWhite,
-                                    padding: const EdgeInsets.symmetric(horizontal: ThemeConstants.spacingM, vertical: ThemeConstants.spacingS),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(ThemeConstants.radiusS),
-                                    ),
+                        // Form Card
+                        Container(
+                          padding: const EdgeInsets.all(ThemeConstants.spacingL),
+                          decoration: ThemeConstants.cardDecoration,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Tanggal
+                              _buildDateField(),
+                              const SizedBox(height: ThemeConstants.spacingL),
+
+                              // ID Objek
+                              _buildTextField(
+                                label: 'ID Objek',
+                                controller: _objectIdController,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'ID objek harus diisi';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: ThemeConstants.spacingL),
+                              
+                              // Jenis Perbaikan
+                              _buildTextField(
+                                label: 'Jenis Perbaikan',
+                                controller: _jenisPerbaikanController,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Jenis perbaikan harus diisi';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: ThemeConstants.spacingL),
+                              
+                              // Jalur
+                              _buildDropdownField(
+                                label: 'Jalur',
+                                value: _jalur,
+                                items: _jalurOptions,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _jalur = value!;
+                                  });
+                                },
+                              ),
+                              const SizedBox(height: ThemeConstants.spacingL),
+                              
+                              // Lajur
+                              _buildDropdownField(
+                                label: 'Lajur',
+                                value: _lajur,
+                                items: _lajurOptions,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _lajur = value!;
+                                  });
+                                },
+                              ),
+                              const SizedBox(height: ThemeConstants.spacingL),
+                              
+                              // Kilometer
+                              _buildTextField(
+                                label: 'Kilometer',
+                                controller: _kilometerController,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Kilometer harus diisi';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: ThemeConstants.spacingL),
+                              
+                              // Status Perbaikan
+                              _buildDropdownField(
+                                label: 'Status Perbaikan',
+                                value: _statusPerbaikan,
+                                items: _statusOptions,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _statusPerbaikan = value!;
+                                  });
+                                },
+                              ),
+                              const SizedBox(height: ThemeConstants.spacingL),
+                              
+                              // Koordinat
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      const Text(
+                                        'Koordinat GPS',
+                                        style: ThemeConstants.bodyLarge,
+                                      ),
+                                      const Spacer(),
+                                      ElevatedButton.icon(
+                                        onPressed: _getCurrentLocation,
+                                        icon: const Icon(Icons.my_location, size: 16),
+                                        label: const Text('Ambil GPS'),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: ThemeConstants.secondaryGreen,
+                                          foregroundColor: ThemeConstants.backgroundWhite,
+                                          padding: const EdgeInsets.symmetric(horizontal: ThemeConstants.spacingM, vertical: ThemeConstants.spacingS),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(ThemeConstants.radiusS),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ),
-                              ],
+                                  const SizedBox(height: ThemeConstants.spacingS),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: _buildTextField(
+                                          label: 'Latitude',
+                                          controller: _latitudeController,
+                                          validator: (value) {
+                                            if (value == null || value.isEmpty) {
+                                              return 'Latitude harus diisi';
+                                            }
+                                            if (double.tryParse(value) == null) {
+                                              return 'Format latitude tidak valid';
+                                            }
+                                            return null;
+                                          },
+                                        ),
+                                      ),
+                                      const SizedBox(width: ThemeConstants.spacingM),
+                                      Expanded(
+                                        child: _buildTextField(
+                                          label: 'Longitude',
+                                          controller: _longitudeController,
+                                          validator: (value) {
+                                            if (value == null || value.isEmpty) {
+                                              return 'Longitude harus diisi';
+                                            }
+                                            if (double.tryParse(value) == null) {
+                                              return 'Format longitude tidak valid';
+                                            }
+                                            return null;
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: ThemeConstants.spacingL),
+                              
+                              // Deskripsi
+                              _buildTextField(
+                                label: 'Deskripsi',
+                                controller: _deskripsiController,
+                                maxLines: 4,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Deskripsi harus diisi';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: ThemeConstants.spacingL),
+                              
+                              // Foto
+                              _buildPhotoSection(),
+                            ],
+                          ),
+                        ),
+                        
+                        const SizedBox(height: ThemeConstants.spacingXL),
+                        
+                        // Tombol Simpan
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: _savePerbaikan,
+                            style: ThemeConstants.secondaryButtonStyle,
+                            child: const Text(
+                              'Simpan Data Perbaikan',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
-                            const SizedBox(height: ThemeConstants.spacingS),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: _buildTextField(
-                                    label: 'Latitude',
-                                    controller: _latitudeController,
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return 'Latitude harus diisi';
-                                      }
-                                      if (double.tryParse(value) == null) {
-                                        return 'Format latitude tidak valid';
-                                      }
-                                      return null;
-                                    },
-                                  ),
-                                ),
-                                const SizedBox(width: ThemeConstants.spacingM),
-                                Expanded(
-                                  child: _buildTextField(
-                                    label: 'Longitude',
-                                    controller: _longitudeController,
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return 'Longitude harus diisi';
-                                      }
-                                      if (double.tryParse(value) == null) {
-                                        return 'Format longitude tidak valid';
-                                      }
-                                      return null;
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
+                          ),
                         ),
-                        const SizedBox(height: ThemeConstants.spacingL),
-                        
-                        // Deskripsi
-                        _buildTextField(
-                          label: 'Deskripsi',
-                          controller: _deskripsiController,
-                          maxLines: 4,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Deskripsi harus diisi';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: ThemeConstants.spacingL),
-                        
-                        // Foto
-                        _buildPhotoSection(),
                       ],
                     ),
                   ),
-                  
-                  const SizedBox(height: ThemeConstants.spacingXL),
-                  
-                  // Tombol Simpan
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _savePerbaikan,
-                      style: ThemeConstants.secondaryButtonStyle,
-                      child: const Text(
-                        'Simpan Data Perbaikan',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
           ),
-        ),
+        ],
       ),
+      floatingActionButton: _buildNavigationButtons(),
     );
   }
 
@@ -598,7 +616,7 @@ class _PerbaikanPageState extends State<PerbaikanPage> {
             SnackBar(
               content: const Text('Lokasi GPS berhasil diambil'),
               backgroundColor: ThemeConstants.successGreen,
-              behavior: SnackBarBehavior.floating,
+              behavior: SnackBarBehavior.fixed,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
               ),
@@ -611,7 +629,7 @@ class _PerbaikanPageState extends State<PerbaikanPage> {
             SnackBar(
               content: Text(result['error']),
               backgroundColor: ThemeConstants.errorRed,
-              behavior: SnackBarBehavior.floating,
+              behavior: SnackBarBehavior.fixed,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
               ),
@@ -630,7 +648,7 @@ class _PerbaikanPageState extends State<PerbaikanPage> {
           SnackBar(
             content: Text('Error: $e'),
             backgroundColor: ThemeConstants.errorRed,
-            behavior: SnackBarBehavior.floating,
+            behavior: SnackBarBehavior.fixed,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
             ),
@@ -645,6 +663,7 @@ class _PerbaikanPageState extends State<PerbaikanPage> {
       final perbaikan = Perbaikan(
         id: _editingId, // Include ID if editing
         tanggal: _tanggal,
+        objectId: _objectIdController.text,
         jenisPerbaikan: _jenisPerbaikanController.text,
         jalur: _jalur,
         lajur: _lajur,
@@ -652,7 +671,7 @@ class _PerbaikanPageState extends State<PerbaikanPage> {
         latitude: _latitudeController.text,
         longitude: _longitudeController.text,
         deskripsi: _deskripsiController.text,
-        statusPerbaikan: _statusPerbaikan,
+        statusPerbaikan: _editingId != null ? _statusPerbaikan : '0%', // Start at 0% for new repairs
         fotoPath: _fotoPath,
       );
 
@@ -672,7 +691,7 @@ class _PerbaikanPageState extends State<PerbaikanPage> {
                   ? 'Data perbaikan berhasil diperbarui' 
                   : 'Data perbaikan berhasil disimpan'),
               backgroundColor: ThemeConstants.successGreen,
-              behavior: SnackBarBehavior.floating,
+              behavior: SnackBarBehavior.fixed,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
               ),
@@ -692,7 +711,7 @@ class _PerbaikanPageState extends State<PerbaikanPage> {
             SnackBar(
               content: Text('Error: $e'),
               backgroundColor: ThemeConstants.errorRed,
-              behavior: SnackBarBehavior.floating,
+              behavior: SnackBarBehavior.fixed,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
               ),
@@ -708,53 +727,105 @@ class _PerbaikanPageState extends State<PerbaikanPage> {
       _tanggal = DateTime.now();
       _jalur = 'Jalur A';
       _lajur = 'Lajur 1';
-      _statusPerbaikan = AppConstants.defaultStatusPerbaikan;
+      _statusPerbaikan = '0%';  // Always start at 0%
       _fotoPath = null;
     });
     _deskripsiController.clear();
     _jenisPerbaikanController.clear();
     _kilometerController.clear();
+    _objectIdController.clear();
     _latitudeController.clear();
     _longitudeController.clear();
   }
 
   Future<void> _exportToPdf() async {
-    final config = await showDialog<pdf_config.PdfConfig>(
-      context: context,
-      builder: (context) => const PdfConfigDialog(),
-    );
+    try {
+      // Ambil data perbaikan untuk tanggal yang dipilih
+      final perbaikanList = await DatabaseHelper().getPerbaikanByDate(_tanggal);
+      
+      // Tampilkan dialog konfirmasi export
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (context) => ExportConfirmationDialog(
+          perbaikanList: perbaikanList,
+          exportType: 'perbaikan',
+          dateRange: DateFormat('dd/MM/yyyy').format(_tanggal),
+        ),
+      );
 
-    if (config != null) {
-      try {
-        final perbaikanList = await DatabaseHelper().getPerbaikanByDate(_tanggal);
-        await PdfService().generatePerbaikanPdf(perbaikanList, config);
-        
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text('PDF berhasil diekspor'),
-              backgroundColor: ThemeConstants.successGreen,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
-              ),
-            ),
+      if (confirmed == true) {
+        // Tampilkan dialog konfigurasi PDF
+        final config = await showDialog<pdf_config.PdfConfig>(
+          context: context,
+          builder: (context) => const PdfConfigDialog(),
+        );
+
+        if (config != null) {
+          // Generate PDF
+          await PdfService().generatePerbaikanPdf(
+            perbaikanList, 
+            config,
+            dateRange: DateFormat('dd/MM/yyyy').format(_tanggal),
           );
-        }
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Error: $e'),
-              backgroundColor: ThemeConstants.errorRed,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
+          
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('PDF berhasil diekspor (${perbaikanList.length} data)'),
+                backgroundColor: ThemeConstants.successGreen,
+                behavior: SnackBarBehavior.fixed,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
+                ),
               ),
-            ),
-          );
+            );
+          }
         }
       }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Gagal membuat PDF: ${e.toString()}'),
+            backgroundColor: ThemeConstants.errorRed,
+            behavior: SnackBarBehavior.fixed,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
+            ),
+          ),
+        );
+      }
     }
+  }
+
+  Widget _buildNavigationButtons() {
+    return Positioned(
+      left: 16,
+      bottom: 16,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Export PDF Button
+          FloatingActionButton(
+            heroTag: "export_pdf",
+            onPressed: _exportToPdf,
+            backgroundColor: ThemeConstants.secondaryGreen,
+            mini: true,
+            child: const Icon(Icons.picture_as_pdf, color: ThemeConstants.backgroundWhite),
+            tooltip: 'Ekspor ke PDF',
+          ),
+          const SizedBox(height: 8),
+          // Back Button
+          FloatingActionButton(
+            heroTag: "back_button",
+            onPressed: () => Navigator.pop(context),
+            backgroundColor: ThemeConstants.textSecondary,
+            mini: true,
+            child: const Icon(Icons.arrow_back, color: ThemeConstants.backgroundWhite),
+            tooltip: 'Kembali',
+          ),
+        ],
+      ),
+    );
   }
 }

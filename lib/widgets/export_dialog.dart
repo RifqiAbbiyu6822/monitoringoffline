@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../models/temuan.dart';
 import '../models/perbaikan.dart';
+import '../models/pdf_config.dart' as pdf_config;
 import '../services/export_service.dart';
+import '../services/pdf_service.dart';
+import '../widgets/pdf_config_dialog.dart';
 import '../utils/error_handler.dart';
 
 class ExportDialog extends StatefulWidget {
@@ -116,6 +119,17 @@ class _ExportDialogState extends State<ExportDialog> {
               title: const Text('TXT'),
               subtitle: const Text('Format teks yang mudah dibaca'),
               value: 'txt',
+              groupValue: _selectedFormat,
+              onChanged: _isExporting ? null : (value) {
+                setState(() {
+                  _selectedFormat = value!;
+                });
+              },
+            ),
+            RadioListTile<String>(
+              title: const Text('PDF'),
+              subtitle: const Text('Format dokumen dengan foto dan layout'),
+              value: 'pdf',
               groupValue: _selectedFormat,
               onChanged: _isExporting ? null : (value) {
                 setState(() {
@@ -243,6 +257,8 @@ class _ExportDialogState extends State<ExportDialog> {
         return await ExportService.exportTemuanToJson(widget.temuanList);
       case 'txt':
         return await ExportService.exportTemuanToTxt(widget.temuanList);
+      case 'pdf':
+        return await _exportTemuanToPdf();
       default:
         throw Exception('Format tidak didukung');
     }
@@ -256,6 +272,8 @@ class _ExportDialogState extends State<ExportDialog> {
         return await ExportService.exportPerbaikanToJson(widget.perbaikanList);
       case 'txt':
         return await ExportService.exportPerbaikanToTxt(widget.perbaikanList);
+      case 'pdf':
+        return await _exportPerbaikanToPdf();
       default:
         throw Exception('Format tidak didukung');
     }
@@ -339,5 +357,49 @@ class _ExportDialogState extends State<ExportDialog> {
   void _copyPathToClipboard(String path) {
     Clipboard.setData(ClipboardData(text: path));
     ErrorHandler.showSuccessSnackBar(context, 'Path berhasil disalin ke clipboard');
+  }
+
+  Future<String> _exportTemuanToPdf() async {
+    // Tampilkan dialog konfigurasi PDF
+    final config = await showDialog<pdf_config.PdfConfig>(
+      context: context,
+      builder: (context) => const PdfConfigDialog(),
+    );
+
+    if (config == null) {
+      throw Exception('Konfigurasi PDF dibatalkan');
+    }
+
+    // Generate PDF
+    await PdfService().generateTemuanPdf(
+      widget.temuanList, 
+      config,
+      dateRange: 'Export dari History',
+      filterInfo: '${widget.temuanList.length} data temuan',
+    );
+
+    return 'PDF Temuan berhasil dibuat';
+  }
+
+  Future<String> _exportPerbaikanToPdf() async {
+    // Tampilkan dialog konfigurasi PDF
+    final config = await showDialog<pdf_config.PdfConfig>(
+      context: context,
+      builder: (context) => const PdfConfigDialog(),
+    );
+
+    if (config == null) {
+      throw Exception('Konfigurasi PDF dibatalkan');
+    }
+
+    // Generate PDF
+    await PdfService().generatePerbaikanPdf(
+      widget.perbaikanList, 
+      config,
+      dateRange: 'Export dari History',
+      filterInfo: '${widget.perbaikanList.length} data perbaikan',
+    );
+
+    return 'PDF Perbaikan berhasil dibuat';
   }
 }

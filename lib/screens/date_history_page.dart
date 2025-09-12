@@ -9,6 +9,7 @@ import '../utils/error_handler.dart';
 import '../constants/theme_constants.dart';
 import '../widgets/delete_confirmation_dialog.dart';
 import '../widgets/pdf_config_dialog.dart';
+import '../widgets/export_confirmation_dialog.dart';
 import '../services/pdf_service.dart';
 import 'detail_history_page.dart';
 
@@ -84,48 +85,46 @@ class _DateHistoryPageState extends State<DateHistoryPage> {
 
     return Scaffold(
       backgroundColor: ThemeConstants.backgroundWhite,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(80),
-        child: AppBar(
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset(
-                'lib/assets/logoJJCWhite.png',
-                height: 24,
-                width: 24,
-                fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) {
-                  return const SizedBox.shrink();
-                },
-              ),
-              const SizedBox(width: 8),
-              Text(
-                'Data $dateText',
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  color: ThemeConstants.backgroundWhite,
-                  fontSize: 20,
+      appBar: null,
+      body: Column(
+        children: [
+          // Custom Header
+          Container(
+            color: widget.type == 'temuan' 
+                ? ThemeConstants.primaryBlue 
+                : ThemeConstants.secondaryGreen,
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      'lib/assets/logoJJCWhite.png',
+                      height: 24,
+                      width: 24,
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) {
+                        return const SizedBox.shrink();
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Data $dateText',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: ThemeConstants.backgroundWhite,
+                        fontSize: 20,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
-          backgroundColor: widget.type == 'temuan' 
-              ? ThemeConstants.primaryBlue 
-              : ThemeConstants.secondaryGreen,
-          centerTitle: true,
-          elevation: 0,
-          systemOverlayStyle: SystemUiOverlayStyle.light,
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.picture_as_pdf, color: ThemeConstants.backgroundWhite),
-              onPressed: _exportToPdf,
-              tooltip: 'Export PDF',
             ),
-          ],
-        ),
-      ),
-      body: _isLoading
+          ),
+          // Content
+          Expanded(
+            child: _isLoading
           ? Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -149,6 +148,10 @@ class _DateHistoryPageState extends State<DateHistoryPage> {
               ),
             )
           : _buildContent(),
+          ),
+        ],
+      ),
+      floatingActionButton: _buildNavigationButtons(),
     );
   }
 
@@ -560,7 +563,7 @@ class _DateHistoryPageState extends State<DateHistoryPage> {
           SnackBar(
             content: const Text('Temuan berhasil dihapus'),
             backgroundColor: ThemeConstants.successGreen,
-            behavior: SnackBarBehavior.floating,
+            behavior: SnackBarBehavior.fixed,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
@@ -589,7 +592,7 @@ class _DateHistoryPageState extends State<DateHistoryPage> {
           SnackBar(
             content: const Text('Perbaikan berhasil dihapus'),
             backgroundColor: ThemeConstants.successGreen,
-            behavior: SnackBarBehavior.floating,
+            behavior: SnackBarBehavior.fixed,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
@@ -604,60 +607,106 @@ class _DateHistoryPageState extends State<DateHistoryPage> {
   }
 
   Future<void> _exportToPdf() async {
-    final config = await showDialog<pdf_config.PdfConfig>(
-      context: context,
-      builder: (context) => const PdfConfigDialog(),
-    );
+    try {
+      // Tampilkan dialog konfirmasi export
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (context) => ExportConfirmationDialog(
+          temuanList: widget.type == 'temuan' ? _temuanList : null,
+          perbaikanList: widget.type == 'perbaikan' ? _perbaikanList : null,
+          exportType: widget.type,
+          dateRange: DateFormat('dd/MM/yyyy').format(widget.selectedDate),
+        ),
+      );
 
-    if (config != null) {
-      try {
-        // Buat informasi tanggal
-        final dateRange = DateFormat('dd/MM/yyyy').format(widget.selectedDate);
-        
-        if (widget.type == 'temuan') {
-          if (_temuanList.isNotEmpty) {
-            await PdfService().generateTemuanPdf(_temuanList, config, dateRange: dateRange);
-          } else {
-            _showNoDataMessage('Tidak ada data temuan untuk tanggal ini');
-            return;
+      if (confirmed == true) {
+        // Tampilkan dialog konfigurasi PDF
+        final config = await showDialog<pdf_config.PdfConfig>(
+          context: context,
+          builder: (context) => const PdfConfigDialog(),
+        );
+
+        if (config != null) {
+          final dateRange = DateFormat('dd/MM/yyyy').format(widget.selectedDate);
+          
+          if (widget.type == 'temuan') {
+            await PdfService().generateTemuanPdf(
+              _temuanList, 
+              config, 
+              dateRange: dateRange,
+              filterInfo: '${_temuanList.length} data temuan',
+            );
+          } else if (widget.type == 'perbaikan') {
+            await PdfService().generatePerbaikanPdf(
+              _perbaikanList, 
+              config, 
+              dateRange: dateRange,
+              filterInfo: '${_perbaikanList.length} data perbaikan',
+            );
           }
-        } else if (widget.type == 'perbaikan') {
-          if (_perbaikanList.isNotEmpty) {
-            await PdfService().generatePerbaikanPdf(_perbaikanList, config, dateRange: dateRange);
-          } else {
-            _showNoDataMessage('Tidak ada data perbaikan untuk tanggal ini');
-            return;
-          }
-        }
-        
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('PDF berhasil diekspor'),
-              backgroundColor: ThemeConstants.successGreen,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(ThemeConstants.radiusM)),
+          
+          if (mounted) {
+            final dataCount = widget.type == 'temuan' ? _temuanList.length : _perbaikanList.length;
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('PDF berhasil diekspor ($dataCount data)'),
+                backgroundColor: ThemeConstants.successGreen,
+                behavior: SnackBarBehavior.fixed,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
+                ),
               ),
-            ),
-          );
+            );
+          }
         }
-      } catch (e) {
-        ErrorHandler.handleError(context, e, customMessage: 'Gagal membuat PDF');
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Gagal membuat PDF: ${e.toString()}'),
+            backgroundColor: ThemeConstants.errorRed,
+            behavior: SnackBarBehavior.fixed,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
+            ),
+          ),
+        );
       }
     }
   }
 
-  void _showNoDataMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: ThemeConstants.warningOrange,
-        behavior: SnackBarBehavior.floating,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(ThemeConstants.radiusM)),
-        ),
+  Widget _buildNavigationButtons() {
+    return Positioned(
+      left: 16,
+      bottom: 16,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Export PDF Button
+          FloatingActionButton(
+            heroTag: "export_pdf",
+            onPressed: _exportToPdf,
+            backgroundColor: widget.type == 'temuan' 
+                ? ThemeConstants.primaryBlue 
+                : ThemeConstants.secondaryGreen,
+            mini: true,
+            child: const Icon(Icons.picture_as_pdf, color: ThemeConstants.backgroundWhite),
+            tooltip: 'Export PDF',
+          ),
+          const SizedBox(height: 8),
+          // Back Button
+          FloatingActionButton(
+            heroTag: "back_button",
+            onPressed: () => Navigator.pop(context),
+            backgroundColor: ThemeConstants.textSecondary,
+            mini: true,
+            child: const Icon(Icons.arrow_back, color: ThemeConstants.backgroundWhite),
+            tooltip: 'Kembali',
+          ),
+        ],
       ),
     );
   }
+
 }

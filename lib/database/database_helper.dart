@@ -18,11 +18,27 @@ class DatabaseHelper {
     return _database!;
   }
 
+  Future<List<PerbaikanProgress>> getPerbaikanProgressByObjectId(String objectId) async {
+    try {
+      final db = await database;
+      final List<Map<String, dynamic>> maps = await db.rawQuery('''
+        SELECT pp.*
+        FROM perbaikan_progress pp
+        JOIN perbaikan p ON pp.perbaikan_id = p.id
+        WHERE p.object_id = ?
+        ORDER BY pp.tanggal DESC
+      ''', [objectId]);
+      return List.generate(maps.length, (i) => PerbaikanProgress.fromMap(maps[i]));
+    } catch (e) {
+      throw Exception('Gagal mengambil data progress perbaikan berdasarkan objek: $e');
+    }
+  }
+
   Future<Database> _initDatabase() async {
     String path = join(await getDatabasesPath(), 'monitoring_offline.db');
     return await openDatabase(
       path,
-      version: 3,
+      version: 4,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -51,6 +67,7 @@ class DatabaseHelper {
         CREATE TABLE perbaikan(
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           tanggal INTEGER NOT NULL,
+          object_id TEXT NOT NULL,
           jenis_perbaikan TEXT NOT NULL,
           jalur TEXT NOT NULL,
           lajur TEXT NOT NULL,
@@ -58,7 +75,7 @@ class DatabaseHelper {
           latitude TEXT NOT NULL,
           longitude TEXT NOT NULL,
           deskripsi TEXT NOT NULL,
-          status_perbaikan TEXT NOT NULL,
+          status_perbaikan TEXT NOT NULL DEFAULT '0%',
           foto_path TEXT
         )
       ''');
@@ -93,6 +110,12 @@ class DatabaseHelper {
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     try {
+      if (oldVersion < 4) {
+        // Add object_id column and set default status to 0%
+        await db.execute('ALTER TABLE perbaikan ADD COLUMN object_id TEXT DEFAULT ""');
+        await db.execute('UPDATE perbaikan SET status_perbaikan = "0%" WHERE status_perbaikan = ""');
+      }
+      
       if (oldVersion < 2) {
         // Tambahkan kolom kilometer, latitude, dan longitude ke tabel temuan
         await db.execute('ALTER TABLE temuan ADD COLUMN kilometer TEXT');
@@ -243,6 +266,21 @@ class DatabaseHelper {
       return List.generate(maps.length, (i) => Perbaikan.fromMap(maps[i]));
     } catch (e) {
       throw Exception('Gagal mengambil data perbaikan berdasarkan tanggal: $e');
+    }
+  }
+
+  Future<List<Perbaikan>> getPerbaikanByObjectId(String objectId) async {
+    try {
+      final db = await database;
+      final List<Map<String, dynamic>> maps = await db.query(
+        'perbaikan',
+        where: 'object_id = ?',
+        whereArgs: [objectId],
+        orderBy: 'tanggal DESC',
+      );
+      return List.generate(maps.length, (i) => Perbaikan.fromMap(maps[i]));
+    } catch (e) {
+      throw Exception('Gagal mengambil data perbaikan berdasarkan objek: $e');
     }
   }
 

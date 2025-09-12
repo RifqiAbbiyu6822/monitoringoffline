@@ -55,46 +55,44 @@ class _TodayTemuanPageState extends State<TodayTemuanPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ThemeConstants.backgroundWhite,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(80),
-        child: AppBar(
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset(
-                'lib/assets/logoJJCWhite.png',
-                height: 24,
-                width: 24,
-                fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) {
-                  return const SizedBox.shrink();
-                },
-              ),
-              const SizedBox(width: 8),
-              const Text(
-                'Temuan Hari Ini',
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  color: ThemeConstants.backgroundWhite,
-                  fontSize: 20,
+      appBar: null,
+      body: Column(
+        children: [
+          // Custom Header
+          Container(
+            color: ThemeConstants.primaryBlue,
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      'lib/assets/logoJJCWhite.png',
+                      height: 24,
+                      width: 24,
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) {
+                        return const SizedBox.shrink();
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    const Text(
+                      'Temuan Hari Ini',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: ThemeConstants.backgroundWhite,
+                        fontSize: 20,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
-          backgroundColor: ThemeConstants.primaryBlue,
-          centerTitle: true,
-          elevation: 0,
-          systemOverlayStyle: SystemUiOverlayStyle.light,
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.picture_as_pdf, color: ThemeConstants.backgroundWhite),
-              onPressed: _exportToPdf,
-              tooltip: 'Export PDF',
             ),
-          ],
-        ),
-      ),
-      body: _isLoading
+          ),
+          // Content
+          Expanded(
+            child: _isLoading
           ? Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -114,6 +112,10 @@ class _TodayTemuanPageState extends State<TodayTemuanPage> {
               ),
             )
           : _buildContent(),
+          ),
+        ],
+      ),
+      floatingActionButton: _buildNavigationButtons(),
     );
   }
 
@@ -404,7 +406,7 @@ class _TodayTemuanPageState extends State<TodayTemuanPage> {
           SnackBar(
             content: const Text('Temuan berhasil dihapus'),
             backgroundColor: ThemeConstants.successGreen,
-            behavior: SnackBarBehavior.floating,
+            behavior: SnackBarBehavior.fixed,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
@@ -442,7 +444,7 @@ class _TodayTemuanPageState extends State<TodayTemuanPage> {
             const SnackBar(
               content: Text('PDF berhasil diekspor'),
               backgroundColor: ThemeConstants.successGreen,
-              behavior: SnackBarBehavior.floating,
+              behavior: SnackBarBehavior.fixed,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(ThemeConstants.radiusM)),
               ),
@@ -460,10 +462,41 @@ class _TodayTemuanPageState extends State<TodayTemuanPage> {
       SnackBar(
         content: Text(message),
         backgroundColor: ThemeConstants.warningOrange,
-        behavior: SnackBarBehavior.floating,
+              behavior: SnackBarBehavior.fixed,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(ThemeConstants.radiusM)),
         ),
+      ),
+    );
+  }
+
+  Widget _buildNavigationButtons() {
+    return Positioned(
+      left: 16,
+      bottom: 16,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Export PDF Button
+          FloatingActionButton(
+            heroTag: "export_pdf",
+            onPressed: _exportToPdf,
+            backgroundColor: ThemeConstants.primaryBlue,
+            mini: true,
+            child: const Icon(Icons.picture_as_pdf, color: ThemeConstants.backgroundWhite),
+            tooltip: 'Export PDF',
+          ),
+          const SizedBox(height: 8),
+          // Back Button
+          FloatingActionButton(
+            heroTag: "back_button",
+            onPressed: () => Navigator.pop(context),
+            backgroundColor: ThemeConstants.textSecondary,
+            mini: true,
+            child: const Icon(Icons.arrow_back, color: ThemeConstants.backgroundWhite),
+            tooltip: 'Kembali',
+          ),
+        ],
       ),
     );
   }

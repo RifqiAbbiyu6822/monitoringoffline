@@ -50,6 +50,11 @@ class _PdfConfigDialogState extends State<PdfConfigDialog> {
               '4 Kolom',
               'Layout tabel dengan 4 kolom',
             ),
+            _buildGridTypeOption(
+              pdf_config.GridType.sixColumns,
+              '6 Kolom',
+              'Layout tabel dengan 6 gambar per halaman (3x2)',
+            ),
             
             const SizedBox(height: 20),
             

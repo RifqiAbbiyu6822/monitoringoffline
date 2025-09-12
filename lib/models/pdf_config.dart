@@ -2,6 +2,7 @@ enum GridType {
   fullA4,
   twoColumns,
   fourColumns,
+  sixColumns,
 }
 
 enum Orientation {

@@ -20,7 +20,7 @@ class ContinuePerbaikanPage extends StatefulWidget {
 }
 
 class _ContinuePerbaikanPageState extends State<ContinuePerbaikanPage> {
-  List<Perbaikan> _incompletePerbaikanList = [];
+  Map<String, List<Perbaikan>> _incompletePerbaikanMap = {};
   bool _isLoading = true;
 
   @override
@@ -36,13 +36,21 @@ class _ContinuePerbaikanPageState extends State<ContinuePerbaikanPage> {
 
     try {
       final allPerbaikan = await DatabaseHelper().getAllPerbaikan();
-      // Filter perbaikan yang belum 100%
-      _incompletePerbaikanList = allPerbaikan.where((perbaikan) {
-        return perbaikan.statusPerbaikan != '100%';
-      }).toList();
+      // Group perbaikan by object ID and filter out completed ones
+      _incompletePerbaikanMap = {};
+      for (var perbaikan in allPerbaikan) {
+        if (perbaikan.statusPerbaikan != '100%') {
+          if (!_incompletePerbaikanMap.containsKey(perbaikan.objectId)) {
+            _incompletePerbaikanMap[perbaikan.objectId] = [];
+          }
+          _incompletePerbaikanMap[perbaikan.objectId]!.add(perbaikan);
+        }
+      }
       
-      // Sort by date descending (newest first)
-      _incompletePerbaikanList.sort((a, b) => b.tanggal.compareTo(a.tanggal));
+      // Sort each group by date
+      for (var repairs in _incompletePerbaikanMap.values) {
+        repairs.sort((a, b) => b.tanggal.compareTo(a.tanggal));
+      }
     } catch (e) {
       ErrorHandler.handleError(context, e, customMessage: 'Gagal memuat data perbaikan');
     } finally {
@@ -54,65 +62,124 @@ class _ContinuePerbaikanPageState extends State<ContinuePerbaikanPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: ThemeConstants.backgroundWhite,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(80),
-        child: AppBar(
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset(
-                'lib/assets/logoJJCWhite.png',
-                height: 24,
-                width: 24,
-                fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) {
-                  return const SizedBox.shrink();
-                },
-              ),
-              const SizedBox(width: 8),
-              const Text(
-                'Lanjutkan Perbaikan',
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  color: ThemeConstants.backgroundWhite,
-                  fontSize: 20,
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.pop(context);
+        return false;
+      },
+      child: Scaffold(
+        backgroundColor: ThemeConstants.backgroundWhite,
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(0),
+          child: AppBar(
+            backgroundColor: ThemeConstants.secondaryGreen,
+            elevation: 0,
+            toolbarHeight: 0,
+          ),
+        ),
+        body: Column(
+          children: [
+            // Custom Header
+            Container(
+              color: ThemeConstants.secondaryGreen,
+              child: SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        'lib/assets/logoJJCWhite.png',
+                        height: 24,
+                        width: 24,
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) {
+                          return const SizedBox.shrink();
+                        },
+                      ),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'Lanjutkan Perbaikan',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: ThemeConstants.backgroundWhite,
+                          fontSize: 20,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ],
-          ),
-          backgroundColor: ThemeConstants.secondaryGreen,
-          centerTitle: true,
-          elevation: 0,
-          systemOverlayStyle: SystemUiOverlayStyle.light,
+            ),
+            // Content
+            Expanded(
+              child: _isLoading
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          'lib/assets/logo_jjcnormal.png',
+                          height: 60,
+                          width: 60,
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stackTrace) {
+                            return const SizedBox.shrink();
+                          },
+                        ),
+                        const SizedBox(height: 20),
+                        const CircularProgressIndicator(color: ThemeConstants.secondaryGreen),
+                      ],
+                    ),
+                  )
+                : _buildContent(),
+            ),
+          ],
         ),
+        floatingActionButton: FloatingActionButton(
+          heroTag: "back_button",
+          onPressed: () => Navigator.pop(context),
+          backgroundColor: ThemeConstants.textSecondary,
+          mini: true,
+          child: const Icon(Icons.arrow_back, color: ThemeConstants.backgroundWhite),
+          tooltip: 'Kembali',
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
       ),
-      body: _isLoading
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Image.asset(
-                    'lib/assets/logo_jjcnormal.png',
-                    height: 60,
-                    width: 60,
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) {
-                      return const SizedBox.shrink();
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  const CircularProgressIndicator(color: ThemeConstants.secondaryGreen),
-                ],
-              ),
-            )
-          : _buildContent(),
+    );
+  }
+
+  Widget _buildObjectCard(String objectId, List<Perbaikan> repairs) {
+    final latestRepair = repairs.first; // Repairs are already sorted by date
+    return Container(
+      margin: const EdgeInsets.only(bottom: ThemeConstants.spacingM),
+      decoration: ThemeConstants.cardDecoration,
+      child: ExpansionTile(
+        title: Text(
+          'Objek: $objectId',
+          style: ThemeConstants.heading3,
+        ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: ThemeConstants.spacingXS),
+            Text(
+              'Status Terakhir: ${latestRepair.statusPerbaikan}',
+              style: ThemeConstants.bodyMedium.copyWith(color: ThemeConstants.textSecondary),
+            ),
+            Text(
+              'Lokasi: ${latestRepair.jalur} - ${latestRepair.lajur} (KM ${latestRepair.kilometer})',
+              style: ThemeConstants.bodySmall.copyWith(color: ThemeConstants.textSecondary),
+            ),
+          ],
+        ),
+        children: repairs.map((repair) => _buildPerbaikanCard(repair)).toList(),
+      ),
     );
   }
 
   Widget _buildContent() {
-    if (_incompletePerbaikanList.isEmpty) {
+    if (_incompletePerbaikanMap.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -215,7 +282,7 @@ class _ContinuePerbaikanPageState extends State<ContinuePerbaikanPage> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${_incompletePerbaikanList.length} perbaikan perlu dilanjutkan',
+                      '${_incompletePerbaikanMap.length} objek memerlukan perbaikan',
                       style: TextStyle(
                         fontSize: 14,
                         color: ThemeConstants.textSecondary,
@@ -228,13 +295,15 @@ class _ContinuePerbaikanPageState extends State<ContinuePerbaikanPage> {
           ),
         ),
         
-        // List perbaikan yang belum selesai
+        // List objek yang memerlukan perbaikan
         Expanded(
           child: ListView.builder(
             padding: const EdgeInsets.symmetric(horizontal: ThemeConstants.spacingM),
-            itemCount: _incompletePerbaikanList.length,
+            itemCount: _incompletePerbaikanMap.length,
             itemBuilder: (context, index) {
-              return _buildPerbaikanCard(_incompletePerbaikanList[index]);
+              String objectId = _incompletePerbaikanMap.keys.elementAt(index);
+              List<Perbaikan> repairs = _incompletePerbaikanMap[objectId]!;
+              return _buildObjectCard(objectId, repairs);
             },
           ),
         ),
@@ -433,7 +502,7 @@ class _ContinuePerbaikanPageState extends State<ContinuePerbaikanPage> {
             const SnackBar(
               content: Text('PDF berhasil diekspor'),
               backgroundColor: ThemeConstants.successGreen,
-              behavior: SnackBarBehavior.floating,
+              behavior: SnackBarBehavior.fixed,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(ThemeConstants.radiusM)),
               ),

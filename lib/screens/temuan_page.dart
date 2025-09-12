@@ -7,6 +7,7 @@ import '../models/temuan.dart';
 import '../database/database_helper.dart';
 import '../services/pdf_service.dart';
 import '../widgets/pdf_config_dialog.dart';
+import '../widgets/export_confirmation_dialog.dart';
 import '../models/pdf_config.dart' as pdf_config;
 import '../services/location_service.dart';
 import '../constants/theme_constants.dart';
@@ -62,232 +63,233 @@ class _TemuanPageState extends State<TemuanPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ThemeConstants.backgroundWhite,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(80),
-        child: AppBar(
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset(
-                'lib/assets/logoJJCWhite.png',
-                height: 24,
-                width: 24,
-                fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) {
-                  return const SizedBox.shrink();
-                },
-              ),
-              const SizedBox(width: 8),
-              const Text(
-                'Input Data Temuan',
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  color: ThemeConstants.backgroundWhite,
-                  fontSize: 20,
+      body: Column(
+        children: [
+          // Custom Header
+          Container(
+            color: ThemeConstants.primaryBlue,
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      'lib/assets/logoJJCWhite.png',
+                      height: 24,
+                      width: 24,
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) {
+                        return const SizedBox.shrink();
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    const Text(
+                      'Input Data Temuan',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: ThemeConstants.backgroundWhite,
+                        fontSize: 20,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
-          backgroundColor: ThemeConstants.primaryBlue,
-          centerTitle: true,
-          elevation: 0,
-          systemOverlayStyle: SystemUiOverlayStyle.light,
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.picture_as_pdf, color: ThemeConstants.backgroundWhite),
-              onPressed: _exportToPdf,
-              tooltip: 'Ekspor ke PDF',
             ),
-          ],
-        ),
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: ThemeConstants.spacingL, vertical: ThemeConstants.spacingM),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Header Section
-                  _buildHeaderSection(),
-                  
-                  const SizedBox(height: ThemeConstants.spacingXL),
-                  
-                  // Form Card
-                  Container(
-                    padding: const EdgeInsets.all(ThemeConstants.spacingL),
-                    decoration: ThemeConstants.cardDecoration,
+          ),
+          // Content
+          Expanded(
+            child: SafeArea(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: ThemeConstants.spacingL, vertical: ThemeConstants.spacingM),
+                  child: Form(
+                    key: _formKey,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Tanggal
-                        _buildDateField(),
-                        const SizedBox(height: ThemeConstants.spacingL),
+                        // Header Section
+                        _buildHeaderSection(),
                         
-                        // Jenis Temuan
-                        _buildDropdownField(
-                          label: 'Jenis Temuan',
-                          value: _jenisTemuan,
-                          items: _jenisTemuanOptions,
-                          onChanged: (value) {
-                            setState(() {
-                              _jenisTemuan = value!;
-                            });
-                          },
-                        ),
-                        const SizedBox(height: ThemeConstants.spacingL),
+                        const SizedBox(height: ThemeConstants.spacingXL),
                         
-                        // Jalur
-                        _buildDropdownField(
-                          label: 'Jalur',
-                          value: _jalur,
-                          items: _jalurOptions,
-                          onChanged: (value) {
-                            setState(() {
-                              _jalur = value!;
-                            });
-                          },
-                        ),
-                        const SizedBox(height: ThemeConstants.spacingL),
-                        
-                        // Lajur
-                        _buildDropdownField(
-                          label: 'Lajur',
-                          value: _lajur,
-                          items: _lajurOptions,
-                          onChanged: (value) {
-                            setState(() {
-                              _lajur = value!;
-                            });
-                          },
-                        ),
-                        const SizedBox(height: ThemeConstants.spacingL),
-                        
-                        // Kilometer
-                        _buildTextField(
-                          label: 'Kilometer',
-                          controller: _kilometerController,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Kilometer harus diisi';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: ThemeConstants.spacingL),
-                        
-                        // Koordinat
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                const Text(
-                                  'Koordinat GPS',
-                                  style: ThemeConstants.bodyLarge,
-                                ),
-                                const Spacer(),
-                                ElevatedButton.icon(
-                                  onPressed: _getCurrentLocation,
-                                  icon: const Icon(Icons.my_location, size: 16),
-                                  label: const Text('Ambil GPS'),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: ThemeConstants.secondaryGreen,
-                                    foregroundColor: ThemeConstants.backgroundWhite,
-                                    padding: const EdgeInsets.symmetric(horizontal: ThemeConstants.spacingM, vertical: ThemeConstants.spacingS),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(ThemeConstants.radiusS),
-                                    ),
+                        // Form Card
+                        Container(
+                          padding: const EdgeInsets.all(ThemeConstants.spacingL),
+                          decoration: ThemeConstants.cardDecoration,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Tanggal
+                              _buildDateField(),
+                              const SizedBox(height: ThemeConstants.spacingL),
+                              
+                              // Jenis Temuan
+                              _buildDropdownField(
+                                label: 'Jenis Temuan',
+                                value: _jenisTemuan,
+                                items: _jenisTemuanOptions,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _jenisTemuan = value!;
+                                  });
+                                },
+                              ),
+                              const SizedBox(height: ThemeConstants.spacingL),
+                              
+                              // Jalur
+                              _buildDropdownField(
+                                label: 'Jalur',
+                                value: _jalur,
+                                items: _jalurOptions,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _jalur = value!;
+                                  });
+                                },
+                              ),
+                              const SizedBox(height: ThemeConstants.spacingL),
+                              
+                              // Lajur
+                              _buildDropdownField(
+                                label: 'Lajur',
+                                value: _lajur,
+                                items: _lajurOptions,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _lajur = value!;
+                                  });
+                                },
+                              ),
+                              const SizedBox(height: ThemeConstants.spacingL),
+                              
+                              // Kilometer
+                              _buildTextField(
+                                label: 'Kilometer',
+                                controller: _kilometerController,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Kilometer harus diisi';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: ThemeConstants.spacingL),
+                              
+                              // Koordinat
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      const Text(
+                                        'Koordinat GPS',
+                                        style: ThemeConstants.bodyLarge,
+                                      ),
+                                      const Spacer(),
+                                      ElevatedButton.icon(
+                                        onPressed: _getCurrentLocation,
+                                        icon: const Icon(Icons.my_location, size: 16),
+                                        label: const Text('Ambil GPS'),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: ThemeConstants.secondaryGreen,
+                                          foregroundColor: ThemeConstants.backgroundWhite,
+                                          padding: const EdgeInsets.symmetric(horizontal: ThemeConstants.spacingM, vertical: ThemeConstants.spacingS),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(ThemeConstants.radiusS),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ),
-                              ],
+                                  const SizedBox(height: ThemeConstants.spacingS),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: _buildTextField(
+                                          label: 'Latitude',
+                                          controller: _latitudeController,
+                                          validator: (value) {
+                                            if (value == null || value.isEmpty) {
+                                              return 'Latitude harus diisi';
+                                            }
+                                            if (double.tryParse(value) == null) {
+                                              return 'Format latitude tidak valid';
+                                            }
+                                            return null;
+                                          },
+                                        ),
+                                      ),
+                                      const SizedBox(width: ThemeConstants.spacingM),
+                                      Expanded(
+                                        child: _buildTextField(
+                                          label: 'Longitude',
+                                          controller: _longitudeController,
+                                          validator: (value) {
+                                            if (value == null || value.isEmpty) {
+                                              return 'Longitude harus diisi';
+                                            }
+                                            if (double.tryParse(value) == null) {
+                                              return 'Format longitude tidak valid';
+                                            }
+                                            return null;
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: ThemeConstants.spacingL),
+                              
+                              // Deskripsi
+                              _buildTextField(
+                                label: 'Deskripsi',
+                                controller: _deskripsiController,
+                                maxLines: 4,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Deskripsi harus diisi';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: ThemeConstants.spacingL),
+                              
+                              // Foto
+                              _buildPhotoSection(),
+                            ],
+                          ),
+                        ),
+                        
+                        const SizedBox(height: ThemeConstants.spacingXL),
+                        
+                        // Tombol Simpan
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: _saveTemuan,
+                            style: ThemeConstants.primaryButtonStyle,
+                            child: const Text(
+                              'Simpan Data Temuan',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
-                            const SizedBox(height: ThemeConstants.spacingS),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: _buildTextField(
-                                    label: 'Latitude',
-                                    controller: _latitudeController,
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return 'Latitude harus diisi';
-                                      }
-                                      if (double.tryParse(value) == null) {
-                                        return 'Format latitude tidak valid';
-                                      }
-                                      return null;
-                                    },
-                                  ),
-                                ),
-                                const SizedBox(width: ThemeConstants.spacingM),
-                                Expanded(
-                                  child: _buildTextField(
-                                    label: 'Longitude',
-                                    controller: _longitudeController,
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return 'Longitude harus diisi';
-                                      }
-                                      if (double.tryParse(value) == null) {
-                                        return 'Format longitude tidak valid';
-                                      }
-                                      return null;
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
+                          ),
                         ),
-                        const SizedBox(height: ThemeConstants.spacingL),
-                        
-                        // Deskripsi
-                        _buildTextField(
-                          label: 'Deskripsi',
-                          controller: _deskripsiController,
-                          maxLines: 4,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Deskripsi harus diisi';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: ThemeConstants.spacingL),
-                        
-                        // Foto
-                        _buildPhotoSection(),
                       ],
                     ),
                   ),
-                  
-                  const SizedBox(height: ThemeConstants.spacingXL),
-                  
-                  // Tombol Simpan
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _saveTemuan,
-                      style: ThemeConstants.primaryButtonStyle,
-                      child: const Text(
-                        'Simpan Data Temuan',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
           ),
-        ),
+        ],
       ),
+      floatingActionButton: _buildNavigationButtons(),
     );
   }
 
@@ -557,7 +559,7 @@ class _TemuanPageState extends State<TemuanPage> {
             SnackBar(
               content: const Text('Lokasi GPS berhasil diambil'),
               backgroundColor: ThemeConstants.successGreen,
-              behavior: SnackBarBehavior.floating,
+              behavior: SnackBarBehavior.fixed,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
               ),
@@ -570,7 +572,7 @@ class _TemuanPageState extends State<TemuanPage> {
             SnackBar(
               content: Text(result['error']),
               backgroundColor: ThemeConstants.errorRed,
-              behavior: SnackBarBehavior.floating,
+              behavior: SnackBarBehavior.fixed,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
               ),
@@ -589,7 +591,7 @@ class _TemuanPageState extends State<TemuanPage> {
           SnackBar(
             content: Text('Error: $e'),
             backgroundColor: ThemeConstants.errorRed,
-            behavior: SnackBarBehavior.floating,
+            behavior: SnackBarBehavior.fixed,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
             ),
@@ -621,7 +623,7 @@ class _TemuanPageState extends State<TemuanPage> {
             SnackBar(
               content: const Text('Data temuan berhasil disimpan'),
               backgroundColor: ThemeConstants.successGreen,
-              behavior: SnackBarBehavior.floating,
+              behavior: SnackBarBehavior.fixed,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
               ),
@@ -637,7 +639,7 @@ class _TemuanPageState extends State<TemuanPage> {
             SnackBar(
               content: Text('Error: $e'),
               backgroundColor: ThemeConstants.errorRed,
-              behavior: SnackBarBehavior.floating,
+              behavior: SnackBarBehavior.fixed,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
               ),
@@ -663,42 +665,93 @@ class _TemuanPageState extends State<TemuanPage> {
   }
 
   Future<void> _exportToPdf() async {
-    final config = await showDialog<pdf_config.PdfConfig>(
-      context: context,
-      builder: (context) => const PdfConfigDialog(),
-    );
+    try {
+      // Ambil data temuan untuk tanggal yang dipilih
+      final temuanList = await DatabaseHelper().getTemuanByDate(_tanggal);
+      
+      // Tampilkan dialog konfirmasi export
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (context) => ExportConfirmationDialog(
+          temuanList: temuanList,
+          exportType: 'temuan',
+          dateRange: DateFormat('dd/MM/yyyy').format(_tanggal),
+        ),
+      );
 
-    if (config != null) {
-      try {
-        final temuanList = await DatabaseHelper().getTemuanByDate(_tanggal);
-        await PdfService().generateTemuanPdf(temuanList, config);
-        
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text('PDF berhasil diekspor'),
-              backgroundColor: ThemeConstants.successGreen,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
-              ),
-            ),
+      if (confirmed == true) {
+        // Tampilkan dialog konfigurasi PDF
+        final config = await showDialog<pdf_config.PdfConfig>(
+          context: context,
+          builder: (context) => const PdfConfigDialog(),
+        );
+
+        if (config != null) {
+          // Generate PDF
+          await PdfService().generateTemuanPdf(
+            temuanList, 
+            config,
+            dateRange: DateFormat('dd/MM/yyyy').format(_tanggal),
           );
-        }
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Error: $e'),
-              backgroundColor: ThemeConstants.errorRed,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
+          
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('PDF berhasil diekspor (${temuanList.length} data)'),
+                backgroundColor: ThemeConstants.successGreen,
+                behavior: SnackBarBehavior.fixed,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
+                ),
               ),
-            ),
-          );
+            );
+          }
         }
       }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Gagal membuat PDF: ${e.toString()}'),
+            backgroundColor: ThemeConstants.errorRed,
+            behavior: SnackBarBehavior.fixed,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
+            ),
+          ),
+        );
+      }
     }
+  }
+
+  Widget _buildNavigationButtons() {
+    return Positioned(
+      left: 16,
+      bottom: 16,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Export PDF Button
+          FloatingActionButton(
+            heroTag: "export_pdf",
+            onPressed: _exportToPdf,
+            backgroundColor: ThemeConstants.primaryBlue,
+            mini: true,
+            child: const Icon(Icons.picture_as_pdf, color: ThemeConstants.backgroundWhite),
+            tooltip: 'Ekspor ke PDF',
+          ),
+          const SizedBox(height: 8),
+          // Back Button
+          FloatingActionButton(
+            heroTag: "back_button",
+            onPressed: () => Navigator.pop(context),
+            backgroundColor: ThemeConstants.textSecondary,
+            mini: true,
+            child: const Icon(Icons.arrow_back, color: ThemeConstants.backgroundWhite),
+            tooltip: 'Kembali',
+          ),
+        ],
+      ),
+    );
   }
 }

@@ -1,6 +1,7 @@
 class Perbaikan {
   final int? id;
   final DateTime tanggal;
+  final String objectId;
   final String jenisPerbaikan;
   final String jalur;
   final String lajur;
@@ -14,6 +15,7 @@ class Perbaikan {
   const Perbaikan({
     this.id,
     required this.tanggal,
+    required this.objectId,
     required this.jenisPerbaikan,
     required this.jalur,
     required this.lajur,
@@ -29,6 +31,7 @@ class Perbaikan {
     return {
       'id': id,
       'tanggal': tanggal.millisecondsSinceEpoch,
+      'object_id': objectId,
       'jenis_perbaikan': jenisPerbaikan,
       'jalur': jalur,
       'lajur': lajur,
@@ -45,6 +48,7 @@ class Perbaikan {
     return Perbaikan(
       id: map['id'],
       tanggal: DateTime.fromMillisecondsSinceEpoch(map['tanggal']),
+      objectId: map['object_id'],
       jenisPerbaikan: map['jenis_perbaikan'],
       jalur: map['jalur'],
       lajur: map['lajur'],
@@ -60,6 +64,7 @@ class Perbaikan {
   Perbaikan copyWith({
     int? id,
     DateTime? tanggal,
+    String? objectId,
     String? jenisPerbaikan,
     String? jalur,
     String? lajur,
@@ -73,6 +78,7 @@ class Perbaikan {
     return Perbaikan(
       id: id ?? this.id,
       tanggal: tanggal ?? this.tanggal,
+      objectId: objectId ?? this.objectId,
       jenisPerbaikan: jenisPerbaikan ?? this.jenisPerbaikan,
       jalur: jalur ?? this.jalur,
       lajur: lajur ?? this.lajur,
@@ -87,7 +93,7 @@ class Perbaikan {
 
   @override
   String toString() {
-    return 'Perbaikan(id: $id, tanggal: $tanggal, jenisPerbaikan: $jenisPerbaikan, '
+    return 'Perbaikan(id: $id, tanggal: $tanggal, objectId: $objectId, jenisPerbaikan: $jenisPerbaikan, '
         'jalur: $jalur, lajur: $lajur, kilometer: $kilometer, '
         'latitude: $latitude, longitude: $longitude, deskripsi: $deskripsi, '
         'statusPerbaikan: $statusPerbaikan, fotoPath: $fotoPath)';

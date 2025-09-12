@@ -3,12 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import '../models/temuan.dart';
 import '../models/perbaikan.dart';
-import '../models/pdf_config.dart' as pdf_config;
 import '../database/database_helper.dart';
 import '../utils/error_handler.dart';
 import '../widgets/export_dialog.dart';
-import '../widgets/pdf_config_dialog.dart';
-import '../services/pdf_service.dart';
 import '../constants/theme_constants.dart';
 import 'date_history_page.dart';
 
@@ -208,74 +205,59 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ThemeConstants.backgroundWhite,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(120),
-        child: AppBar(
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset(
-                'lib/assets/logoJJCWhite.png',
-                height: 24,
-                width: 24,
-                fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) {
-                  return const SizedBox.shrink();
-                },
-              ),
-              const SizedBox(width: 8),
-              const Text(
-                'History Data',
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  color: ThemeConstants.backgroundWhite,
-                  fontSize: 20,
-                ),
-              ),
-            ],
-          ),
-          backgroundColor: ThemeConstants.primaryBlue,
-          centerTitle: true,
-          elevation: 0,
-          systemOverlayStyle: SystemUiOverlayStyle.light,
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.picture_as_pdf, color: ThemeConstants.backgroundWhite),
-              onPressed: _exportToPdf,
-              tooltip: 'Export PDF',
-            ),
-            IconButton(
-              icon: const Icon(Icons.file_download, color: ThemeConstants.backgroundWhite),
-              onPressed: _showExportDialog,
-              tooltip: 'Export Data',
-            ),
-            IconButton(
-              icon: const Icon(Icons.filter_list, color: ThemeConstants.backgroundWhite),
-              onPressed: _showFilterDialog,
-              tooltip: 'Filter',
-            ),
-            IconButton(
-              icon: const Icon(Icons.sort, color: ThemeConstants.backgroundWhite),
-              onPressed: _showSortDialog,
-              tooltip: 'Sort',
-            ),
-          ],
-          bottom: TabBar(
-            controller: _tabController,
-            indicatorColor: ThemeConstants.backgroundWhite,
-            indicatorWeight: 3,
-            labelColor: ThemeConstants.backgroundWhite,
-            unselectedLabelColor: ThemeConstants.backgroundWhite.withOpacity(0.7),
-            labelStyle: const TextStyle(fontWeight: FontWeight.w600),
-            tabs: const [
-              Tab(text: 'Temuan'),
-              Tab(text: 'Perbaikan'),
-            ],
-          ),
-        ),
-      ),
+      appBar: null,
       body: Column(
         children: [
+          // Custom Header dengan Tab
+          Container(
+            color: ThemeConstants.primaryBlue,
+            child: Column(
+              children: [
+                // Header dengan logo dan title
+                SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          'lib/assets/logoJJCWhite.png',
+                          height: 24,
+                          width: 24,
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stackTrace) {
+                            return const SizedBox.shrink();
+                          },
+                        ),
+                        const SizedBox(width: 8),
+                        const Text(
+                          'History Data',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: ThemeConstants.backgroundWhite,
+                            fontSize: 20,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                // Tab Bar
+                TabBar(
+                  controller: _tabController,
+                  indicatorColor: ThemeConstants.backgroundWhite,
+                  indicatorWeight: 3,
+                  labelColor: ThemeConstants.backgroundWhite,
+                  unselectedLabelColor: ThemeConstants.backgroundWhite.withOpacity(0.7),
+                  labelStyle: const TextStyle(fontWeight: FontWeight.w600),
+                  tabs: const [
+                    Tab(text: 'Temuan'),
+                    Tab(text: 'Perbaikan'),
+                  ],
+                ),
+              ],
+            ),
+          ),
           // Search Bar
           Container(
             padding: const EdgeInsets.all(ThemeConstants.spacingM),
@@ -332,6 +314,72 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
                 _buildPerbaikanList(),
               ],
             ),
+          ),
+        ],
+      ),
+      floatingActionButton: _buildNavigationButtons(),
+    );
+  }
+
+  Widget _buildNavigationButtons() {
+    return Positioned(
+      left: 16,
+      bottom: 16,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Export PDF Button
+          FloatingActionButton(
+            heroTag: "export_pdf",
+            onPressed: _exportToPdf,
+            backgroundColor: ThemeConstants.primaryBlue,
+            mini: true,
+            child: const Icon(Icons.picture_as_pdf, color: ThemeConstants.backgroundWhite),
+            tooltip: 'Export PDF',
+          ),
+          const SizedBox(height: 8),
+          
+          // Export Data Button
+          FloatingActionButton(
+            heroTag: "export_data",
+            onPressed: _showExportDialog,
+            backgroundColor: ThemeConstants.secondaryGreen,
+            mini: true,
+            child: const Icon(Icons.file_download, color: ThemeConstants.backgroundWhite),
+            tooltip: 'Export Data',
+          ),
+          const SizedBox(height: 8),
+          
+          // Filter Button
+          FloatingActionButton(
+            heroTag: "filter",
+            onPressed: _showFilterDialog,
+            backgroundColor: ThemeConstants.warningOrange,
+            mini: true,
+            child: const Icon(Icons.filter_list, color: ThemeConstants.backgroundWhite),
+            tooltip: 'Filter',
+          ),
+          const SizedBox(height: 8),
+          
+          // Sort Button
+          FloatingActionButton(
+            heroTag: "sort",
+            onPressed: _showSortDialog,
+            backgroundColor: ThemeConstants.textSecondary,
+            mini: true,
+            child: const Icon(Icons.sort, color: ThemeConstants.backgroundWhite),
+            tooltip: 'Sort',
+          ),
+          const SizedBox(height: 8),
+          
+          // Back Button
+          FloatingActionButton(
+            heroTag: "back_button",
+            onPressed: () => Navigator.pop(context),
+            backgroundColor: ThemeConstants.textSecondary,
+            mini: true,
+            child: const Icon(Icons.arrow_back, color: ThemeConstants.backgroundWhite),
+            tooltip: 'Kembali',
           ),
         ],
       ),
@@ -545,116 +593,10 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
   }
 
   Future<void> _exportToPdf() async {
-    final config = await showDialog<pdf_config.PdfConfig>(
-      context: context,
-      builder: (context) => const PdfConfigDialog(),
-    );
-
-    if (config != null) {
-      try {
-        // Buat informasi tanggal dan filter
-        final dateRange = _getDateRangeInfo();
-        final filterInfo = _getFilterInfo();
-        
-        // Export data sesuai dengan tab yang sedang aktif
-        if (_tabController.index == 0) {
-          // Tab Temuan
-          if (_filteredTemuanList.isNotEmpty) {
-            await PdfService().generateTemuanPdf(_filteredTemuanList, config, dateRange: dateRange, filterInfo: filterInfo);
-          } else {
-            _showNoDataMessage('Tidak ada data temuan untuk diekspor');
-            return;
-          }
-        } else {
-          // Tab Perbaikan
-          if (_filteredPerbaikanList.isNotEmpty) {
-            await PdfService().generatePerbaikanPdf(_filteredPerbaikanList, config, dateRange: dateRange, filterInfo: filterInfo);
-          } else {
-            _showNoDataMessage('Tidak ada data perbaikan untuk diekspor');
-            return;
-          }
-        }
-        
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('PDF berhasil diekspor'),
-              backgroundColor: ThemeConstants.successGreen,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(ThemeConstants.radiusM)),
-              ),
-            ),
-          );
-        }
-      } catch (e) {
-        ErrorHandler.handleError(context, e, customMessage: 'Gagal membuat PDF');
-      }
-    }
+    // Tampilkan ExportDialog yang sudah diperbaiki
+    _showExportDialog();
   }
 
-  String? _getDateRangeInfo() {
-    if (_tabController.index == 0) {
-      // Tab Temuan
-      if (_filteredTemuanList.isEmpty) return null;
-      final dates = _filteredTemuanList.map((item) => item.tanggal).toList();
-      dates.sort();
-      
-      final startDate = DateFormat('dd/MM/yyyy').format(dates.first);
-      final endDate = DateFormat('dd/MM/yyyy').format(dates.last);
-      
-      if (startDate == endDate) {
-        return startDate;
-      } else {
-        return '$startDate - $endDate';
-      }
-    } else {
-      // Tab Perbaikan
-      if (_filteredPerbaikanList.isEmpty) return null;
-      final dates = _filteredPerbaikanList.map((item) => item.tanggal).toList();
-      dates.sort();
-      
-      final startDate = DateFormat('dd/MM/yyyy').format(dates.first);
-      final endDate = DateFormat('dd/MM/yyyy').format(dates.last);
-      
-      if (startDate == endDate) {
-        return startDate;
-      } else {
-        return '$startDate - $endDate';
-      }
-    }
-  }
-
-  String? _getFilterInfo() {
-    final List<String> filters = [];
-    
-    if (_searchQuery.isNotEmpty) {
-      filters.add('Pencarian: "$_searchQuery"');
-    }
-    
-    if (_sortBy != 'tanggal') {
-      filters.add('Urutkan: $_sortBy');
-    }
-    
-    if (!_sortAscending) {
-      filters.add('Urutan: Menurun');
-    }
-    
-    return filters.isNotEmpty ? filters.join(', ') : null;
-  }
-
-  void _showNoDataMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: ThemeConstants.warningOrange,
-        behavior: SnackBarBehavior.floating,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(ThemeConstants.radiusM)),
-        ),
-      ),
-    );
-  }
 
   void _showFilterDialog() {
     showDialog(
