@@ -89,12 +89,13 @@ class PdfService {
     pdf.addPage(
       pw.Page(
         pageFormat: _getPageFormat(config),
+        margin: const pw.EdgeInsets.all(40),
         build: (pw.Context context) {
           return pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
               header,
-              pw.SizedBox(height: 20),
+              pw.SizedBox(height: 60),
               pw.Expanded(
                 child: pw.Center(
                   child: pw.Text(
@@ -119,122 +120,82 @@ class PdfService {
   Future<pw.Widget> _buildHeader(String type, {String? dateRange, String? filterInfo}) async {
     return pw.Container(
       width: double.infinity,
-      padding: const pw.EdgeInsets.fromLTRB(30, 20, 30, 20),
-      decoration: pw.BoxDecoration(
-        color: PdfColors.blue50,
-        border: pw.Border(
-          bottom: pw.BorderSide(color: PdfColors.blue200, width: 0.5),
-        ),
-      ),
-      child: pw.Row(
-        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: pw.CrossAxisAlignment.center,
+      padding: const pw.EdgeInsets.only(bottom: 30),
+      child: pw.Column(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
-          // Logo dan Informasi Utama
-          pw.Expanded(
-            child: pw.Row(
-              crossAxisAlignment: pw.CrossAxisAlignment.center,
-              children: [
-                // Logo JJC dengan border halus
-                pw.Container(
-                  width: 45,
-                  height: 45,
-                  padding: const pw.EdgeInsets.all(4),
-                  decoration: pw.BoxDecoration(
-                    color: PdfColors.white,
-                    borderRadius: pw.BorderRadius.circular(8),
-                    boxShadow: [
-                      pw.BoxShadow(
-                        color: PdfColors.grey300,
-                        offset: PdfPoint(0, 1),
-                        blurRadius: 2,
-                      ),
-                    ],
+          // Header utama dengan logo dan judul
+          pw.Row(
+            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              // Logo dan judul dalam kolom vertikal
+              pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  // Logo dengan ukuran baru
+                  pw.Container(
+                    width: 120,
+                    height: 120,
+                    child: await _buildLogoWidget(),
                   ),
-                  child: await _buildLogoWidget(),
-                ),
-                pw.SizedBox(width: 15),
-                
-                // Informasi perusahaan dan laporan
-                pw.Expanded(
-                  child: pw.Column(
-                    crossAxisAlignment: pw.CrossAxisAlignment.start,
-                    children: [
-                      // Nama perusahaan dengan style modern
-                      pw.Text(
-                        'JASAMARGA JALAN LAYANG CIKAMPEK',
-                        style: pw.TextStyle(
-                          fontSize: 16,
-                          fontWeight: pw.FontWeight.bold,
-                          color: PdfColors.blueGrey800,
-                        ),
-                      ),
-                      pw.SizedBox(height: 6),
-                      
-                      // Judul laporan dengan aksen warna
-                      pw.Container(
-                        padding: const pw.EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                        decoration: pw.BoxDecoration(
-                          color: PdfColors.blue100,
-                          borderRadius: pw.BorderRadius.circular(4),
-                        ),
-                        child: pw.Text(
-                          type == 'TEMUAN' ? 'LAPORAN TEMUAN JALAN LAYANG MBZ' : 'LAPORAN PERBAIKAN JALAN LAYANG MBZ',
-                          style: pw.TextStyle(
-                            fontSize: 12,
-                            fontWeight: pw.FontWeight.bold,
-                            color: PdfColors.blue800,
-                          ),
-                        ),
-                      ),
-                    ],
+                  pw.SizedBox(height: 16),
+                  
+                  // Judul laporan dengan style baru
+                  pw.Text(
+                    type == 'TEMUAN' ? 'LAPORAN ANOMALI JALAN LAYANG MBZ' : 'LAPORAN PERBAIKAN JALAN LAYANG MBZ',
+                    style: pw.TextStyle(
+                      fontSize: 14,
+                      fontWeight: pw.FontWeight.bold,
+                      color: PdfColors.blueGrey800,
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ),
+                ],
+              ),
 
-          // Informasi waktu dan filter dengan desain minimalis
+              // Informasi tanggal dan filter
+              pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.end,
+                children: [
+                  pw.Text(
+                    DateFormat(_dateFormat).format(DateTime.now()),
+                    style: pw.TextStyle(
+                      fontSize: 12,
+                      color: PdfColors.blueGrey700,
+                      fontWeight: pw.FontWeight.bold,
+                    ),
+                  ),
+                  if (dateRange != null) ...[
+                    pw.SizedBox(height: 4),
+                    pw.Text(
+                      'Periode: $dateRange',
+                      style: const pw.TextStyle(
+                        fontSize: 10,
+                        color: PdfColors.blueGrey600,
+                      ),
+                    ),
+                  ],
+                  if (filterInfo != null) ...[
+                    pw.SizedBox(height: 4),
+                    pw.Text(
+                      filterInfo,
+                      style: const pw.TextStyle(
+                        fontSize: 10,
+                        color: PdfColors.blueGrey600,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ],
+          ),
+          
+          // Garis pembatas sederhana
+          pw.SizedBox(height: 20),
           pw.Container(
-            padding: const pw.EdgeInsets.all(12),
-            decoration: pw.BoxDecoration(
-              color: PdfColors.white,
-              borderRadius: pw.BorderRadius.circular(8),
-              border: pw.Border.all(color: PdfColors.blue100, width: 0.5),
-            ),
-            child: pw.Column(
-              crossAxisAlignment: pw.CrossAxisAlignment.end,
-              children: [
-                pw.Text(
-                  DateFormat(_dateFormat).format(DateTime.now()),
-                  style: pw.TextStyle(
-                    fontSize: 10,
-                    color: PdfColors.blueGrey800,
-                    fontWeight: pw.FontWeight.bold,
-                  ),
-                ),
-                if (dateRange != null) ...[
-                  pw.SizedBox(height: 4),
-                  pw.Text(
-                    'Periode: $dateRange',
-                    style: const pw.TextStyle(
-                      fontSize: 9,
-                      color: PdfColors.blueGrey600,
-                    ),
-                  ),
-                ],
-                if (filterInfo != null) ...[
-                  pw.SizedBox(height: 4),
-                  pw.Text(
-                    filterInfo,
-                    style: const pw.TextStyle(
-                      fontSize: 9,
-                      color: PdfColors.blueGrey600,
-                    ),
-                  ),
-                ],
-              ],
-            ),
+            height: 1,
+            width: double.infinity,
+            color: PdfColors.blueGrey300,
           ),
         ],
       ),
@@ -311,34 +272,16 @@ class PdfService {
 
   pw.Widget _buildLogoPlaceholder() {
     return pw.Container(
-      width: 40,
-      height: 40,
-      decoration: pw.BoxDecoration(
-        color: PdfColors.blue600,
-        borderRadius: pw.BorderRadius.circular(8),
-        border: pw.Border.all(color: PdfColors.blue800, width: 1),
-      ),
+      width: 80,
+      height: 80,
       child: pw.Center(
-        child: pw.Column(
-          mainAxisAlignment: pw.MainAxisAlignment.center,
-          children: [
-            pw.Text(
-              'JJC',
-              style: pw.TextStyle(
-                color: PdfColors.white,
-                fontSize: 10,
-                fontWeight: pw.FontWeight.bold,
-              ),
-            ),
-            pw.Text(
-              'LOGO',
-              style: pw.TextStyle(
-                color: PdfColors.white,
-                fontSize: 6,
-                fontWeight: pw.FontWeight.normal,
-              ),
-            ),
-          ],
+        child: pw.Text(
+          'JJC',
+          style: pw.TextStyle(
+            fontSize: 24,
+            fontWeight: pw.FontWeight.bold,
+            color: PdfColors.blueGrey600,
+          ),
         ),
       ),
     );
@@ -356,15 +299,15 @@ class PdfService {
           columnsPerRow = 2;
           break;
         case pdf_config.GridType.fourColumns:
-          columnsPerRow = 2; // Changed to 2 for better readability
+          columnsPerRow = 2;
           break;
         case pdf_config.GridType.sixColumns:
-          columnsPerRow = 2; // Changed to 2 for better readability
+          columnsPerRow = 2;
           break;
       }
 
       // Bagi data menjadi chunks untuk setiap halaman dengan maksimal 4 item per halaman
-      final itemsPerPage = 4; // Fixed 4 items per page for better layout
+      final itemsPerPage = 4;
       final pages = <List<dynamic>>[];
       
       for (int i = 0; i < dataList.length; i += itemsPerPage) {
@@ -391,7 +334,7 @@ class PdfService {
         pdf.addPage(
           pw.Page(
             pageFormat: _getPageFormat(config),
-            margin: const pw.EdgeInsets.all(30),
+            margin: const pw.EdgeInsets.all(40),
             build: (pw.Context context) {
               return pw.Column(
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -415,15 +358,6 @@ class PdfService {
   pw.Widget _buildPhotoGridFromWidgets(List<pw.Widget> photoWidgets, int columnsPerRow) {
     final rows = <pw.Widget>[];
     
-    // Add a clean divider at the top
-    rows.add(
-      pw.Container(
-        margin: const pw.EdgeInsets.symmetric(horizontal: 30),
-        child: pw.Divider(thickness: 0.5, color: PdfColors.blue200),
-      ),
-    );
-    rows.add(pw.SizedBox(height: 20));
-    
     for (int i = 0; i < photoWidgets.length; i += columnsPerRow) {
       final rowItems = <pw.Widget>[];
       
@@ -431,62 +365,31 @@ class PdfService {
         rowItems.add(
           pw.Expanded(
             child: pw.Padding(
-              padding: const pw.EdgeInsets.symmetric(horizontal: 10),
-              child: pw.Container(
-                decoration: pw.BoxDecoration(
-                  color: PdfColors.white,
-                  borderRadius: pw.BorderRadius.circular(8),
-                  boxShadow: [
-                    pw.BoxShadow(
-                      color: PdfColors.grey200,
-                      offset: PdfPoint(0, 2),
-                      blurRadius: 3,
-                    ),
-                  ],
-                ),
-                child: pw.ClipRRect(
-                  horizontalRadius: 8,
-                  verticalRadius: 8,
-                  child: photoWidgets[i + j],
-                ),
-              ),
+              padding: const pw.EdgeInsets.symmetric(horizontal: 15),
+              child: photoWidgets[i + j],
             ),
           ),
         );
       }
       
-      // Add spacers for incomplete rows with proper styling
+      // Add spacers for incomplete rows
       while (rowItems.length < columnsPerRow) {
         rowItems.add(pw.Expanded(
-          child: pw.Container(
-            margin: const pw.EdgeInsets.symmetric(horizontal: 10),
-          ),
+          child: pw.Container(),
         ));
       }
       
       rows.add(
-        pw.Padding(
-          padding: const pw.EdgeInsets.symmetric(horizontal: 20),
-          child: pw.Row(
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
-            children: rowItems,
-          ),
+        pw.Row(
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: rowItems,
         ),
       );
       
       if (i + columnsPerRow < photoWidgets.length) {
-        rows.add(pw.SizedBox(height: 25));
+        rows.add(pw.SizedBox(height: 40));
       }
     }
-    
-    // Add a clean divider at the bottom
-    rows.add(pw.SizedBox(height: 20));
-    rows.add(
-      pw.Container(
-        margin: const pw.EdgeInsets.symmetric(horizontal: 30),
-        child: pw.Divider(thickness: 0.5, color: PdfColors.blue200),
-      ),
-    );
     
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -541,12 +444,8 @@ class PdfService {
           final imageBytes = await file.readAsBytes();
           if (imageBytes.isNotEmpty) {
             return pw.Container(
-              height: 120,
+              height: 180,
               width: double.infinity,
-              decoration: pw.BoxDecoration(
-                border: pw.Border.all(color: PdfColors.grey300),
-                borderRadius: pw.BorderRadius.circular(8),
-              ),
               child: pw.Image(
                 pw.MemoryImage(imageBytes),
                 fit: pw.BoxFit.cover,
@@ -567,224 +466,131 @@ class PdfService {
   }
 
   pw.Widget _buildPhotoContainer(pw.Widget fotoWidget, Map<String, dynamic> itemData) {
-    return pw.Container(
-      margin: const pw.EdgeInsets.all(10),
-      padding: const pw.EdgeInsets.all(12),
-      decoration: pw.BoxDecoration(
-        color: PdfColors.white,
-        borderRadius: pw.BorderRadius.circular(8),
-        boxShadow: [
-          pw.BoxShadow(
-            color: PdfColors.grey200,
-            offset: PdfPoint(0, 2),
-            blurRadius: 3,
-          ),
-        ],
-      ),
-      child: pw.Column(
-        crossAxisAlignment: pw.CrossAxisAlignment.start,
-        children: [
-          // Header info
-          pw.Row(
-            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-            children: [
-              pw.Container(
-                padding: const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: pw.BoxDecoration(
-                  color: PdfColors.blue100,
-                  borderRadius: pw.BorderRadius.circular(4),
-                ),
-                child: pw.Text(
-                  itemData['jenis'],
-                  style: pw.TextStyle(
-                    color: PdfColors.blue800,
-                    fontSize: 10,
-                    fontWeight: pw.FontWeight.bold,
-                  ),
-                ),
+    return pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: [
+        // Header section dengan informasi utama
+        pw.Row(
+          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: pw.CrossAxisAlignment.center,
+          children: [
+            pw.Text(
+              itemData['jenis'],
+              style: pw.TextStyle(
+                fontSize: 14,
+                fontWeight: pw.FontWeight.bold,
+                color: PdfColors.blueGrey800,
               ),
-              pw.Text(
-                itemData['tanggal'],
-                style: pw.TextStyle(
-                  color: PdfColors.grey700,
-                  fontSize: 9,
-                ),
+            ),
+            pw.Text(
+              itemData['tanggal'],
+              style: pw.TextStyle(
+                fontSize: 12,
+                color: PdfColors.blueGrey600,
               ),
-            ],
-          ),
-          pw.SizedBox(height: 10),
-          
-          // Photo with rounded corners
-          pw.ClipRRect(
-            horizontalRadius: 6,
-            verticalRadius: 6,
-            child: fotoWidget,
-          ),
-          pw.SizedBox(height: 12),
-          
-          // Info grid in modern layout
-          _buildItemInfo(itemData),
-        ],
-      ),
+            ),
+          ],
+        ),
+        
+        pw.SizedBox(height: 12),
+        
+        // Photo section
+        fotoWidget,
+        
+        pw.SizedBox(height: 16),
+        
+        // Information section dengan layout yang clean
+        _buildItemInfo(itemData),
+      ],
     );
   }
 
   pw.Widget _buildItemInfo(Map<String, dynamic> itemData) {
-    return pw.Container(
-      padding: const pw.EdgeInsets.all(10),
-      decoration: pw.BoxDecoration(
-        color: PdfColors.grey50,
-        borderRadius: pw.BorderRadius.circular(6),
-        border: pw.Border.all(color: PdfColors.grey200, width: 0.5),
-      ),
-      child: pw.Column(
-        crossAxisAlignment: pw.CrossAxisAlignment.start,
-        children: [
-          // Location info
-          pw.Row(
-            children: [
-              pw.Container(
-                padding: const pw.EdgeInsets.all(4),
-                decoration: pw.BoxDecoration(
-                  color: PdfColors.blue50,
-                  shape: pw.BoxShape.circle,
-                ),
-                child: pw.Icon(
-                  const pw.IconData(0xE0C8), // location icon
-                  size: 10,
-                  color: PdfColors.blue300,
-                ),
-              ),
-              pw.SizedBox(width: 6),
-              pw.Text(
-                '${itemData['jalur']} - ${itemData['lajur']} (KM ${itemData['kilometer']})',
-                style: pw.TextStyle(
-                  color: PdfColors.grey800,
-                  fontSize: 9,
-                ),
-              ),
-            ],
+    return pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: [
+        // Location information
+        pw.Text(
+          'Lokasi: ${itemData['jalur']} - ${itemData['lajur']} (KM ${itemData['kilometer']})',
+          style: pw.TextStyle(
+            fontSize: 11,
+            color: PdfColors.blueGrey700,
+            fontWeight: pw.FontWeight.bold,
           ),
-          pw.SizedBox(height: 6),
-          
-          // Coordinates
-          pw.Container(
-            padding: const pw.EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-            decoration: pw.BoxDecoration(
-              color: PdfColors.white,
-              borderRadius: pw.BorderRadius.circular(4),
-              border: pw.Border.all(color: PdfColors.grey200, width: 0.5),
-            ),
-            child: pw.Row(
-              mainAxisSize: pw.MainAxisSize.min,
-              children: [
-                pw.Text(
-                  'Lat: ${itemData['latitude']}',
-                  style: const pw.TextStyle(
-                    color: PdfColors.grey600,
-                    fontSize: 8,
-                  ),
-                ),
-                pw.SizedBox(width: 8),
-                pw.Text(
-                  'Lng: ${itemData['longitude']}',
-                  style: const pw.TextStyle(
-                    color: PdfColors.grey600,
-                    fontSize: 8,
-                  ),
-                ),
-              ],
-            ),
+        ),
+        
+        pw.SizedBox(height: 8),
+        
+        // Coordinates
+        pw.Text(
+          'Koordinat: ${itemData['latitude']}, ${itemData['longitude']}',
+          style: pw.TextStyle(
+            fontSize: 10,
+            color: PdfColors.blueGrey600,
           ),
-          
-          // Status (if available)
-          if (itemData['statusPerbaikan'] != null)
-            pw.Column(
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
-              children: [
-                pw.SizedBox(height: 8),
-                pw.Container(
-                  padding: const pw.EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                  decoration: pw.BoxDecoration(
-                    color: PdfColors.green50,
-                    borderRadius: pw.BorderRadius.circular(4),
-                    border: pw.Border.all(color: PdfColors.green200, width: 0.5),
-                  ),
-                  child: pw.Text(
-                    'Status: ${itemData['statusPerbaikan']}',
-                    style: pw.TextStyle(
-                      color: PdfColors.green700,
-                      fontSize: 9,
-                      fontWeight: pw.FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            
-          // Description
+        ),
+        
+        // Status (if available)
+        if (itemData['statusPerbaikan'] != null) ...[
           pw.SizedBox(height: 8),
-          pw.Container(
-            width: double.infinity,
-            padding: const pw.EdgeInsets.all(8),
-            decoration: pw.BoxDecoration(
-              color: PdfColors.white,
-              borderRadius: pw.BorderRadius.circular(4),
-              border: pw.Border.all(color: PdfColors.grey200, width: 0.5),
-            ),
-            child: pw.Column(
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
-              children: [
-                pw.Text(
-                  'Deskripsi',
-                  style: pw.TextStyle(
-                    color: PdfColors.blueGrey800,
-                    fontSize: 9,
-                    fontWeight: pw.FontWeight.bold,
-                  ),
-                ),
-                pw.SizedBox(height: 4),
-                pw.Text(
-                  itemData['deskripsi'],
-                  style: const pw.TextStyle(
-                    color: PdfColors.grey700,
-                    fontSize: 8,
-                  ),
-                  maxLines: 3,
-                  overflow: pw.TextOverflow.clip,
-                ),
-              ],
+          pw.Text(
+            'Status: ${itemData['statusPerbaikan']}',
+            style: pw.TextStyle(
+              fontSize: 11,
+              color: PdfColors.green700,
+              fontWeight: pw.FontWeight.bold,
             ),
           ),
         ],
-      ),
+        
+        pw.SizedBox(height: 12),
+        
+        // Description
+        pw.Text(
+          'Deskripsi:',
+          style: pw.TextStyle(
+            fontSize: 11,
+            fontWeight: pw.FontWeight.bold,
+            color: PdfColors.blueGrey800,
+          ),
+        ),
+        pw.SizedBox(height: 4),
+        pw.Text(
+          itemData['deskripsi'],
+          style: pw.TextStyle(
+            fontSize: 10,
+            color: PdfColors.blueGrey700,
+            height: 1.4,
+          ),
+          maxLines: 4,
+          overflow: pw.TextOverflow.clip,
+        ),
+      ],
     );
   }
 
   pw.Widget _buildPhotoPlaceholder(String message) {
     return pw.Container(
-      height: 120,
+      height: 180,
       width: double.infinity,
-      decoration: pw.BoxDecoration(
-        border: pw.Border.all(color: PdfColors.grey300),
-        borderRadius: pw.BorderRadius.circular(8),
-        color: PdfColors.grey200,
-      ),
+      color: PdfColors.grey100,
       child: pw.Center(
         child: pw.Column(
           mainAxisAlignment: pw.MainAxisAlignment.center,
           children: [
-            pw.Icon(
-              pw.IconData(0xe3b2), // camera_alt icon
-              size: 30,
-              color: PdfColors.grey600,
+            pw.Text(
+              '📷',
+              style: pw.TextStyle(
+                fontSize: 24,
+                color: PdfColors.grey400,
+              ),
             ),
             pw.SizedBox(height: 8),
             pw.Text(
               message,
               style: pw.TextStyle(
-                fontSize: 8,
-                color: PdfColors.grey600,
+                fontSize: 10,
+                color: PdfColors.grey500,
               ),
               textAlign: pw.TextAlign.center,
             ),

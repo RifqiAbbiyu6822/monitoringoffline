@@ -76,133 +76,121 @@ class _DetailHistoryPageState extends State<DetailHistoryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ThemeConstants.backgroundWhite,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(80),
-        child: AppBar(
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset(
-                'lib/assets/logoJJCWhite.png',
-                height: 24,
-                width: 24,
-                fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) {
-                  return const SizedBox.shrink();
-                },
-              ),
-              const SizedBox(width: 8),
-              Text(
-                'Detail ${widget.type == 'temuan' ? 'Temuan' : 'Perbaikan'}',
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  color: ThemeConstants.backgroundWhite,
-                  fontSize: 20,
-                ),
-              ),
-            ],
-          ),
-          backgroundColor: widget.type == 'temuan' ? ThemeConstants.primaryBlue : ThemeConstants.secondaryGreen,
-          centerTitle: true,
-          elevation: 0,
-          systemOverlayStyle: SystemUiOverlayStyle.light,
-          actions: [
-            if (!_isLoading && _data != null)
-              PopupMenuButton<String>(
-                icon: const Icon(Icons.more_vert, color: ThemeConstants.backgroundWhite),
-                onSelected: (value) {
-                  if (value == 'delete') {
-                    _deleteData();
-                  }
-                },
-                itemBuilder: (context) => [
-                  const PopupMenuItem(
-                    value: 'delete',
-                    child: Row(
-                      children: [
-                        Icon(Icons.delete, color: ThemeConstants.errorRed),
-                        SizedBox(width: ThemeConstants.spacingS),
-                        Text('Hapus Data', style: TextStyle(color: ThemeConstants.errorRed)),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-          ],
+      appBar: AppBar(
+        backgroundColor: widget.type == 'temuan' ? ThemeConstants.primaryBlue : ThemeConstants.secondaryGreen,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
         ),
-      ),
-      body: _isLoading
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Image.asset(
-                    'lib/assets/logo_jjcnormal.png',
-                    height: 60,
-                    width: 60,
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) {
-                      return const SizedBox.shrink();
-                    },
+        actions: [
+          if (!_isLoading && _data != null)
+            PopupMenuButton<String>(
+              icon: const Icon(Icons.more_vert),
+              onSelected: (value) {
+                if (value == 'delete') {
+                  _deleteData();
+                }
+              },
+              itemBuilder: (context) => [
+                const PopupMenuItem(
+                  value: 'delete',
+                  child: Row(
+                    children: [
+                      Icon(Icons.delete, color: ThemeConstants.errorRed),
+                      SizedBox(width: ThemeConstants.spacingS),
+                      Text('Hapus Data', style: TextStyle(color: ThemeConstants.errorRed)),
+                    ],
                   ),
-                  const SizedBox(height: 20),
-                  const CircularProgressIndicator(color: ThemeConstants.primaryBlue),
-                ],
+                ),
+              ],
+            ),
+        ],
+      ),
+      body: Column(
+        children: [
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            child: Text(
+              'Detail ${widget.type == 'temuan' ? 'Temuan' : 'Perbaikan'}',
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
               ),
-            )
-          : _data == null
+            ),
+          ),
+          Expanded(
+            child: _isLoading
               ? Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(
-                        Icons.error_outline,
-                        size: 64,
-                        color: ThemeConstants.textSecondary,
-                      ),
-                      const SizedBox(height: ThemeConstants.spacingM),
+                      const CircularProgressIndicator(),
+                      const SizedBox(height: 20),
                       Text(
-                        'Data tidak ditemukan',
-                        style: ThemeConstants.heading3.copyWith(color: ThemeConstants.textSecondary),
+                        'Memuat data...',
+                        style: TextStyle(color: ThemeConstants.textSecondary),
                       ),
                     ],
                   ),
                 )
-              : SingleChildScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  child: Padding(
-                    padding: const EdgeInsets.all(ThemeConstants.spacingL),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Header Card
-                        _buildHeaderCard(),
-                        
-                        const SizedBox(height: ThemeConstants.spacingL),
-                        
-                        // Info Card
-                        _buildInfoCard(),
-                        
-                        const SizedBox(height: ThemeConstants.spacingL),
-                        
-                        // Location Card
-                        _buildLocationCard(),
-                        
-                        const SizedBox(height: ThemeConstants.spacingL),
-                        
-                        // Description Card
-                        _buildDescriptionCard(),
-                        
-                        if (_data.fotoPath != null) ...[
-                          const SizedBox(height: ThemeConstants.spacingL),
-                          
-                          // Photo Card
-                          _buildPhotoCard(),
+              : _data == null
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.error_outline,
+                            size: 64,
+                            color: ThemeConstants.textSecondary,
+                          ),
+                          const SizedBox(height: ThemeConstants.spacingM),
+                          Text(
+                            'Data tidak ditemukan',
+                            style: ThemeConstants.heading3.copyWith(color: ThemeConstants.textSecondary),
+                          ),
                         ],
-                      ],
+                      ),
+                    )
+                  : SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      child: Padding(
+                        padding: const EdgeInsets.all(ThemeConstants.spacingL),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Header Card
+                            _buildHeaderCard(),
+                            
+                            const SizedBox(height: ThemeConstants.spacingL),
+                            
+                            // Info Card
+                            _buildInfoCard(),
+                            
+                            const SizedBox(height: ThemeConstants.spacingL),
+                            
+                            // Location Card
+                            _buildLocationCard(),
+                            
+                            const SizedBox(height: ThemeConstants.spacingL),
+                            
+                            // Description Card
+                            _buildDescriptionCard(),
+                            
+                            if (_data.fotoPath != null) ...[
+                              const SizedBox(height: ThemeConstants.spacingL),
+                              
+                              // Photo Card
+                              _buildPhotoCard(),
+                            ],
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
-                ),
+          ),
+        ],
+      ),
     );
   }
 

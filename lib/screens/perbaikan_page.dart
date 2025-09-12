@@ -96,38 +96,6 @@ class _PerbaikanPageState extends State<PerbaikanPage> {
       backgroundColor: ThemeConstants.backgroundWhite,
       body: Column(
         children: [
-          // Custom Header
-          Container(
-            color: ThemeConstants.secondaryGreen,
-            child: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      'lib/assets/logoJJCWhite.png',
-                      height: 24,
-                      width: 24,
-                      fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) {
-                        return const SizedBox.shrink();
-                      },
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      _editingId != null ? 'Lanjutkan Perbaikan' : 'Input Data Perbaikan',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                        color: ThemeConstants.backgroundWhite,
-                        fontSize: 20,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
           // Content
           Expanded(
             child: SafeArea(
@@ -141,7 +109,6 @@ class _PerbaikanPageState extends State<PerbaikanPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // Header Section
-                        _buildHeaderSection(),
                         
                         const SizedBox(height: ThemeConstants.spacingXL),
                         
@@ -350,45 +317,6 @@ class _PerbaikanPageState extends State<PerbaikanPage> {
     );
   }
 
-  Widget _buildHeaderSection() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(ThemeConstants.spacingL),
-      decoration: ThemeConstants.surfaceDecoration,
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(ThemeConstants.spacingM),
-            decoration: BoxDecoration(
-              color: ThemeConstants.secondaryGreen,
-              borderRadius: BorderRadius.circular(ThemeConstants.radiusL),
-            ),
-            child: const Icon(
-              Icons.build_outlined,
-              size: 32,
-              color: ThemeConstants.backgroundWhite,
-            ),
-          ),
-          const SizedBox(height: ThemeConstants.spacingM),
-          const Text(
-            'Input Data Perbaikan',
-            style: ThemeConstants.heading2,
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: ThemeConstants.spacingXS),
-          Text(
-            'Pencatatan perbaikan yang telah dilakukan',
-            style: TextStyle(
-              fontSize: 14,
-              color: ThemeConstants.secondaryGreen.withOpacity(0.7),
-              fontWeight: FontWeight.w400,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildDateField() {
     return Column(
@@ -561,17 +489,61 @@ class _PerbaikanPageState extends State<PerbaikanPage> {
     }
   }
 
-  Future<void> _pickImage() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: ImageSource.camera);
-    if (image != null) {
-      setState(() {
-        _fotoPath = image.path;
-      });
+Future<void> _pickImage() async {
+  final ImagePicker picker = ImagePicker();
+  
+  // Show bottom sheet to choose between camera and gallery
+  final source = await showModalBottomSheet<ImageSource>(
+    context: context,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (BuildContext context) {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('Ambil Foto'),
+              onTap: () => Navigator.pop(context, ImageSource.camera),
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('Pilih dari Galeri'),
+              onTap: () => Navigator.pop(context, ImageSource.gallery),
+            ),
+          ],
+        ),
+      );
+    },
+  );
+  
+  if (source != null) {
+    try {
+      final XFile? image = await picker.pickImage(
+        source: source,
+        maxWidth: 1920,
+        maxHeight: 1080,
+        imageQuality: 85,
+      );
+      if (image != null && mounted) {
+        setState(() {
+          _fotoPath = image.path;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Gagal mengambil foto. Silakan coba lagi.'),
+          ),
+        );
+      }
     }
   }
-
-  void _removeImage() {
+}  void _removeImage() {
     setState(() {
       _fotoPath = null;
     });

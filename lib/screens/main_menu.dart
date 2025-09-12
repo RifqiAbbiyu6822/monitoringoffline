@@ -15,188 +15,184 @@ class MainMenuPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ThemeConstants.backgroundWhite,
-      body: Column(
-        children: [
-          // Custom Header
-          Container(
-            color: ThemeConstants.primaryBlue,
-            child: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      'lib/assets/logoJJCWhite.png',
-                      height: 24,
-                      width: 24,
-                      fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) {
-                        return const SizedBox.shrink();
-                      },
+      backgroundColor: const Color(0xFFFAFBFC),
+      body: SafeArea(
+        child: CustomScrollView(
+          physics: const BouncingScrollPhysics(),
+          slivers: [
+            // Header Section
+            SliverToBoxAdapter(
+              child: Container(
+                margin: const EdgeInsets.fromLTRB(24, 32, 24, 48),
+                padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 32),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.04),
+                      blurRadius: 20,
+                      offset: const Offset(0, 8),
                     ),
-                    const SizedBox(width: 8),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    // Logo
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: ThemeConstants.primaryBlue.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Image.asset(
+                        'lib/assets/logo_jjcnormal.png',
+                        height: 60,
+                        width: 100,
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Icon(
+                            Icons.engineering_outlined,
+                            size: 60,
+                            color: ThemeConstants.primaryBlue,
+                          );
+                        },
+                      ),
+                    ),
+                    
+                    const SizedBox(height: 24),
+                    
+                    // Title
                     const Text(
-                      'Jasa Marga Mobile',
+                      'Monitoring Jalan Layang MBZ',
                       style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        color: ThemeConstants.backgroundWhite,
-                        fontSize: 18,
+                        fontSize: 24,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF1A1D29),
+                        letterSpacing: -0.5,
+                        height: 1.2,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    
+                    const SizedBox(height: 12),
+                    
+                    // Subtitle
+                    Text(
+                      'Sistem pencatatan dan pelaporan terintegrasi',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey.shade600,
+                        fontWeight: FontWeight.w400,
                         letterSpacing: 0.2,
                       ),
+                      textAlign: TextAlign.center,
                     ),
                   ],
                 ),
               ),
             ),
-          ),
-          // Content
-          Expanded(
-            child: SafeArea(
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                child: Padding(
-                  padding: const EdgeInsets.all(ThemeConstants.spacingL),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: ThemeConstants.spacingM),
-                      
-                      // Header Section
-                      _buildHeaderSection(),
-                      
-                      const SizedBox(height: 32),
-                      
-                      // Menu Cards
-                      _buildMenuCards(context),
-                      
-                      const SizedBox(height: 40),
-                      
-                      // Footer
-                      _buildFooter(),
-                    ],
-                  ),
-                ),
+            // Menu Section
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              sliver: SliverToBoxAdapter(
+                child: _buildMenuSection(context),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-      floatingActionButton: _buildNavigationButtons(),
+      floatingActionButton: _buildExitButton(context),
+      floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
     );
   }
 
-  Widget _buildHeaderSection() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 28, horizontal: ThemeConstants.spacingL),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.grey.shade200, width: 0.5),
-      ),
-      child: Column(
-        children: [
-          Image.asset(
-            'lib/assets/logo_jjcnormal.png',
-            height: 100,
-            width: 160,
-            fit: BoxFit.contain,
-            errorBuilder: (context, error, stackTrace) {
-              return Icon(
-                Icons.engineering_outlined,
-                size: 80,
-                color: ThemeConstants.primaryBlue,
-              );
-            },
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Monitoring Jalan Layang MBZ',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF2C3E50),
-              letterSpacing: -0.2,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Aplikasi untuk pencatatan dan pelaporan',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey.shade600,
-              fontWeight: FontWeight.w400,
-              letterSpacing: 0.1,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMenuCards(BuildContext context) {
+  Widget _buildMenuSection(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 4),
-          child: Text(
-            'Menu Utama',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: Colors.grey.shade800,
-              letterSpacing: -0.1,
-            ),
+        const Text(
+          'Menu Utama',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF1A1D29),
+            letterSpacing: -0.3,
           ),
         ),
-        const SizedBox(height: 20),
         
-        _buildMenuCard(
-          context,
-          icon: Icons.search_rounded,
-          title: 'Temuan',
-          subtitle: 'Pencatatan temuan atau anomali',
-          color: ThemeConstants.primaryBlue,
-          onTap: () => _showTemuanOptions(context),
+        const SizedBox(height: 24),
+        
+        // Menu Grid
+        Column(
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: _buildMenuCard(
+                    context,
+                    icon: Icons.search_rounded,
+                    title: 'Temuan',
+                    subtitle: 'Pencatatan anomali',
+                    color: ThemeConstants.primaryBlue,
+                    onTap: () => _showTemuanOptions(context),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: _buildMenuCard(
+                    context,
+                    icon: Icons.build_rounded,
+                    title: 'Perbaikan',
+                    subtitle: 'Pencatatan perbaikan',
+                    color: ThemeConstants.secondaryGreen,
+                    onTap: () => _showPerbaikanOptions(context),
+                  ),
+                ),
+              ],
+            ),
+            
+            const SizedBox(height: 16),
+            
+            Row(
+              children: [
+                Expanded(
+                  child: _buildMenuCard(
+                    context,
+                    icon: Icons.history_rounded,
+                    title: 'History',
+                    subtitle: 'Riwayat data',
+                    color: ThemeConstants.accentYellow,
+                    onTap: () => _navigateWithAnimation(context, const HistoryPage()),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade50,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.grey.shade200, width: 0.5),
+                    ),
+                    child: Center(
+                      child: Text(
+                        'Coming Soon',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey.shade500,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
         
-        const SizedBox(height: 16),
-        
-        _buildMenuCard(
-          context,
-          icon: Icons.build_rounded,
-          title: 'Perbaikan',
-          subtitle: 'Pencatatan perbaikan yang telah dilakukan',
-          color: ThemeConstants.secondaryGreen,
-          onTap: () => _showPerbaikanOptions(context),
-        ),
-        
-        const SizedBox(height: 16),
-        
-        _buildMenuCard(
-          context,
-          icon: Icons.history_rounded,
-          title: 'History',
-          subtitle: 'Lihat riwayat data temuan dan perbaikan',
-          color: ThemeConstants.accentYellow,
-          onTap: () => _navigateWithAnimation(context, const HistoryPage()),
-        ),
-        
-        const SizedBox(height: 16),
-        
-        _buildMenuCard(
-          context,
-          icon: Icons.logout_rounded,
-          title: 'Keluar',
-          subtitle: 'Menutup aplikasi',
-          color: ThemeConstants.errorRed,
-          onTap: () => _showExitDialog(context),
-        ),
+        const SizedBox(height: 60),
       ],
     );
   }
@@ -217,73 +213,64 @@ class MainMenuPage extends StatelessWidget {
         splashColor: color.withOpacity(0.1),
         highlightColor: color.withOpacity(0.05),
         child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(20),
+          height: 130, // Increased height to accommodate content
+          padding: const EdgeInsets.all(16), // Reduced padding
           decoration: BoxDecoration(
-            color: ThemeConstants.backgroundWhite,
+            color: Colors.white,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: Colors.grey.shade200, width: 0.5),
             boxShadow: [
               BoxShadow(
-                color: Colors.grey.shade100,
-                blurRadius: 6,
-                offset: const Offset(0, 2),
-                spreadRadius: 0,
+                color: Colors.black.withOpacity(0.04),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
               ),
             ],
           ),
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min, // Added to prevent expansion
             children: [
               Container(
-                padding: const EdgeInsets.all(14),
+                padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.08),
+                  color: color.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
                   icon,
                   color: color,
-                  size: 22,
+                  size: 24,
                 ),
               ),
-              const SizedBox(width: 18),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.grey.shade800,
-                        letterSpacing: -0.1,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      subtitle,
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.grey.shade600,
-                        fontWeight: FontWeight.w400,
-                        letterSpacing: 0.1,
-                      ),
-                    ),
-                  ],
+              
+              const Spacer(),
+              
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF1A1D29),
+                  letterSpacing: -0.2,
                 ),
+                maxLines: 1, // Added to prevent text overflow
+                overflow: TextOverflow.ellipsis, // Added to handle long text
               ),
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(
-                  Icons.arrow_forward_ios_rounded,
+              
+              const SizedBox(height: 4),
+              
+              Text(
+                subtitle,
+                style: TextStyle(
+                  fontSize: 12,
                   color: Colors.grey.shade600,
-                  size: 14,
+                  fontWeight: FontWeight.w400,
+                  letterSpacing: 0.1,
+                  height: 1.2, // Reduced line height
                 ),
+                maxLines: 1, // Limit to one line
+                overflow: TextOverflow.ellipsis, // Handle text overflow
               ),
             ],
           ),
@@ -292,42 +279,11 @@ class MainMenuPage extends StatelessWidget {
     );
   }
 
-  Widget _buildFooter() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200, width: 0.5),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.copyright_rounded,
-            size: 14,
-            color: Colors.grey.shade500,
-          ),
-          const SizedBox(width: 6),
-          Text(
-            '2024 Jasa Marga - Monitoring Jalan Tol',
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey.shade600,
-              fontWeight: FontWeight.w400,
-              letterSpacing: 0.1,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   void _showTemuanOptions(BuildContext context) {
     showDialog(
       context: context,
-      barrierColor: Colors.black.withOpacity(0.4),
+      barrierColor: Colors.black.withOpacity(0.5),
       builder: (BuildContext context) {
         return const TemuanOptionDialog();
       },
@@ -345,7 +301,7 @@ class MainMenuPage extends StatelessWidget {
   void _showPerbaikanOptions(BuildContext context) {
     showDialog(
       context: context,
-      barrierColor: Colors.black.withOpacity(0.4),
+      barrierColor: Colors.black.withOpacity(0.5),
       builder: (BuildContext context) {
         return const PerbaikanOptionDialog();
       },
@@ -390,44 +346,70 @@ class MainMenuPage extends StatelessWidget {
     );
   }
 
+  Widget _buildExitButton(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.shade300, width: 0.5),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => _showExitDialog(context),
+          borderRadius: BorderRadius.circular(16),
+          child: Container(
+            width: 56,
+            height: 56,
+            child: Icon(
+              Icons.close_rounded,
+              color: Colors.grey.shade600,
+              size: 24,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   void _showExitDialog(BuildContext context) {
     showDialog(
       context: context,
-      barrierColor: Colors.black.withOpacity(0.4),
+      barrierColor: Colors.black.withOpacity(0.5),
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: ThemeConstants.backgroundWhite,
+          backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
           contentPadding: const EdgeInsets.all(24),
           titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 12),
           actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-          title: Text(
-            'Konfirmasi Keluar',
+          title: const Text(
+            'Keluar Aplikasi',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 20,
               fontWeight: FontWeight.w600,
-              color: Colors.grey.shade800,
-              letterSpacing: -0.1,
+              color: Color(0xFF1A1D29),
+              letterSpacing: -0.3,
             ),
           ),
           content: Text(
             'Apakah Anda yakin ingin keluar dari aplikasi?',
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 16,
               color: Colors.grey.shade600,
               fontWeight: FontWeight.w400,
-              letterSpacing: 0.1,
+              letterSpacing: 0.2,
             ),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
               style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(12),
                 ),
               ),
               child: Text(
@@ -435,7 +417,7 @@ class MainMenuPage extends StatelessWidget {
                 style: TextStyle(
                   color: Colors.grey.shade600,
                   fontWeight: FontWeight.w500,
-                  fontSize: 14,
+                  fontSize: 16,
                 ),
               ),
             ),
@@ -444,45 +426,24 @@ class MainMenuPage extends StatelessWidget {
               onPressed: () => SystemNavigator.pop(),
               style: ElevatedButton.styleFrom(
                 backgroundColor: ThemeConstants.errorRed,
-                foregroundColor: ThemeConstants.backgroundWhite,
+                foregroundColor: Colors.white,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
               ),
               child: const Text(
                 'Keluar',
                 style: TextStyle(
                   fontWeight: FontWeight.w500,
-                  fontSize: 14,
+                  fontSize: 16,
                 ),
               ),
             ),
           ],
         );
       },
-    );
-  }
-
-  Widget _buildNavigationButtons() {
-    return Positioned(
-      left: 16,
-      bottom: 16,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Back Button
-          FloatingActionButton(
-            heroTag: "back_button",
-            onPressed: () => SystemNavigator.pop(),
-            backgroundColor: ThemeConstants.textSecondary,
-            mini: true,
-            child: const Icon(Icons.arrow_back, color: ThemeConstants.backgroundWhite),
-            tooltip: 'Kembali',
-          ),
-        ],
-      ),
     );
   }
 }

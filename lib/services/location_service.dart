@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -59,8 +60,14 @@ class LocationService {
 
       // Ambil posisi saat ini
       final position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-        timeLimit: const Duration(seconds: 15),
+        desiredAccuracy: LocationAccuracy.medium,
+        timeLimit: const Duration(seconds: 10),
+        forceAndroidLocationManager: true, // Use Android's classic location manager
+      ).timeout(
+        const Duration(seconds: 10),
+        onTimeout: () {
+          throw TimeoutException('Timeout saat mencari lokasi');
+        },
       );
 
       // Update cache

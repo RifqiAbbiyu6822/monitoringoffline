@@ -88,40 +88,6 @@ class _DateHistoryPageState extends State<DateHistoryPage> {
       appBar: null,
       body: Column(
         children: [
-          // Custom Header
-          Container(
-            color: widget.type == 'temuan' 
-                ? ThemeConstants.primaryBlue 
-                : ThemeConstants.secondaryGreen,
-            child: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      'lib/assets/logoJJCWhite.png',
-                      height: 24,
-                      width: 24,
-                      fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) {
-                        return const SizedBox.shrink();
-                      },
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Data $dateText',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                        color: ThemeConstants.backgroundWhite,
-                        fontSize: 20,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
           // Content
           Expanded(
             child: _isLoading

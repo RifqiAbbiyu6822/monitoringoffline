@@ -205,58 +205,18 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ThemeConstants.backgroundWhite,
-      appBar: null,
       body: Column(
         children: [
-          // Custom Header dengan Tab
-          Container(
-            color: ThemeConstants.primaryBlue,
-            child: Column(
-              children: [
-                // Header dengan logo dan title
-                SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          'lib/assets/logoJJCWhite.png',
-                          height: 24,
-                          width: 24,
-                          fit: BoxFit.contain,
-                          errorBuilder: (context, error, stackTrace) {
-                            return const SizedBox.shrink();
-                          },
-                        ),
-                        const SizedBox(width: 8),
-                        const Text(
-                          'History Data',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: ThemeConstants.backgroundWhite,
-                            fontSize: 20,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                // Tab Bar
-                TabBar(
-                  controller: _tabController,
-                  indicatorColor: ThemeConstants.backgroundWhite,
-                  indicatorWeight: 3,
-                  labelColor: ThemeConstants.backgroundWhite,
-                  unselectedLabelColor: ThemeConstants.backgroundWhite.withOpacity(0.7),
-                  labelStyle: const TextStyle(fontWeight: FontWeight.w600),
-                  tabs: const [
-                    Tab(text: 'Temuan'),
-                    Tab(text: 'Perbaikan'),
-                  ],
-                ),
-              ],
-            ),
+          TabBar(
+            controller: _tabController,
+            labelColor: ThemeConstants.primaryBlue,
+            unselectedLabelColor: Colors.grey,
+            indicatorColor: ThemeConstants.primaryBlue,
+            labelStyle: const TextStyle(fontWeight: FontWeight.w600),
+            tabs: const [
+              Tab(text: 'Temuan'),
+              Tab(text: 'Perbaikan'),
+            ],
           ),
           // Search Bar
           Container(

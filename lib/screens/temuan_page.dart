@@ -65,38 +65,6 @@ class _TemuanPageState extends State<TemuanPage> {
       backgroundColor: ThemeConstants.backgroundWhite,
       body: Column(
         children: [
-          // Custom Header
-          Container(
-            color: ThemeConstants.primaryBlue,
-            child: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      'lib/assets/logoJJCWhite.png',
-                      height: 24,
-                      width: 24,
-                      fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) {
-                        return const SizedBox.shrink();
-                      },
-                    ),
-                    const SizedBox(width: 8),
-                    const Text(
-                      'Input Data Temuan',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        color: ThemeConstants.backgroundWhite,
-                        fontSize: 20,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
           // Content
           Expanded(
             child: SafeArea(
@@ -504,17 +472,61 @@ class _TemuanPageState extends State<TemuanPage> {
     }
   }
 
-  Future<void> _pickImage() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: ImageSource.camera);
-    if (image != null) {
-      setState(() {
-        _fotoPath = image.path;
-      });
+Future<void> _pickImage() async {
+  final ImagePicker picker = ImagePicker();
+  
+  // Show bottom sheet to choose between camera and gallery
+  final source = await showModalBottomSheet<ImageSource>(
+    context: context,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (BuildContext context) {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('Ambil Foto'),
+              onTap: () => Navigator.pop(context, ImageSource.camera),
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('Pilih dari Galeri'),
+              onTap: () => Navigator.pop(context, ImageSource.gallery),
+            ),
+          ],
+        ),
+      );
+    },
+  );
+  
+  if (source != null) {
+    try {
+      final XFile? image = await picker.pickImage(
+        source: source,
+        maxWidth: 1920,
+        maxHeight: 1080,
+        imageQuality: 85,
+      );
+      if (image != null && mounted) {
+        setState(() {
+          _fotoPath = image.path;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Gagal mengambil foto. Silakan coba lagi.'),
+          ),
+        );
+      }
     }
   }
-
-  void _removeImage() {
+}  void _removeImage() {
     setState(() {
       _fotoPath = null;
     });

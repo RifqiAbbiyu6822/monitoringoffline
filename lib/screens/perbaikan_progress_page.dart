@@ -59,38 +59,6 @@ class _PerbaikanProgressPageState extends State<PerbaikanProgressPage> {
       appBar: null,
       body: Column(
         children: [
-          // Custom Header
-          Container(
-            color: ThemeConstants.secondaryGreen,
-            child: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      'lib/assets/logoJJCWhite.png',
-                      height: 24,
-                      width: 24,
-                      fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) {
-                        return const SizedBox.shrink();
-                      },
-                    ),
-                    const SizedBox(width: 8),
-                    const Text(
-                      'Progress Perbaikan',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        color: ThemeConstants.backgroundWhite,
-                        fontSize: 20,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
           // Content
           Expanded(
             child: _isLoading
@@ -742,28 +710,59 @@ class _AddProgressDialogState extends State<AddProgressDialog> {
   }
 
   Future<void> _pickImage() async {
-    try {
-      final ImagePicker picker = ImagePicker();
-      final XFile? image = await picker.pickImage(
-        source: ImageSource.camera,
-        maxWidth: 1920,
-        maxHeight: 1080,
-        imageQuality: 85,
-      );
-      
-      if (image != null) {
-        setState(() {
-          _fotoPath = image.path;
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Gagal mengambil foto: $e'),
-            backgroundColor: ThemeConstants.errorRed,
+    final ImagePicker picker = ImagePicker();
+    
+    // Show bottom sheet to choose between camera and gallery
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext context) {
+        return Container(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.camera_alt),
+                title: const Text('Ambil Foto'),
+                onTap: () => Navigator.pop(context, ImageSource.camera),
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo_library),
+                title: const Text('Pilih dari Galeri'),
+                onTap: () => Navigator.pop(context, ImageSource.gallery),
+              ),
+            ],
           ),
         );
+      },
+    );
+    
+    if (source != null) {
+      try {
+        final XFile? image = await picker.pickImage(
+          source: source,
+          maxWidth: 1920,
+          maxHeight: 1080,
+          imageQuality: 85,
+        );
+        
+        if (image != null && mounted) {
+          setState(() {
+            _fotoPath = image.path;
+          });
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Gagal mengambil foto: $e'),
+              backgroundColor: ThemeConstants.errorRed,
+            ),
+          );
+        }
       }
     }
   }

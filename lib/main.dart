@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'screens/main_menu.dart';
+import 'screens/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
           elevation: 0,
         ),
       ),
-      home: const MainMenuPage(),
+      home: const SplashScreen(),
       debugShowCheckedModeBanner: false,
     );
   }

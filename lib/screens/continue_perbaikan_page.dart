@@ -69,48 +69,8 @@ class _ContinuePerbaikanPageState extends State<ContinuePerbaikanPage> {
       },
       child: Scaffold(
         backgroundColor: ThemeConstants.backgroundWhite,
-        appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(0),
-          child: AppBar(
-            backgroundColor: ThemeConstants.secondaryGreen,
-            elevation: 0,
-            toolbarHeight: 0,
-          ),
-        ),
         body: Column(
           children: [
-            // Custom Header
-            Container(
-              color: ThemeConstants.secondaryGreen,
-              child: SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.asset(
-                        'lib/assets/logoJJCWhite.png',
-                        height: 24,
-                        width: 24,
-                        fit: BoxFit.contain,
-                        errorBuilder: (context, error, stackTrace) {
-                          return const SizedBox.shrink();
-                        },
-                      ),
-                      const SizedBox(width: 8),
-                      const Text(
-                        'Lanjutkan Perbaikan',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: ThemeConstants.backgroundWhite,
-                          fontSize: 20,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
             // Content
             Expanded(
               child: _isLoading

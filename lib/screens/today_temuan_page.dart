@@ -58,38 +58,6 @@ class _TodayTemuanPageState extends State<TodayTemuanPage> {
       appBar: null,
       body: Column(
         children: [
-          // Custom Header
-          Container(
-            color: ThemeConstants.primaryBlue,
-            child: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      'lib/assets/logoJJCWhite.png',
-                      height: 24,
-                      width: 24,
-                      fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) {
-                        return const SizedBox.shrink();
-                      },
-                    ),
-                    const SizedBox(width: 8),
-                    const Text(
-                      'Temuan Hari Ini',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        color: ThemeConstants.backgroundWhite,
-                        fontSize: 20,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
           // Content
           Expanded(
             child: _isLoading
