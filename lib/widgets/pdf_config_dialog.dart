@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/pdf_config.dart' as pdf_config;
+import '../constants/theme_constants.dart';
 
 class PdfConfigDialog extends StatefulWidget {
   const PdfConfigDialog({super.key});
@@ -15,26 +16,17 @@ class _PdfConfigDialogState extends State<PdfConfigDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text(
-        'Konfigurasi PDF',
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-        ),
-      ),
+      backgroundColor: ThemeConstants.backgroundWhite,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(ThemeConstants.radiusL)),
+      title: const Text('Konfigurasi PDF', style: ThemeConstants.heading3),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Tipe Grid
-            const Text(
-              'Tipe Grid:',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 10),
+            const Text('Tipe Grid:', style: ThemeConstants.bodyLarge),
+            const SizedBox(height: ThemeConstants.spacingS),
             _buildGridTypeOption(
               pdf_config.GridType.fullA4,
               'Full A4',
@@ -56,17 +48,11 @@ class _PdfConfigDialogState extends State<PdfConfigDialog> {
               'Layout tabel dengan 6 gambar per halaman (3x2)',
             ),
             
-            const SizedBox(height: 20),
+            const SizedBox(height: ThemeConstants.spacingM),
             
             // Orientasi
-            const Text(
-              'Orientasi:',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 10),
+            const Text('Orientasi:', style: ThemeConstants.bodyLarge),
+            const SizedBox(height: ThemeConstants.spacingS),
             _buildOrientationOption(
               pdf_config.Orientation.portrait,
               'Potret',
@@ -96,8 +82,8 @@ class _PdfConfigDialogState extends State<PdfConfigDialog> {
             Navigator.of(context).pop(config);
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.blue[600],
-            foregroundColor: Colors.white,
+            backgroundColor: ThemeConstants.primary,
+            foregroundColor: ThemeConstants.backgroundWhite,
           ),
           child: const Text('Generate PDF'),
         ),
@@ -111,7 +97,7 @@ class _PdfConfigDialogState extends State<PdfConfigDialog> {
     String description,
   ) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
+      padding: const EdgeInsets.only(bottom: ThemeConstants.spacingS),
       child: InkWell(
         onTap: () {
           setState(() {
@@ -119,18 +105,18 @@ class _PdfConfigDialogState extends State<PdfConfigDialog> {
           });
         },
         child: Container(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(ThemeConstants.spacingM),
           decoration: BoxDecoration(
             border: Border.all(
               color: _selectedGridType == gridType
-                  ? Colors.blue[600]!
-                  : Colors.grey[300]!,
+                  ? ThemeConstants.primary
+                  : ThemeConstants.textSecondary.withOpacity(0.3),
               width: _selectedGridType == gridType ? 2 : 1,
             ),
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
             color: _selectedGridType == gridType
-                ? Colors.blue[50]
-                : Colors.white,
+                ? ThemeConstants.primary.withOpacity(0.05)
+                : ThemeConstants.backgroundWhite,
           ),
           child: Row(
             children: [
@@ -142,28 +128,25 @@ class _PdfConfigDialogState extends State<PdfConfigDialog> {
                     _selectedGridType = value!;
                   });
                 },
-                activeColor: Colors.blue[600],
+                activeColor: ThemeConstants.primary,
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: ThemeConstants.spacingS),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       title,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
+                      style: ThemeConstants.bodyMedium.copyWith(
+                        fontWeight: FontWeight.w600,
                         color: _selectedGridType == gridType
-                            ? Colors.blue[800]
-                            : Colors.black87,
+                            ? ThemeConstants.primary
+                            : ThemeConstants.textPrimary,
                       ),
                     ),
                     Text(
                       description,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[600],
-                      ),
+                      style: ThemeConstants.bodySmall,
                     ),
                   ],
                 ),
@@ -181,7 +164,7 @@ class _PdfConfigDialogState extends State<PdfConfigDialog> {
     String description,
   ) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
+      padding: const EdgeInsets.only(bottom: ThemeConstants.spacingS),
       child: InkWell(
         onTap: () {
           setState(() {
@@ -189,18 +172,18 @@ class _PdfConfigDialogState extends State<PdfConfigDialog> {
           });
         },
         child: Container(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(ThemeConstants.spacingM),
           decoration: BoxDecoration(
             border: Border.all(
               color: _selectedOrientation == orientation
-                  ? Colors.blue[600]!
-                  : Colors.grey[300]!,
+                  ? ThemeConstants.primary
+                  : ThemeConstants.textSecondary.withOpacity(0.3),
               width: _selectedOrientation == orientation ? 2 : 1,
             ),
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
             color: _selectedOrientation == orientation
-                ? Colors.blue[50]
-                : Colors.white,
+                ? ThemeConstants.primary.withOpacity(0.05)
+                : ThemeConstants.backgroundWhite,
           ),
           child: Row(
             children: [
@@ -212,28 +195,25 @@ class _PdfConfigDialogState extends State<PdfConfigDialog> {
                     _selectedOrientation = value!;
                   });
                 },
-                activeColor: Colors.blue[600],
+                activeColor: ThemeConstants.primary,
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: ThemeConstants.spacingS),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       title,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
+                      style: ThemeConstants.bodyMedium.copyWith(
+                        fontWeight: FontWeight.w600,
                         color: _selectedOrientation == orientation
-                            ? Colors.blue[800]
-                            : Colors.black87,
+                            ? ThemeConstants.primary
+                            : ThemeConstants.textPrimary,
                       ),
                     ),
                     Text(
                       description,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[600],
-                      ),
+                      style: ThemeConstants.bodySmall,
                     ),
                   ],
                 ),

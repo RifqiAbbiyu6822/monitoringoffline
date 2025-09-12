@@ -12,7 +12,7 @@ class PerbaikanOptionDialog extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
       ),
       child: Container(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(ThemeConstants.spacingL),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -20,38 +20,28 @@ class PerbaikanOptionDialog extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: ThemeConstants.secondaryGreen.withOpacity(0.1),
+                color: ThemeConstants.secondary.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Icon(
                 Icons.build_rounded,
                 size: 32,
-                color: ThemeConstants.secondaryGreen,
+                color: ThemeConstants.secondary,
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: ThemeConstants.spacingL),
             
             Text(
               'Pilih Jenis Perbaikan',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: Colors.grey.shade800,
-                letterSpacing: -0.1,
-              ),
+              style: ThemeConstants.heading3,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: ThemeConstants.spacingS),
             Text(
               'Pilih opsi yang sesuai dengan kebutuhan Anda',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey.shade600,
-                fontWeight: FontWeight.w400,
-                letterSpacing: 0.1,
-              ),
+              style: ThemeConstants.bodyMedium.copyWith(color: ThemeConstants.textSecondary),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: ThemeConstants.spacingL),
             
             // Option 1: Perbaikan Baru
             _buildOptionCard(
@@ -59,13 +49,13 @@ class PerbaikanOptionDialog extends StatelessWidget {
               icon: Icons.add_circle_outline,
               title: 'Perbaikan Baru',
               subtitle: 'Buat pencatatan perbaikan baru',
-              color: ThemeConstants.secondaryGreen,
+              color: ThemeConstants.secondary,
               onTap: () {
                 Navigator.pop(context, 'new');
               },
             ),
             
-            const SizedBox(height: 12),
+            const SizedBox(height: ThemeConstants.spacingS),
             
             // Option 2: Lanjutkan Perbaikan
             _buildOptionCard(
@@ -73,30 +63,26 @@ class PerbaikanOptionDialog extends StatelessWidget {
               icon: Icons.edit_outlined,
               title: 'Lanjutkan Perbaikan',
               subtitle: 'Lanjutkan perbaikan yang belum selesai',
-              color: ThemeConstants.primaryBlue,
+              color: ThemeConstants.primary,
               onTap: () {
                 Navigator.pop(context, 'continue');
               },
             ),
             
-            const SizedBox(height: 20),
+            const SizedBox(height: ThemeConstants.spacingL),
             
             // Cancel Button
             TextButton(
               onPressed: () => Navigator.pop(context),
               style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                padding: const EdgeInsets.symmetric(horizontal: ThemeConstants.spacingM, vertical: ThemeConstants.spacingS),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
                 ),
               ),
               child: Text(
                 'Batal',
-                style: TextStyle(
-                  color: Colors.grey.shade600,
-                  fontWeight: FontWeight.w500,
-                  fontSize: 14,
-                ),
+                style: ThemeConstants.bodyMedium.copyWith(color: ThemeConstants.textSecondary, fontWeight: FontWeight.w500),
               ),
             ),
           ],
@@ -122,19 +108,9 @@ class PerbaikanOptionDialog extends StatelessWidget {
         highlightColor: color.withOpacity(0.05),
         child: Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: ThemeConstants.backgroundWhite,
+          padding: const EdgeInsets.all(ThemeConstants.spacingL),
+          decoration: ThemeConstants.cardDecoration.copyWith(
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.grey.shade200, width: 0.5),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.shade100,
-                blurRadius: 6,
-                offset: const Offset(0, 2),
-                spreadRadius: 0,
-              ),
-            ],
           ),
           child: Row(
             children: [
@@ -157,22 +133,12 @@ class PerbaikanOptionDialog extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.grey.shade800,
-                        letterSpacing: -0.1,
-                      ),
+                      style: ThemeConstants.bodyLarge.copyWith(fontWeight: FontWeight.w600),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       subtitle,
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.grey.shade600,
-                        fontWeight: FontWeight.w400,
-                        letterSpacing: 0.1,
-                      ),
+                      style: ThemeConstants.bodySmall,
                     ),
                   ],
                 ),
@@ -180,12 +146,12 @@ class PerbaikanOptionDialog extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
+                  color: ThemeConstants.surfaceGrey,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
                   Icons.arrow_forward_ios_rounded,
-                  color: Colors.grey.shade600,
+                  color: ThemeConstants.textSecondary,
                   size: 14,
                 ),
               ),

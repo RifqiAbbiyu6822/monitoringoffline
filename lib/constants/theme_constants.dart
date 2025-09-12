@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 
 class ThemeConstants {
-  // Color palette constants
-  static const Color primaryBlue = Color(0xFF0F2B57);
-  static const Color secondaryGreen = Color(0xFF228B22);
+  // Simplified color scheme: primary, secondary, neutral
+  static const Color primary = Color(0xFF0F2B57); // deep blue
+  static const Color secondary = Color(0xFF228B22); // green
+  static const Color neutral = Color(0xFF707070);
+
+  // Extended palette derived from scheme
   static const Color accentYellow = Color(0xFFFFC107);
   static const Color backgroundWhite = Color(0xFFFFFFFF);
   static const Color surfaceGrey = Color(0xFFF8F9FA);
@@ -12,6 +15,8 @@ class ThemeConstants {
   static const Color errorRed = Color(0xFFE74C3C);
   static const Color successGreen = Color(0xFF27AE60);
   static const Color warningOrange = Color(0xFFF39C12);
+  static const Color onPrimary = backgroundWhite;
+  static const Color onSecondary = backgroundWhite;
 
   // Text styles
   static const TextStyle heading1 = TextStyle(
@@ -58,10 +63,10 @@ class ThemeConstants {
 
   // Button styles
   static ButtonStyle primaryButtonStyle = ElevatedButton.styleFrom(
-    backgroundColor: primaryBlue,
+    backgroundColor: primary,
     foregroundColor: backgroundWhite,
     elevation: 2,
-    shadowColor: primaryBlue.withOpacity(0.3),
+    shadowColor: primary.withOpacity(0.3),
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(8),
     ),
@@ -69,10 +74,10 @@ class ThemeConstants {
   );
 
   static ButtonStyle secondaryButtonStyle = ElevatedButton.styleFrom(
-    backgroundColor: secondaryGreen,
+    backgroundColor: secondary,
     foregroundColor: backgroundWhite,
     elevation: 2,
-    shadowColor: secondaryGreen.withOpacity(0.3),
+    shadowColor: secondary.withOpacity(0.3),
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(8),
     ),
@@ -94,10 +99,10 @@ class ThemeConstants {
   static BoxDecoration cardDecoration = BoxDecoration(
     color: backgroundWhite,
     borderRadius: BorderRadius.circular(12),
-    border: Border.all(color: primaryBlue.withOpacity(0.1)),
+    border: Border.all(color: primary.withOpacity(0.1)),
     boxShadow: [
       BoxShadow(
-        color: primaryBlue.withOpacity(0.08),
+        color: primary.withOpacity(0.08),
         blurRadius: 8,
         offset: const Offset(0, 2),
       ),
@@ -107,7 +112,7 @@ class ThemeConstants {
   static BoxDecoration surfaceDecoration = BoxDecoration(
     color: surfaceGrey,
     borderRadius: BorderRadius.circular(12),
-    border: Border.all(color: primaryBlue.withOpacity(0.1)),
+    border: Border.all(color: primary.withOpacity(0.1)),
   );
 
   // Input field styles
@@ -116,15 +121,15 @@ class ThemeConstants {
     labelStyle: const TextStyle(color: textSecondary),
     border: OutlineInputBorder(
       borderRadius: BorderRadius.circular(8),
-      borderSide: BorderSide(color: primaryBlue.withOpacity(0.3)),
+      borderSide: BorderSide(color: primary.withOpacity(0.3)),
     ),
     enabledBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(8),
-      borderSide: BorderSide(color: primaryBlue.withOpacity(0.3)),
+      borderSide: BorderSide(color: primary.withOpacity(0.3)),
     ),
     focusedBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(8),
-      borderSide: const BorderSide(color: primaryBlue, width: 2),
+      borderSide: const BorderSide(color: primary, width: 2),
     ),
     errorBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(8),

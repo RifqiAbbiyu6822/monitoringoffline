@@ -75,7 +75,7 @@ class _TodayTemuanPageState extends State<TodayTemuanPage> {
                     },
                   ),
                   const SizedBox(height: 20),
-                  const CircularProgressIndicator(color: ThemeConstants.primaryBlue),
+                  const CircularProgressIndicator(color: ThemeConstants.primary),
                 ],
               ),
             )
@@ -96,13 +96,13 @@ class _TodayTemuanPageState extends State<TodayTemuanPage> {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: ThemeConstants.primaryBlue.withOpacity(0.1),
+                color: ThemeConstants.primary.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(50),
               ),
               child: Icon(
                 Icons.search_off,
                 size: 64,
-                color: ThemeConstants.primaryBlue,
+                color: ThemeConstants.primary,
               ),
             ),
             const SizedBox(height: ThemeConstants.spacingL),
@@ -134,7 +134,7 @@ class _TodayTemuanPageState extends State<TodayTemuanPage> {
               icon: const Icon(Icons.add),
               label: const Text('Tambah Temuan Baru'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: ThemeConstants.primaryBlue,
+                backgroundColor: ThemeConstants.primary,
                 foregroundColor: ThemeConstants.backgroundWhite,
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 shape: RoundedRectangleBorder(
@@ -155,10 +155,10 @@ class _TodayTemuanPageState extends State<TodayTemuanPage> {
           margin: const EdgeInsets.all(ThemeConstants.spacingM),
           padding: const EdgeInsets.all(ThemeConstants.spacingM),
           decoration: BoxDecoration(
-            color: ThemeConstants.primaryBlue.withOpacity(0.1),
+            color: ThemeConstants.primary.withOpacity(0.1),
             borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
             border: Border.all(
-              color: ThemeConstants.primaryBlue.withOpacity(0.3),
+              color: ThemeConstants.primary.withOpacity(0.3),
               width: 1,
             ),
           ),
@@ -167,12 +167,12 @@ class _TodayTemuanPageState extends State<TodayTemuanPage> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: ThemeConstants.primaryBlue.withOpacity(0.1),
+                  color: ThemeConstants.primary.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
                 ),
                 child: const Icon(
                   Icons.today,
-                  color: ThemeConstants.primaryBlue,
+                  color: ThemeConstants.primary,
                   size: 24,
                 ),
               ),
@@ -186,7 +186,7 @@ class _TodayTemuanPageState extends State<TodayTemuanPage> {
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: ThemeConstants.primaryBlue,
+                        color: ThemeConstants.primary,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -227,12 +227,12 @@ class _TodayTemuanPageState extends State<TodayTemuanPage> {
         leading: Container(
           padding: const EdgeInsets.all(ThemeConstants.spacingM),
           decoration: BoxDecoration(
-            color: ThemeConstants.primaryBlue.withOpacity(0.1),
+            color: ThemeConstants.primary.withOpacity(0.1),
             borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
           ),
           child: const Icon(
             Icons.search_outlined,
-            color: ThemeConstants.primaryBlue,
+            color: ThemeConstants.primary,
             size: 24,
           ),
         ),
@@ -307,7 +307,7 @@ class _TodayTemuanPageState extends State<TodayTemuanPage> {
               value: 'view',
               child: Row(
                 children: [
-                  Icon(Icons.visibility, color: ThemeConstants.primaryBlue),
+                  Icon(Icons.visibility, color: ThemeConstants.primary),
                   SizedBox(width: 8),
                   Text('Lihat Detail'),
                 ],
@@ -449,7 +449,7 @@ class _TodayTemuanPageState extends State<TodayTemuanPage> {
           FloatingActionButton(
             heroTag: "export_pdf",
             onPressed: _exportToPdf,
-            backgroundColor: ThemeConstants.primaryBlue,
+            backgroundColor: ThemeConstants.primary,
             mini: true,
             child: const Icon(Icons.picture_as_pdf, color: ThemeConstants.backgroundWhite),
             tooltip: 'Export PDF',

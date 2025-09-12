@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:intl/intl.dart';
-import 'dart:io';
 import '../models/temuan.dart';
 import '../database/database_helper.dart';
 import '../services/pdf_service.dart';
@@ -11,6 +9,9 @@ import '../widgets/export_confirmation_dialog.dart';
 import '../models/pdf_config.dart' as pdf_config;
 import '../services/location_service.dart';
 import '../constants/theme_constants.dart';
+import '../widgets/common_form_widgets.dart';
+import '../utils/ui_helpers.dart';
+import '../utils/date_utils.dart';
 
 class TemuanPage extends StatefulWidget {
   const TemuanPage({super.key});
@@ -71,7 +72,7 @@ class _TemuanPageState extends State<TemuanPage> {
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: ThemeConstants.spacingL, vertical: ThemeConstants.spacingM),
+                  padding: UIHelpers.paddingSymmetricPage,
                   child: Form(
                     key: _formKey,
                     child: Column(
@@ -79,9 +80,7 @@ class _TemuanPageState extends State<TemuanPage> {
                       children: [
                         // Header Section
                         _buildHeaderSection(),
-                        
-                        const SizedBox(height: ThemeConstants.spacingXL),
-                        
+                        UIHelpers.vXL,
                         // Form Card
                         Container(
                           padding: const EdgeInsets.all(ThemeConstants.spacingL),
@@ -90,11 +89,15 @@ class _TemuanPageState extends State<TemuanPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               // Tanggal
-                              _buildDateField(),
-                              const SizedBox(height: ThemeConstants.spacingL),
+                              CommonFormWidgets.buildDateField(
+                                label: 'Tanggal',
+                                value: _tanggal,
+                                onTap: _selectDate,
+                              ),
+                              UIHelpers.vL,
                               
                               // Jenis Temuan
-                              _buildDropdownField(
+                              CommonFormWidgets.buildDropdownField(
                                 label: 'Jenis Temuan',
                                 value: _jenisTemuan,
                                 items: _jenisTemuanOptions,
@@ -104,10 +107,10 @@ class _TemuanPageState extends State<TemuanPage> {
                                   });
                                 },
                               ),
-                              const SizedBox(height: ThemeConstants.spacingL),
+                              UIHelpers.vL,
                               
                               // Jalur
-                              _buildDropdownField(
+                              CommonFormWidgets.buildDropdownField(
                                 label: 'Jalur',
                                 value: _jalur,
                                 items: _jalurOptions,
@@ -117,10 +120,10 @@ class _TemuanPageState extends State<TemuanPage> {
                                   });
                                 },
                               ),
-                              const SizedBox(height: ThemeConstants.spacingL),
+                              UIHelpers.vL,
                               
                               // Lajur
-                              _buildDropdownField(
+                              CommonFormWidgets.buildDropdownField(
                                 label: 'Lajur',
                                 value: _lajur,
                                 items: _lajurOptions,
@@ -130,10 +133,10 @@ class _TemuanPageState extends State<TemuanPage> {
                                   });
                                 },
                               ),
-                              const SizedBox(height: ThemeConstants.spacingL),
+                              UIHelpers.vL,
                               
                               // Kilometer
-                              _buildTextField(
+                              CommonFormWidgets.buildTextField(
                                 label: 'Kilometer',
                                 controller: _kilometerController,
                                 validator: (value) {
@@ -143,76 +146,18 @@ class _TemuanPageState extends State<TemuanPage> {
                                   return null;
                                 },
                               ),
-                              const SizedBox(height: ThemeConstants.spacingL),
+                              UIHelpers.vL,
                               
                               // Koordinat
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      const Text(
-                                        'Koordinat GPS',
-                                        style: ThemeConstants.bodyLarge,
-                                      ),
-                                      const Spacer(),
-                                      ElevatedButton.icon(
-                                        onPressed: _getCurrentLocation,
-                                        icon: const Icon(Icons.my_location, size: 16),
-                                        label: const Text('Ambil GPS'),
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: ThemeConstants.secondaryGreen,
-                                          foregroundColor: ThemeConstants.backgroundWhite,
-                                          padding: const EdgeInsets.symmetric(horizontal: ThemeConstants.spacingM, vertical: ThemeConstants.spacingS),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(ThemeConstants.radiusS),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: ThemeConstants.spacingS),
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: _buildTextField(
-                                          label: 'Latitude',
-                                          controller: _latitudeController,
-                                          validator: (value) {
-                                            if (value == null || value.isEmpty) {
-                                              return 'Latitude harus diisi';
-                                            }
-                                            if (double.tryParse(value) == null) {
-                                              return 'Format latitude tidak valid';
-                                            }
-                                            return null;
-                                          },
-                                        ),
-                                      ),
-                                      const SizedBox(width: ThemeConstants.spacingM),
-                                      Expanded(
-                                        child: _buildTextField(
-                                          label: 'Longitude',
-                                          controller: _longitudeController,
-                                          validator: (value) {
-                                            if (value == null || value.isEmpty) {
-                                              return 'Longitude harus diisi';
-                                            }
-                                            if (double.tryParse(value) == null) {
-                                              return 'Format longitude tidak valid';
-                                            }
-                                            return null;
-                                          },
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                              CommonFormWidgets.buildGpsSection(
+                                latitudeController: _latitudeController,
+                                longitudeController: _longitudeController,
+                                onGetLocation: _getCurrentLocation,
                               ),
-                              const SizedBox(height: ThemeConstants.spacingL),
+                              UIHelpers.vL,
                               
                               // Deskripsi
-                              _buildTextField(
+                              CommonFormWidgets.buildTextField(
                                 label: 'Deskripsi',
                                 controller: _deskripsiController,
                                 maxLines: 4,
@@ -223,16 +168,20 @@ class _TemuanPageState extends State<TemuanPage> {
                                   return null;
                                 },
                               ),
-                              const SizedBox(height: ThemeConstants.spacingL),
+                              UIHelpers.vL,
                               
                               // Foto
-                              _buildPhotoSection(),
+                              CommonFormWidgets.buildPhotoSection(
+                                label: 'Foto Temuan',
+                                photoPath: _fotoPath,
+                                onPickImage: _pickImage,
+                                onRemoveImage: _removeImage,
+                                buttonColor: ThemeConstants.primary,
+                              ),
                             ],
                           ),
                         ),
-                        
-                        const SizedBox(height: ThemeConstants.spacingXL),
-                        
+                        UIHelpers.vXL,
                         // Tombol Simpan
                         SizedBox(
                           width: double.infinity,
@@ -271,7 +220,7 @@ class _TemuanPageState extends State<TemuanPage> {
           Container(
             padding: const EdgeInsets.all(ThemeConstants.spacingM),
             decoration: BoxDecoration(
-              color: ThemeConstants.primaryBlue,
+              color: ThemeConstants.primary,
               borderRadius: BorderRadius.circular(ThemeConstants.radiusL),
             ),
             child: const Icon(
@@ -291,7 +240,7 @@ class _TemuanPageState extends State<TemuanPage> {
             'Pencatatan temuan atau anomali jalan tol',
             style: TextStyle(
               fontSize: 14,
-              color: ThemeConstants.primaryBlue.withOpacity(0.7),
+              color: ThemeConstants.primary.withOpacity(0.7),
               fontWeight: FontWeight.w400,
             ),
             textAlign: TextAlign.center,
@@ -301,162 +250,13 @@ class _TemuanPageState extends State<TemuanPage> {
     );
   }
 
-  Widget _buildDateField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Tanggal',
-          style: ThemeConstants.bodyLarge,
-        ),
-        const SizedBox(height: ThemeConstants.spacingS),
-        InkWell(
-          onTap: _selectDate,
-          borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
-          child: Container(
-            padding: const EdgeInsets.all(ThemeConstants.spacingM),
-            decoration: BoxDecoration(
-              border: Border.all(color: ThemeConstants.primaryBlue.withOpacity(0.3)),
-              borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
-              color: ThemeConstants.backgroundWhite,
-            ),
-            child: Row(
-              children: [
-                Icon(Icons.calendar_today, color: ThemeConstants.primaryBlue.withOpacity(0.7)),
-                const SizedBox(width: ThemeConstants.spacingM),
-                Text(
-                  DateFormat('dd MMMM yyyy').format(_tanggal),
-                  style: ThemeConstants.bodyMedium,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
+  // Menggunakan CommonFormWidgets untuk field
 
-  Widget _buildDropdownField({
-    required String label,
-    required String value,
-    required List<String> items,
-    required ValueChanged<String?> onChanged,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: ThemeConstants.bodyLarge,
-        ),
-        const SizedBox(height: ThemeConstants.spacingS),
-        DropdownButtonFormField<String>(
-          value: value,
-          decoration: ThemeConstants.inputDecoration(label),
-          items: items.map((String item) {
-            return DropdownMenuItem<String>(
-              value: item,
-              child: Text(item, style: ThemeConstants.bodyMedium),
-            );
-          }).toList(),
-          onChanged: onChanged,
-        ),
-      ],
-    );
-  }
+  // Menggunakan CommonFormWidgets untuk dropdown
 
-  Widget _buildTextField({
-    required String label,
-    required TextEditingController controller,
-    int maxLines = 1,
-    String? Function(String?)? validator,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: ThemeConstants.bodyLarge,
-        ),
-        const SizedBox(height: ThemeConstants.spacingS),
-        TextFormField(
-          controller: controller,
-          maxLines: maxLines,
-          style: ThemeConstants.bodyMedium,
-          decoration: ThemeConstants.inputDecoration(label),
-          validator: validator,
-        ),
-      ],
-    );
-  }
+  // Menggunakan CommonFormWidgets untuk text field
 
-  Widget _buildPhotoSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Foto Temuan',
-          style: ThemeConstants.bodyLarge,
-        ),
-        const SizedBox(height: ThemeConstants.spacingS),
-        Row(
-          children: [
-            Expanded(
-              child: ElevatedButton.icon(
-                onPressed: _pickImage,
-                icon: const Icon(Icons.camera_alt),
-                label: const Text('Ambil Foto'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: ThemeConstants.primaryBlue,
-                  foregroundColor: ThemeConstants.backgroundWhite,
-                  padding: const EdgeInsets.symmetric(vertical: ThemeConstants.spacingM),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
-                  ),
-                ),
-              ),
-            ),
-            if (_fotoPath != null) ...[
-              const SizedBox(width: ThemeConstants.spacingM),
-              Expanded(
-                child: ElevatedButton.icon(
-                  onPressed: _removeImage,
-                  icon: const Icon(Icons.delete),
-                  label: const Text('Hapus'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: ThemeConstants.errorRed,
-                    foregroundColor: ThemeConstants.backgroundWhite,
-                    padding: const EdgeInsets.symmetric(vertical: ThemeConstants.spacingM),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ],
-        ),
-        if (_fotoPath != null) ...[
-          const SizedBox(height: ThemeConstants.spacingM),
-          Container(
-            height: 200,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              border: Border.all(color: ThemeConstants.primaryBlue.withOpacity(0.3)),
-              borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
-              child: Image.file(
-                File(_fotoPath!),
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-        ],
-      ],
-    );
-  }
+  // Menggunakan CommonFormWidgets untuk photo section
 
   Future<void> _selectDate() async {
     final DateTime? picked = await showDatePicker(
@@ -544,7 +344,7 @@ Future<void> _pickImage() async {
         ),
         content: Row(
           children: [
-            const CircularProgressIndicator(color: ThemeConstants.primaryBlue),
+            const CircularProgressIndicator(color: ThemeConstants.primary),
             const SizedBox(width: ThemeConstants.spacingL),
             const Text('Mengambil lokasi GPS...', style: ThemeConstants.bodyMedium),
           ],
@@ -687,7 +487,7 @@ Future<void> _pickImage() async {
         builder: (context) => ExportConfirmationDialog(
           temuanList: temuanList,
           exportType: 'temuan',
-          dateRange: DateFormat('dd/MM/yyyy').format(_tanggal),
+          dateRange: AppDateUtils.formatShortDate(_tanggal),
         ),
       );
 
@@ -703,7 +503,7 @@ Future<void> _pickImage() async {
           await PdfService().generateTemuanPdf(
             temuanList, 
             config,
-            dateRange: DateFormat('dd/MM/yyyy').format(_tanggal),
+            dateRange: AppDateUtils.formatShortDate(_tanggal),
           );
           
           if (mounted) {
@@ -747,7 +547,7 @@ Future<void> _pickImage() async {
           FloatingActionButton(
             heroTag: "export_pdf",
             onPressed: _exportToPdf,
-            backgroundColor: ThemeConstants.primaryBlue,
+            backgroundColor: ThemeConstants.primary,
             mini: true,
             child: const Icon(Icons.picture_as_pdf, color: ThemeConstants.backgroundWhite),
             tooltip: 'Ekspor ke PDF',

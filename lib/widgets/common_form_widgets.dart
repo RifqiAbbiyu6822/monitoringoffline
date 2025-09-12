@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'dart:io';
+import '../constants/theme_constants.dart';
+import '../utils/date_utils.dart';
 
 class CommonFormWidgets {
   static Widget buildDateField({
@@ -11,31 +12,22 @@ class CommonFormWidgets {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-          ),
-        ),
-        const SizedBox(height: 8),
+        Text(label, style: ThemeConstants.bodyLarge),
+        const SizedBox(height: ThemeConstants.spacingS),
         InkWell(
           onTap: onTap,
           child: Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(ThemeConstants.spacingM),
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey[300]!),
-              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: ThemeConstants.primary.withOpacity(0.3)),
+              borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
+              color: ThemeConstants.backgroundWhite,
             ),
             child: Row(
               children: [
-                Icon(Icons.calendar_today, color: Colors.grey[600]),
-                const SizedBox(width: 10),
-                Text(
-                  DateFormat('dd MMMM yyyy').format(value),
-                  style: const TextStyle(fontSize: 16),
-                ),
+                Icon(Icons.calendar_today, color: ThemeConstants.primary.withOpacity(0.7)),
+                const SizedBox(width: ThemeConstants.spacingM),
+                Text(AppDateUtils.formatDisplayDate(value), style: ThemeConstants.bodyMedium),
               ],
             ),
           ),
@@ -53,27 +45,15 @@ class CommonFormWidgets {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-          ),
-        ),
-        const SizedBox(height: 8),
+        Text(label, style: ThemeConstants.bodyLarge),
+        const SizedBox(height: ThemeConstants.spacingS),
         DropdownButtonFormField<String>(
           value: value,
-          decoration: InputDecoration(
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          ),
+          decoration: ThemeConstants.inputDecoration(label),
           items: items.map((String item) {
             return DropdownMenuItem<String>(
               value: item,
-              child: Text(item),
+              child: Text(item, style: ThemeConstants.bodyMedium),
             );
           }).toList(),
           onChanged: onChanged,
@@ -91,24 +71,13 @@ class CommonFormWidgets {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-          ),
-        ),
-        const SizedBox(height: 8),
+        Text(label, style: ThemeConstants.bodyLarge),
+        const SizedBox(height: ThemeConstants.spacingS),
         TextFormField(
           controller: controller,
           maxLines: maxLines,
-          decoration: InputDecoration(
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            contentPadding: const EdgeInsets.all(12),
-          ),
+          style: ThemeConstants.bodyMedium,
+          decoration: ThemeConstants.inputDecoration(label),
           validator: validator,
         ),
       ],
@@ -125,15 +94,8 @@ class CommonFormWidgets {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-          ),
-        ),
-        const SizedBox(height: 8),
+        Text(label, style: ThemeConstants.bodyLarge),
+        const SizedBox(height: ThemeConstants.spacingS),
         Row(
           children: [
             Expanded(
@@ -142,28 +104,28 @@ class CommonFormWidgets {
                 icon: const Icon(Icons.camera_alt),
                 label: const Text('Ambil Foto'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: buttonColor ?? Colors.blue[600],
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  backgroundColor: buttonColor ?? ThemeConstants.primary,
+                  foregroundColor: ThemeConstants.backgroundWhite,
+                  padding: const EdgeInsets.symmetric(vertical: ThemeConstants.spacingM),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
                   ),
                 ),
               ),
             ),
             if (photoPath != null) ...[
-              const SizedBox(width: 10),
+              const SizedBox(width: ThemeConstants.spacingM),
               Expanded(
                 child: ElevatedButton.icon(
                   onPressed: onRemoveImage,
                   icon: const Icon(Icons.delete),
                   label: const Text('Hapus'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red[600],
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    backgroundColor: ThemeConstants.errorRed,
+                    foregroundColor: ThemeConstants.backgroundWhite,
+                    padding: const EdgeInsets.symmetric(vertical: ThemeConstants.spacingM),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
                     ),
                   ),
                 ),
@@ -172,16 +134,16 @@ class CommonFormWidgets {
           ],
         ),
         if (photoPath != null) ...[
-          const SizedBox(height: 10),
+          const SizedBox(height: ThemeConstants.spacingM),
           Container(
             height: 200,
             width: double.infinity,
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey[300]!),
-              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: ThemeConstants.primary.withOpacity(0.3)),
+              borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
             ),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
               child: Image.file(
                 File(photoPath),
                 fit: BoxFit.cover,
@@ -203,31 +165,27 @@ class CommonFormWidgets {
       children: [
         Row(
           children: [
-            const Text(
-              'Koordinat GPS',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-              ),
-            ),
+            const Text('Koordinat GPS', style: ThemeConstants.bodyLarge),
             const Spacer(),
             ElevatedButton.icon(
               onPressed: onGetLocation,
               icon: const Icon(Icons.my_location, size: 16),
               label: const Text('Ambil GPS'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green[600],
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                backgroundColor: ThemeConstants.secondary,
+                foregroundColor: ThemeConstants.backgroundWhite,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: ThemeConstants.spacingM,
+                  vertical: ThemeConstants.spacingS,
+                ),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(6),
+                  borderRadius: BorderRadius.circular(ThemeConstants.radiusS),
                 ),
               ),
             ),
           ],
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: ThemeConstants.spacingS),
         Row(
           children: [
             Expanded(
@@ -245,7 +203,7 @@ class CommonFormWidgets {
                 },
               ),
             ),
-            const SizedBox(width: 10),
+            const SizedBox(width: ThemeConstants.spacingM),
             Expanded(
               child: buildTextField(
                 label: 'Longitude',
@@ -271,18 +229,8 @@ class CommonFormWidgets {
     required List<Widget> children,
   }) {
     return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
+      padding: const EdgeInsets.all(ThemeConstants.spacingL),
+      decoration: ThemeConstants.cardDecoration,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: children,
@@ -298,20 +246,17 @@ class CommonFormWidgets {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: backgroundColor ?? Colors.green[600],
-        foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(vertical: 15),
+        backgroundColor: backgroundColor ?? ThemeConstants.secondary,
+        foregroundColor: ThemeConstants.backgroundWhite,
+        padding: const EdgeInsets.symmetric(vertical: ThemeConstants.spacingM),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
         ),
-        elevation: 5,
+        elevation: 2,
       ),
       child: Text(
         text,
-        style: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
-        ),
+        style: ThemeConstants.bodyMedium.copyWith(fontWeight: FontWeight.w600),
       ),
     );
   }

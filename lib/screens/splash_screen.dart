@@ -93,13 +93,13 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
         statusBarColor: Colors.transparent,
         statusBarIconBrightness: Brightness.dark,
         statusBarBrightness: Brightness.light,
-        systemNavigationBarColor: Color(0xFFFAFBFC),
+        systemNavigationBarColor: ThemeConstants.surfaceGrey,
         systemNavigationBarIconBrightness: Brightness.dark,
       ),
     );
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFAFBFC), // Same background as main menu
+      backgroundColor: ThemeConstants.surfaceGrey, // Same background as main menu
       body: SafeArea(
         child: Center(
           child: AnimatedBuilder(
@@ -114,16 +114,8 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 48),
                       padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 40),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
+                      decoration: ThemeConstants.cardDecoration.copyWith(
                         borderRadius: BorderRadius.circular(24),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.04),
-                            blurRadius: 20,
-                            offset: const Offset(0, 8),
-                          ),
-                        ],
                       ),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
@@ -132,7 +124,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                           Container(
                             padding: const EdgeInsets.all(20),
                             decoration: BoxDecoration(
-                              color: ThemeConstants.primaryBlue.withOpacity(0.1),
+                              color: ThemeConstants.primary.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Image.asset(
@@ -144,7 +136,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                                 return Icon(
                                   Icons.engineering_outlined,
                                   size: 80,
-                                  color: ThemeConstants.primaryBlue,
+                                  color: ThemeConstants.primary,
                                 );
                               },
                             ),
@@ -155,13 +147,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                           // Main title matching main menu typography
                           const Text(
                             'Monitoring Jalan Layang MBZ',
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xFF1A1D29),
-                              letterSpacing: -0.5,
-                              height: 1.2,
-                            ),
+                            style: ThemeConstants.heading1,
                             textAlign: TextAlign.center,
                           ),
                           
@@ -170,13 +156,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                           // Subtitle matching main menu style
                           Text(
                             'Sistem pencatatan dan pelaporan terintegrasi',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.grey.shade600,
-                              fontWeight: FontWeight.w400,
-                              letterSpacing: 0.2,
-                              height: 1.4,
-                            ),
+                            style: ThemeConstants.bodyMedium.copyWith(color: ThemeConstants.textSecondary, height: 1.4),
                             textAlign: TextAlign.center,
                           ),
                           
@@ -186,7 +166,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                           Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: ThemeConstants.primaryBlue.withOpacity(0.1),
+                              color: ThemeConstants.primary.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: SizedBox(
@@ -194,7 +174,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                               height: 24,
                               child: CircularProgressIndicator(
                                 valueColor: AlwaysStoppedAnimation<Color>(
-                                  ThemeConstants.primaryBlue,
+                                  ThemeConstants.primary,
                                 ),
                                 strokeWidth: 2.5,
                               ),

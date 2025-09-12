@@ -36,8 +36,8 @@ class ExportConfirmationDialog extends StatelessWidget {
           Icon(
             Icons.picture_as_pdf,
             color: exportType == 'temuan' 
-                ? ThemeConstants.primaryBlue 
-                : ThemeConstants.secondaryGreen,
+                ? ThemeConstants.primary 
+                : ThemeConstants.secondary,
             size: 28,
           ),
           const SizedBox(width: 12),
@@ -57,13 +57,13 @@ class ExportConfirmationDialog extends StatelessWidget {
               padding: const EdgeInsets.all(ThemeConstants.spacingM),
               decoration: BoxDecoration(
                 color: exportType == 'temuan' 
-                    ? ThemeConstants.primaryBlue.withOpacity(0.1)
-                    : ThemeConstants.secondaryGreen.withOpacity(0.1),
+                    ? ThemeConstants.primary.withOpacity(0.1)
+                    : ThemeConstants.secondary.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
                 border: Border.all(
                   color: exportType == 'temuan' 
-                      ? ThemeConstants.primaryBlue.withOpacity(0.3)
-                      : ThemeConstants.secondaryGreen.withOpacity(0.3),
+                      ? ThemeConstants.primary.withOpacity(0.3)
+                      : ThemeConstants.secondary.withOpacity(0.3),
                 ),
               ),
               child: Column(
@@ -74,8 +74,8 @@ class ExportConfirmationDialog extends StatelessWidget {
                       Icon(
                         exportType == 'temuan' ? Icons.search_outlined : Icons.build_outlined,
                         color: exportType == 'temuan' 
-                            ? ThemeConstants.primaryBlue 
-                            : ThemeConstants.secondaryGreen,
+                            ? ThemeConstants.primary 
+                            : ThemeConstants.secondary,
                         size: 20,
                       ),
                       const SizedBox(width: 8),
@@ -83,8 +83,8 @@ class ExportConfirmationDialog extends StatelessWidget {
                         'Data $dataType',
                         style: ThemeConstants.heading3.copyWith(
                           color: exportType == 'temuan' 
-                              ? ThemeConstants.primaryBlue 
-                              : ThemeConstants.secondaryGreen,
+                              ? ThemeConstants.primary 
+                              : ThemeConstants.secondary,
                         ),
                       ),
                     ],
@@ -165,8 +165,8 @@ class ExportConfirmationDialog extends StatelessWidget {
               : null,
           style: ElevatedButton.styleFrom(
             backgroundColor: exportType == 'temuan' 
-                ? ThemeConstants.primaryBlue 
-                : ThemeConstants.secondaryGreen,
+                ? ThemeConstants.primary 
+                : ThemeConstants.secondary,
             foregroundColor: ThemeConstants.backgroundWhite,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(ThemeConstants.radiusM),

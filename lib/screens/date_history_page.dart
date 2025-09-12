@@ -68,20 +68,7 @@ class _DateHistoryPageState extends State<DateHistoryPage> {
 
   @override
   Widget build(BuildContext context) {
-    final dateFormat = DateFormat('EEEE, dd MMMM yyyy', 'id_ID');
-    final isToday = DateFormat('yyyy-MM-dd').format(widget.selectedDate) == 
-                   DateFormat('yyyy-MM-dd').format(DateTime.now());
-    final isYesterday = DateFormat('yyyy-MM-dd').format(widget.selectedDate) == 
-                       DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(const Duration(days: 1)));
-    
-    String dateText;
-    if (isToday) {
-      dateText = 'Hari Ini';
-    } else if (isYesterday) {
-      dateText = 'Kemarin';
-    } else {
-      dateText = dateFormat.format(widget.selectedDate);
-    }
+    // Info tanggal relatif tidak digunakan di UI detail; akan dihitung langsung saat rendering jika dibutuhkan.
 
     return Scaffold(
       backgroundColor: ThemeConstants.backgroundWhite,
@@ -107,8 +94,8 @@ class _DateHistoryPageState extends State<DateHistoryPage> {
                   const SizedBox(height: 20),
                   CircularProgressIndicator(
                     color: widget.type == 'temuan' 
-                        ? ThemeConstants.primaryBlue 
-                        : ThemeConstants.secondaryGreen,
+                        ? ThemeConstants.primary 
+                        : ThemeConstants.secondary,
                   ),
                 ],
               ),
@@ -154,13 +141,13 @@ class _DateHistoryPageState extends State<DateHistoryPage> {
           padding: const EdgeInsets.all(ThemeConstants.spacingM),
           decoration: BoxDecoration(
             color: widget.type == 'temuan' 
-                ? ThemeConstants.primaryBlue.withOpacity(0.1)
-                : ThemeConstants.secondaryGreen.withOpacity(0.1),
+                ? ThemeConstants.primary.withOpacity(0.1)
+                : ThemeConstants.secondary.withOpacity(0.1),
             borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
             border: Border.all(
               color: widget.type == 'temuan' 
-                  ? ThemeConstants.primaryBlue.withOpacity(0.3)
-                  : ThemeConstants.secondaryGreen.withOpacity(0.3),
+                  ? ThemeConstants.primary.withOpacity(0.3)
+                  : ThemeConstants.secondary.withOpacity(0.3),
               width: 1,
             ),
           ),
@@ -168,7 +155,7 @@ class _DateHistoryPageState extends State<DateHistoryPage> {
             children: [
               Icon(
                 widget.type == 'temuan' ? Icons.search_outlined : Icons.build_outlined,
-                color: widget.type == 'temuan' ? ThemeConstants.primaryBlue : ThemeConstants.secondaryGreen,
+                color: widget.type == 'temuan' ? ThemeConstants.primary : ThemeConstants.secondary,
                 size: 24,
               ),
               const SizedBox(width: ThemeConstants.spacingM),
@@ -181,7 +168,7 @@ class _DateHistoryPageState extends State<DateHistoryPage> {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: widget.type == 'temuan' ? ThemeConstants.primaryBlue : ThemeConstants.secondaryGreen,
+                        color: widget.type == 'temuan' ? ThemeConstants.primary : ThemeConstants.secondary,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -226,12 +213,12 @@ class _DateHistoryPageState extends State<DateHistoryPage> {
         leading: Container(
           padding: const EdgeInsets.all(ThemeConstants.spacingM),
           decoration: BoxDecoration(
-            color: ThemeConstants.primaryBlue.withOpacity(0.1),
+            color: ThemeConstants.primary.withOpacity(0.1),
             borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
           ),
           child: const Icon(
             Icons.search_outlined,
-            color: ThemeConstants.primaryBlue,
+            color: ThemeConstants.primary,
             size: 24,
           ),
         ),
@@ -306,7 +293,7 @@ class _DateHistoryPageState extends State<DateHistoryPage> {
               value: 'view',
               child: Row(
                 children: [
-                  Icon(Icons.visibility, color: ThemeConstants.primaryBlue),
+                  Icon(Icons.visibility, color: ThemeConstants.primary),
                   SizedBox(width: 8),
                   Text('Lihat Detail'),
                 ],
@@ -348,12 +335,12 @@ class _DateHistoryPageState extends State<DateHistoryPage> {
         leading: Container(
           padding: const EdgeInsets.all(ThemeConstants.spacingM),
           decoration: BoxDecoration(
-            color: ThemeConstants.secondaryGreen.withOpacity(0.1),
+            color: ThemeConstants.secondary.withOpacity(0.1),
             borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
           ),
           child: const Icon(
             Icons.build_outlined,
-            color: ThemeConstants.secondaryGreen,
+            color: ThemeConstants.secondary,
             size: 24,
           ),
         ),
@@ -443,7 +430,7 @@ class _DateHistoryPageState extends State<DateHistoryPage> {
               value: 'view',
               child: Row(
                 children: [
-                  Icon(Icons.visibility, color: ThemeConstants.secondaryGreen),
+                  Icon(Icons.visibility, color: ThemeConstants.secondary),
                   SizedBox(width: 8),
                   Text('Lihat Detail'),
                 ],
@@ -654,8 +641,8 @@ class _DateHistoryPageState extends State<DateHistoryPage> {
             heroTag: "export_pdf",
             onPressed: _exportToPdf,
             backgroundColor: widget.type == 'temuan' 
-                ? ThemeConstants.primaryBlue 
-                : ThemeConstants.secondaryGreen,
+                ? ThemeConstants.primary 
+                : ThemeConstants.secondary,
             mini: true,
             child: const Icon(Icons.picture_as_pdf, color: ThemeConstants.backgroundWhite),
             tooltip: 'Export PDF',

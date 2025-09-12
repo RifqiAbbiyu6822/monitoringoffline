@@ -209,9 +209,9 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
         children: [
           TabBar(
             controller: _tabController,
-            labelColor: ThemeConstants.primaryBlue,
+            labelColor: ThemeConstants.primary,
             unselectedLabelColor: Colors.grey,
-            indicatorColor: ThemeConstants.primaryBlue,
+            indicatorColor: ThemeConstants.primary,
             labelStyle: const TextStyle(fontWeight: FontWeight.w600),
             tabs: const [
               Tab(text: 'Temuan'),
@@ -233,7 +233,7 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
               decoration: InputDecoration(
                 hintText: 'Cari data...',
                 hintStyle: TextStyle(color: ThemeConstants.textSecondary),
-                prefixIcon: Icon(Icons.search, color: ThemeConstants.primaryBlue),
+                prefixIcon: Icon(Icons.search, color: ThemeConstants.primary),
                 suffixIcon: _searchQuery.isNotEmpty
                     ? IconButton(
                         icon: Icon(Icons.clear, color: ThemeConstants.textSecondary),
@@ -246,18 +246,9 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
                         },
                       )
                     : null,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
-                  borderSide: BorderSide(color: ThemeConstants.primaryBlue.withOpacity(0.3)),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
-                  borderSide: BorderSide(color: ThemeConstants.primaryBlue.withOpacity(0.3)),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
-                  borderSide: const BorderSide(color: ThemeConstants.primaryBlue, width: 2),
-                ),
+                border: ThemeConstants.inputDecoration('Cari data...').border,
+                enabledBorder: ThemeConstants.inputDecoration('Cari data...').enabledBorder,
+                focusedBorder: ThemeConstants.inputDecoration('Cari data...').focusedBorder,
                 filled: true,
                 fillColor: ThemeConstants.backgroundWhite,
                 contentPadding: const EdgeInsets.symmetric(horizontal: ThemeConstants.spacingM, vertical: ThemeConstants.spacingM),
@@ -292,7 +283,7 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
           FloatingActionButton(
             heroTag: "export_pdf",
             onPressed: _exportToPdf,
-            backgroundColor: ThemeConstants.primaryBlue,
+            backgroundColor: ThemeConstants.primary,
             mini: true,
             child: const Icon(Icons.picture_as_pdf, color: ThemeConstants.backgroundWhite),
             tooltip: 'Export PDF',
@@ -303,7 +294,7 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
           FloatingActionButton(
             heroTag: "export_data",
             onPressed: _showExportDialog,
-            backgroundColor: ThemeConstants.secondaryGreen,
+            backgroundColor: ThemeConstants.secondary,
             mini: true,
             child: const Icon(Icons.file_download, color: ThemeConstants.backgroundWhite),
             tooltip: 'Export Data',
@@ -349,7 +340,7 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
   Widget _buildTemuanList() {
     if (_isLoading) {
       return const Center(
-        child: CircularProgressIndicator(color: ThemeConstants.primaryBlue),
+        child: CircularProgressIndicator(color: ThemeConstants.primary),
       );
     }
 
@@ -396,7 +387,7 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
   Widget _buildPerbaikanList() {
     if (_isLoading) {
       return const Center(
-        child: CircularProgressIndicator(color: ThemeConstants.primaryBlue),
+        child: CircularProgressIndicator(color: ThemeConstants.primary),
       );
     }
 
@@ -480,13 +471,13 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
                   padding: const EdgeInsets.all(ThemeConstants.spacingM),
                   decoration: BoxDecoration(
                     color: type == 'temuan' 
-                        ? ThemeConstants.primaryBlue.withOpacity(0.1)
-                        : ThemeConstants.secondaryGreen.withOpacity(0.1),
+                        ? ThemeConstants.primary.withOpacity(0.1)
+                        : ThemeConstants.secondary.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
                   ),
                   child: Icon(
                     type == 'temuan' ? Icons.search_outlined : Icons.build_outlined,
-                    color: type == 'temuan' ? ThemeConstants.primaryBlue : ThemeConstants.secondaryGreen,
+                    color: type == 'temuan' ? ThemeConstants.primary : ThemeConstants.secondary,
                     size: 24,
                   ),
                 ),
@@ -500,7 +491,7 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: type == 'temuan' ? ThemeConstants.primaryBlue : ThemeConstants.secondaryGreen,
+                          color: type == 'temuan' ? ThemeConstants.primary : ThemeConstants.secondary,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -514,7 +505,7 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: type == 'temuan' ? ThemeConstants.primaryBlue : ThemeConstants.secondaryGreen,
+                    color: type == 'temuan' ? ThemeConstants.primary : ThemeConstants.secondary,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -628,13 +619,13 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
                 child: Container(
                   padding: const EdgeInsets.all(ThemeConstants.spacingM),
                   decoration: BoxDecoration(
-                    border: Border.all(color: ThemeConstants.primaryBlue.withOpacity(0.3)),
+                    border: Border.all(color: ThemeConstants.primary.withOpacity(0.3)),
                     borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
                     color: ThemeConstants.backgroundWhite,
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.calendar_today, color: ThemeConstants.primaryBlue.withOpacity(0.7)),
+                      Icon(Icons.calendar_today, color: ThemeConstants.primary.withOpacity(0.7)),
                       const SizedBox(width: ThemeConstants.spacingM),
                       Text(
                         _filterDateFrom != null
@@ -666,13 +657,13 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
                 child: Container(
                   padding: const EdgeInsets.all(ThemeConstants.spacingM),
                   decoration: BoxDecoration(
-                    border: Border.all(color: ThemeConstants.primaryBlue.withOpacity(0.3)),
+                    border: Border.all(color: ThemeConstants.primary.withOpacity(0.3)),
                     borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
                     color: ThemeConstants.backgroundWhite,
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.calendar_today, color: ThemeConstants.primaryBlue.withOpacity(0.7)),
+                      Icon(Icons.calendar_today, color: ThemeConstants.primary.withOpacity(0.7)),
                       const SizedBox(width: ThemeConstants.spacingM),
                       Text(
                         _filterDateTo != null
@@ -741,7 +732,7 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
                   _sortBy = value!;
                 });
               },
-              activeColor: ThemeConstants.primaryBlue,
+              activeColor: ThemeConstants.primary,
             ),
             RadioListTile<String>(
               title: const Text('Jenis', style: ThemeConstants.bodyMedium),
@@ -752,7 +743,7 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
                   _sortBy = value!;
                 });
               },
-              activeColor: ThemeConstants.primaryBlue,
+              activeColor: ThemeConstants.primary,
             ),
             RadioListTile<String>(
               title: const Text('Jalur', style: ThemeConstants.bodyMedium),
@@ -763,7 +754,7 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
                   _sortBy = value!;
                 });
               },
-              activeColor: ThemeConstants.primaryBlue,
+              activeColor: ThemeConstants.primary,
             ),
             RadioListTile<String>(
               title: const Text('Lajur', style: ThemeConstants.bodyMedium),
@@ -774,7 +765,7 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
                   _sortBy = value!;
                 });
               },
-              activeColor: ThemeConstants.primaryBlue,
+              activeColor: ThemeConstants.primary,
             ),
             RadioListTile<String>(
               title: const Text('Kilometer', style: ThemeConstants.bodyMedium),
@@ -785,7 +776,7 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
                   _sortBy = value!;
                 });
               },
-              activeColor: ThemeConstants.primaryBlue,
+              activeColor: ThemeConstants.primary,
             ),
             if (_tabController.index == 1) // Perbaikan tab
               RadioListTile<String>(
@@ -797,7 +788,7 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
                     _sortBy = value!;
                   });
                 },
-                activeColor: ThemeConstants.primaryBlue,
+                activeColor: ThemeConstants.primary,
               ),
             const Divider(),
             SwitchListTile(
@@ -808,7 +799,7 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
                   _sortAscending = value;
                 });
               },
-              activeColor: ThemeConstants.primaryBlue,
+              activeColor: ThemeConstants.primary,
             ),
           ],
         ),

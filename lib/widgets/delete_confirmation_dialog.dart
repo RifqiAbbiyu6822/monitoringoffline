@@ -23,7 +23,7 @@ class DeleteConfirmationDialog extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
       ),
       child: Container(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(ThemeConstants.spacingL),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -40,47 +40,37 @@ class DeleteConfirmationDialog extends StatelessWidget {
                 color: ThemeConstants.errorRed,
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: ThemeConstants.spacingL),
             
             // Title
             Text(
               title,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: Colors.grey.shade800,
-                letterSpacing: -0.1,
-              ),
+              style: ThemeConstants.heading3,
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: ThemeConstants.spacingS),
             
             // Message
             Text(
               message,
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey.shade600,
-                fontWeight: FontWeight.w400,
-                letterSpacing: 0.1,
-              ),
+              style: ThemeConstants.bodyMedium.copyWith(color: ThemeConstants.textSecondary),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: ThemeConstants.spacingM),
             
             // Item Info
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(ThemeConstants.spacingM),
               decoration: BoxDecoration(
                 color: itemType == 'temuan' 
-                    ? ThemeConstants.primaryBlue.withOpacity(0.1)
-                    : ThemeConstants.secondaryGreen.withOpacity(0.1),
+                    ? ThemeConstants.primary.withOpacity(0.1)
+                    : ThemeConstants.secondary.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: itemType == 'temuan' 
-                      ? ThemeConstants.primaryBlue.withOpacity(0.3)
-                      : ThemeConstants.secondaryGreen.withOpacity(0.3),
+                      ? ThemeConstants.primary.withOpacity(0.3)
+                      : ThemeConstants.secondary.withOpacity(0.3),
                   width: 1,
                 ),
               ),
@@ -88,24 +78,23 @@ class DeleteConfirmationDialog extends StatelessWidget {
                 children: [
                   Icon(
                     itemType == 'temuan' ? Icons.search_outlined : Icons.build_outlined,
-                    color: itemType == 'temuan' ? ThemeConstants.primaryBlue : ThemeConstants.secondaryGreen,
+                    color: itemType == 'temuan' ? ThemeConstants.primary : ThemeConstants.secondary,
                     size: 20,
                   ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       itemName,
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: itemType == 'temuan' ? ThemeConstants.primaryBlue : ThemeConstants.secondaryGreen,
+                      style: ThemeConstants.bodyMedium.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: itemType == 'temuan' ? ThemeConstants.primary : ThemeConstants.secondary,
                       ),
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: ThemeConstants.spacingL),
             
             // Action Buttons
             Row(
@@ -114,18 +103,14 @@ class DeleteConfirmationDialog extends StatelessWidget {
                   child: TextButton(
                     onPressed: () => Navigator.pop(context, false),
                     style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      padding: const EdgeInsets.symmetric(horizontal: ThemeConstants.spacingM, vertical: ThemeConstants.spacingS),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
                       ),
                     ),
                     child: Text(
                       'Batal',
-                      style: TextStyle(
-                        color: Colors.grey.shade600,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 14,
-                      ),
+                      style: ThemeConstants.bodyMedium.copyWith(color: ThemeConstants.textSecondary, fontWeight: FontWeight.w500),
                     ),
                   ),
                 ),
@@ -138,17 +123,11 @@ class DeleteConfirmationDialog extends StatelessWidget {
                       foregroundColor: ThemeConstants.backgroundWhite,
                       elevation: 0,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
                       ),
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      padding: const EdgeInsets.symmetric(horizontal: ThemeConstants.spacingM, vertical: ThemeConstants.spacingS),
                     ),
-                    child: const Text(
-                      'Hapus',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 14,
-                      ),
-                    ),
+                    child: const Text('Hapus', style: ThemeConstants.bodyMedium),
                   ),
                 ),
               ],

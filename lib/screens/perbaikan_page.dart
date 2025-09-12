@@ -217,7 +217,7 @@ class _PerbaikanPageState extends State<PerbaikanPage> {
                                         icon: const Icon(Icons.my_location, size: 16),
                                         label: const Text('Ambil GPS'),
                                         style: ElevatedButton.styleFrom(
-                                          backgroundColor: ThemeConstants.secondaryGreen,
+                                          backgroundColor: ThemeConstants.secondary,
                                           foregroundColor: ThemeConstants.backgroundWhite,
                                           padding: const EdgeInsets.symmetric(horizontal: ThemeConstants.spacingM, vertical: ThemeConstants.spacingS),
                                           shape: RoundedRectangleBorder(
@@ -333,13 +333,13 @@ class _PerbaikanPageState extends State<PerbaikanPage> {
           child: Container(
             padding: const EdgeInsets.all(ThemeConstants.spacingM),
             decoration: BoxDecoration(
-              border: Border.all(color: ThemeConstants.secondaryGreen.withOpacity(0.3)),
+              border: Border.all(color: ThemeConstants.secondary.withOpacity(0.3)),
               borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
               color: ThemeConstants.backgroundWhite,
             ),
             child: Row(
               children: [
-                Icon(Icons.calendar_today, color: ThemeConstants.secondaryGreen.withOpacity(0.7)),
+                Icon(Icons.calendar_today, color: ThemeConstants.secondary.withOpacity(0.7)),
                 const SizedBox(width: ThemeConstants.spacingM),
                 Text(
                   DateFormat('dd MMMM yyyy').format(_tanggal),
@@ -424,7 +424,7 @@ class _PerbaikanPageState extends State<PerbaikanPage> {
                 icon: const Icon(Icons.camera_alt),
                 label: const Text('Ambil Foto'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: ThemeConstants.secondaryGreen,
+                  backgroundColor: ThemeConstants.secondary,
                   foregroundColor: ThemeConstants.backgroundWhite,
                   padding: const EdgeInsets.symmetric(vertical: ThemeConstants.spacingM),
                   shape: RoundedRectangleBorder(
@@ -459,7 +459,7 @@ class _PerbaikanPageState extends State<PerbaikanPage> {
             height: 200,
             width: double.infinity,
             decoration: BoxDecoration(
-              border: Border.all(color: ThemeConstants.secondaryGreen.withOpacity(0.3)),
+              border: Border.all(color: ThemeConstants.secondary.withOpacity(0.3)),
               borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
             ),
             child: ClipRRect(
@@ -561,7 +561,7 @@ Future<void> _pickImage() async {
         ),
         content: Row(
           children: [
-            const CircularProgressIndicator(color: ThemeConstants.secondaryGreen),
+            const CircularProgressIndicator(color: ThemeConstants.secondary),
             const SizedBox(width: ThemeConstants.spacingL),
             const Text('Mengambil lokasi GPS...', style: ThemeConstants.bodyMedium),
           ],
@@ -781,7 +781,7 @@ Future<void> _pickImage() async {
           FloatingActionButton(
             heroTag: "export_pdf",
             onPressed: _exportToPdf,
-            backgroundColor: ThemeConstants.secondaryGreen,
+            backgroundColor: ThemeConstants.secondary,
             mini: true,
             child: const Icon(Icons.picture_as_pdf, color: ThemeConstants.backgroundWhite),
             tooltip: 'Ekspor ke PDF',

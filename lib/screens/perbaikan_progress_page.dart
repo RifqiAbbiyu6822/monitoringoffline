@@ -76,7 +76,7 @@ class _PerbaikanProgressPageState extends State<PerbaikanProgressPage> {
                     },
                   ),
                   const SizedBox(height: 20),
-                  const CircularProgressIndicator(color: ThemeConstants.secondaryGreen),
+                  const CircularProgressIndicator(color: ThemeConstants.secondary),
                 ],
               ),
             )
@@ -97,10 +97,10 @@ class _PerbaikanProgressPageState extends State<PerbaikanProgressPage> {
           margin: const EdgeInsets.all(ThemeConstants.spacingM),
           padding: const EdgeInsets.all(ThemeConstants.spacingM),
           decoration: BoxDecoration(
-            color: ThemeConstants.primaryBlue.withOpacity(0.1),
+            color: ThemeConstants.primary.withOpacity(0.1),
             borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
             border: Border.all(
-              color: ThemeConstants.primaryBlue.withOpacity(0.3),
+              color: ThemeConstants.primary.withOpacity(0.3),
               width: 1,
             ),
           ),
@@ -112,12 +112,12 @@ class _PerbaikanProgressPageState extends State<PerbaikanProgressPage> {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: ThemeConstants.primaryBlue.withOpacity(0.1),
+                      color: ThemeConstants.primary.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
                     ),
                     child: const Icon(
                       Icons.build_outlined,
-                      color: ThemeConstants.primaryBlue,
+                      color: ThemeConstants.primary,
                       size: 24,
                     ),
                   ),
@@ -131,7 +131,7 @@ class _PerbaikanProgressPageState extends State<PerbaikanProgressPage> {
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
-                            color: ThemeConstants.primaryBlue,
+                            color: ThemeConstants.primary,
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -153,7 +153,7 @@ class _PerbaikanProgressPageState extends State<PerbaikanProgressPage> {
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
-                  color: ThemeConstants.primaryBlue,
+                  color: ThemeConstants.primary,
                 ),
               ),
             ],
@@ -170,13 +170,13 @@ class _PerbaikanProgressPageState extends State<PerbaikanProgressPage> {
                       Container(
                         padding: const EdgeInsets.all(24),
                         decoration: BoxDecoration(
-                          color: ThemeConstants.secondaryGreen.withOpacity(0.1),
+                          color: ThemeConstants.secondary.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(50),
                         ),
                         child: Icon(
                           Icons.timeline_outlined,
                           size: 64,
-                          color: ThemeConstants.secondaryGreen,
+                          color: ThemeConstants.secondary,
                         ),
                       ),
                       const SizedBox(height: ThemeConstants.spacingL),
@@ -200,7 +200,7 @@ class _PerbaikanProgressPageState extends State<PerbaikanProgressPage> {
                         icon: const Icon(Icons.add),
                         label: const Text('Tambah Progress'),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: ThemeConstants.secondaryGreen,
+                          backgroundColor: ThemeConstants.secondary,
                           foregroundColor: ThemeConstants.backgroundWhite,
                           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                           shape: RoundedRectangleBorder(
@@ -427,7 +427,7 @@ class _PerbaikanProgressPageState extends State<PerbaikanProgressPage> {
           FloatingActionButton(
             heroTag: "export_pdf",
             onPressed: _exportToPdf,
-            backgroundColor: ThemeConstants.primaryBlue,
+            backgroundColor: ThemeConstants.primary,
             mini: true,
             child: const Icon(Icons.picture_as_pdf, color: ThemeConstants.backgroundWhite),
             tooltip: 'Export PDF',
@@ -437,7 +437,7 @@ class _PerbaikanProgressPageState extends State<PerbaikanProgressPage> {
           FloatingActionButton(
             heroTag: "add_progress",
             onPressed: _showAddProgressDialog,
-            backgroundColor: ThemeConstants.secondaryGreen,
+            backgroundColor: ThemeConstants.secondary,
             mini: true,
             child: const Icon(Icons.add, color: ThemeConstants.backgroundWhite),
             tooltip: 'Tambah Progress',
@@ -527,13 +527,13 @@ class _AddProgressDialogState extends State<AddProgressDialog> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: ThemeConstants.secondaryGreen.withOpacity(0.1),
+                  color: ThemeConstants.secondary.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: const Icon(
                   Icons.timeline_rounded,
                   size: 32,
-                  color: ThemeConstants.secondaryGreen,
+                  color: ThemeConstants.secondary,
                 ),
               ),
               const SizedBox(height: 20),
@@ -685,7 +685,7 @@ class _AddProgressDialogState extends State<AddProgressDialog> {
                     child: ElevatedButton(
                       onPressed: _isLoading ? null : _saveProgress,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: ThemeConstants.secondaryGreen,
+                        backgroundColor: ThemeConstants.secondary,
                         foregroundColor: ThemeConstants.backgroundWhite,
                       ),
                       child: _isLoading

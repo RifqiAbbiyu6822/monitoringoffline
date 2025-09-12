@@ -88,7 +88,7 @@ class _ContinuePerbaikanPageState extends State<ContinuePerbaikanPage> {
                           },
                         ),
                         const SizedBox(height: 20),
-                        const CircularProgressIndicator(color: ThemeConstants.secondaryGreen),
+                        const CircularProgressIndicator(color: ThemeConstants.secondary),
                       ],
                     ),
                   )
@@ -147,13 +147,13 @@ class _ContinuePerbaikanPageState extends State<ContinuePerbaikanPage> {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: ThemeConstants.secondaryGreen.withOpacity(0.1),
+                color: ThemeConstants.secondary.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(50),
               ),
               child: Icon(
                 Icons.check_circle_outline,
                 size: 64,
-                color: ThemeConstants.secondaryGreen,
+                color: ThemeConstants.secondary,
               ),
             ),
             const SizedBox(height: ThemeConstants.spacingL),
@@ -185,7 +185,7 @@ class _ContinuePerbaikanPageState extends State<ContinuePerbaikanPage> {
               icon: const Icon(Icons.add),
               label: const Text('Buat Perbaikan Baru'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: ThemeConstants.secondaryGreen,
+                backgroundColor: ThemeConstants.secondary,
                 foregroundColor: ThemeConstants.backgroundWhite,
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 shape: RoundedRectangleBorder(
@@ -206,10 +206,10 @@ class _ContinuePerbaikanPageState extends State<ContinuePerbaikanPage> {
           margin: const EdgeInsets.all(ThemeConstants.spacingM),
           padding: const EdgeInsets.all(ThemeConstants.spacingM),
           decoration: BoxDecoration(
-            color: ThemeConstants.secondaryGreen.withOpacity(0.1),
+            color: ThemeConstants.secondary.withOpacity(0.1),
             borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
             border: Border.all(
-              color: ThemeConstants.secondaryGreen.withOpacity(0.3),
+              color: ThemeConstants.secondary.withOpacity(0.3),
               width: 1,
             ),
           ),
@@ -218,12 +218,12 @@ class _ContinuePerbaikanPageState extends State<ContinuePerbaikanPage> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: ThemeConstants.secondaryGreen.withOpacity(0.1),
+                  color: ThemeConstants.secondary.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
                 ),
                 child: const Icon(
                   Icons.build_outlined,
-                  color: ThemeConstants.secondaryGreen,
+                  color: ThemeConstants.secondary,
                   size: 24,
                 ),
               ),
@@ -237,7 +237,7 @@ class _ContinuePerbaikanPageState extends State<ContinuePerbaikanPage> {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: ThemeConstants.secondaryGreen,
+                        color: ThemeConstants.secondary,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -280,12 +280,12 @@ class _ContinuePerbaikanPageState extends State<ContinuePerbaikanPage> {
         leading: Container(
           padding: const EdgeInsets.all(ThemeConstants.spacingM),
           decoration: BoxDecoration(
-            color: ThemeConstants.secondaryGreen.withOpacity(0.1),
+            color: ThemeConstants.secondary.withOpacity(0.1),
             borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
           ),
           child: const Icon(
             Icons.build_outlined,
-            color: ThemeConstants.secondaryGreen,
+            color: ThemeConstants.secondary,
             size: 24,
           ),
         ),
@@ -384,7 +384,7 @@ class _ContinuePerbaikanPageState extends State<ContinuePerbaikanPage> {
               value: 'view',
               child: Row(
                 children: [
-                  Icon(Icons.visibility, color: ThemeConstants.secondaryGreen),
+                  Icon(Icons.visibility, color: ThemeConstants.secondary),
                   SizedBox(width: 8),
                   Text('Lihat Detail'),
                 ],
@@ -394,7 +394,7 @@ class _ContinuePerbaikanPageState extends State<ContinuePerbaikanPage> {
               value: 'progress',
               child: Row(
                 children: [
-                  Icon(Icons.timeline, color: ThemeConstants.primaryBlue),
+                  Icon(Icons.timeline, color: ThemeConstants.primary),
                   SizedBox(width: 8),
                   Text('Lihat Progress'),
                 ],
@@ -404,7 +404,7 @@ class _ContinuePerbaikanPageState extends State<ContinuePerbaikanPage> {
               value: 'continue',
               child: Row(
                 children: [
-                  Icon(Icons.edit, color: ThemeConstants.primaryBlue),
+                  Icon(Icons.edit, color: ThemeConstants.primary),
                   SizedBox(width: 8),
                   Text('Lanjutkan Perbaikan'),
                 ],
@@ -414,7 +414,7 @@ class _ContinuePerbaikanPageState extends State<ContinuePerbaikanPage> {
               value: 'export',
               child: Row(
                 children: [
-                  Icon(Icons.picture_as_pdf, color: ThemeConstants.secondaryGreen),
+                  Icon(Icons.picture_as_pdf, color: ThemeConstants.secondary),
                   SizedBox(width: 8),
                   Text('Export PDF'),
                 ],

@@ -77,7 +77,7 @@ class _DetailHistoryPageState extends State<DetailHistoryPage> {
     return Scaffold(
       backgroundColor: ThemeConstants.backgroundWhite,
       appBar: AppBar(
-        backgroundColor: widget.type == 'temuan' ? ThemeConstants.primaryBlue : ThemeConstants.secondaryGreen,
+        backgroundColor: widget.type == 'temuan' ? ThemeConstants.primary : ThemeConstants.secondary,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -205,14 +205,14 @@ class _DetailHistoryPageState extends State<DetailHistoryPage> {
             padding: const EdgeInsets.all(ThemeConstants.spacingL),
             decoration: BoxDecoration(
               color: widget.type == 'temuan' 
-                  ? ThemeConstants.primaryBlue.withOpacity(0.1)
-                  : ThemeConstants.secondaryGreen.withOpacity(0.1),
+                  ? ThemeConstants.primary.withOpacity(0.1)
+                  : ThemeConstants.secondary.withOpacity(0.1),
               borderRadius: BorderRadius.circular(ThemeConstants.radiusL),
             ),
             child: Icon(
               widget.type == 'temuan' ? Icons.search_outlined : Icons.build_outlined,
               size: 48,
-              color: widget.type == 'temuan' ? ThemeConstants.primaryBlue : ThemeConstants.secondaryGreen,
+              color: widget.type == 'temuan' ? ThemeConstants.primary : ThemeConstants.secondary,
             ),
           ),
           const SizedBox(height: ThemeConstants.spacingM),
@@ -324,8 +324,8 @@ class _DetailHistoryPageState extends State<DetailHistoryPage> {
               borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
               border: Border.all(
                 color: widget.type == 'temuan' 
-                    ? ThemeConstants.primaryBlue.withOpacity(0.3)
-                    : ThemeConstants.secondaryGreen.withOpacity(0.3),
+                    ? ThemeConstants.primary.withOpacity(0.3)
+                    : ThemeConstants.secondary.withOpacity(0.3),
               ),
             ),
             child: ClipRRect(
@@ -370,14 +370,14 @@ class _DetailHistoryPageState extends State<DetailHistoryPage> {
             padding: const EdgeInsets.all(ThemeConstants.spacingS),
             decoration: BoxDecoration(
               color: widget.type == 'temuan' 
-                  ? ThemeConstants.primaryBlue.withOpacity(0.1)
-                  : ThemeConstants.secondaryGreen.withOpacity(0.1),
+                  ? ThemeConstants.primary.withOpacity(0.1)
+                  : ThemeConstants.secondary.withOpacity(0.1),
               borderRadius: BorderRadius.circular(ThemeConstants.radiusS),
             ),
             child: Icon(
               icon,
               size: 20,
-              color: widget.type == 'temuan' ? ThemeConstants.primaryBlue : ThemeConstants.secondaryGreen,
+              color: widget.type == 'temuan' ? ThemeConstants.primary : ThemeConstants.secondary,
             ),
           ),
           const SizedBox(width: ThemeConstants.spacingM),

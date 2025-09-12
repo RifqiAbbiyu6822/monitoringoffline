@@ -7,6 +7,7 @@ import '../services/export_service.dart';
 import '../services/pdf_service.dart';
 import '../widgets/pdf_config_dialog.dart';
 import '../utils/error_handler.dart';
+import '../constants/theme_constants.dart';
 
 class ExportDialog extends StatefulWidget {
   final List<Temuan> temuanList;
@@ -30,9 +31,13 @@ class _ExportDialogState extends State<ExportDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      backgroundColor: ThemeConstants.backgroundWhite,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(ThemeConstants.radiusL),
+      ),
       title: const Text(
         'Export Data',
-        style: TextStyle(fontWeight: FontWeight.bold),
+        style: ThemeConstants.heading3,
       ),
       content: SingleChildScrollView(
         child: Column(
@@ -40,16 +45,10 @@ class _ExportDialogState extends State<ExportDialog> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Data Type Selection
-            const Text(
-              'Pilih Data:',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
+            const Text('Pilih Data:', style: ThemeConstants.bodyLarge),
+            const SizedBox(height: ThemeConstants.spacingS),
             RadioListTile<String>(
-              title: const Text('Semua Data'),
+              title: const Text('Semua Data', style: ThemeConstants.bodyMedium),
               subtitle: Text('Temuan: ${widget.temuanList.length}, Perbaikan: ${widget.perbaikanList.length}'),
               value: 'all',
               groupValue: _selectedDataType,
@@ -58,9 +57,10 @@ class _ExportDialogState extends State<ExportDialog> {
                   _selectedDataType = value!;
                 });
               },
+              activeColor: ThemeConstants.primary,
             ),
             RadioListTile<String>(
-              title: const Text('Data Temuan'),
+              title: const Text('Data Temuan', style: ThemeConstants.bodyMedium),
               subtitle: Text('${widget.temuanList.length} data'),
               value: 'temuan',
               groupValue: _selectedDataType,
@@ -69,9 +69,10 @@ class _ExportDialogState extends State<ExportDialog> {
                   _selectedDataType = value!;
                 });
               },
+              activeColor: ThemeConstants.primary,
             ),
             RadioListTile<String>(
-              title: const Text('Data Perbaikan'),
+              title: const Text('Data Perbaikan', style: ThemeConstants.bodyMedium),
               subtitle: Text('${widget.perbaikanList.length} data'),
               value: 'perbaikan',
               groupValue: _selectedDataType,
@@ -80,22 +81,17 @@ class _ExportDialogState extends State<ExportDialog> {
                   _selectedDataType = value!;
                 });
               },
+              activeColor: ThemeConstants.primary,
             ),
             
-            const SizedBox(height: 16),
+            const SizedBox(height: ThemeConstants.spacingM),
             
             // Format Selection
-            const Text(
-              'Pilih Format:',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
+            const Text('Pilih Format:', style: ThemeConstants.bodyLarge),
+            const SizedBox(height: ThemeConstants.spacingS),
             RadioListTile<String>(
-              title: const Text('CSV'),
-              subtitle: const Text('Format spreadsheet (Excel)'),
+              title: const Text('CSV', style: ThemeConstants.bodyMedium),
+              subtitle: const Text('Format spreadsheet (Excel)', style: ThemeConstants.bodySmall),
               value: 'csv',
               groupValue: _selectedFormat,
               onChanged: _isExporting ? null : (value) {
@@ -103,10 +99,11 @@ class _ExportDialogState extends State<ExportDialog> {
                   _selectedFormat = value!;
                 });
               },
+              activeColor: ThemeConstants.primary,
             ),
             RadioListTile<String>(
-              title: const Text('JSON'),
-              subtitle: const Text('Format data untuk integrasi sistem'),
+              title: const Text('JSON', style: ThemeConstants.bodyMedium),
+              subtitle: const Text('Format data untuk integrasi sistem', style: ThemeConstants.bodySmall),
               value: 'json',
               groupValue: _selectedFormat,
               onChanged: _isExporting ? null : (value) {
@@ -114,10 +111,11 @@ class _ExportDialogState extends State<ExportDialog> {
                   _selectedFormat = value!;
                 });
               },
+              activeColor: ThemeConstants.primary,
             ),
             RadioListTile<String>(
-              title: const Text('TXT'),
-              subtitle: const Text('Format teks yang mudah dibaca'),
+              title: const Text('TXT', style: ThemeConstants.bodyMedium),
+              subtitle: const Text('Format teks yang mudah dibaca', style: ThemeConstants.bodySmall),
               value: 'txt',
               groupValue: _selectedFormat,
               onChanged: _isExporting ? null : (value) {
@@ -125,10 +123,11 @@ class _ExportDialogState extends State<ExportDialog> {
                   _selectedFormat = value!;
                 });
               },
+              activeColor: ThemeConstants.primary,
             ),
             RadioListTile<String>(
-              title: const Text('PDF'),
-              subtitle: const Text('Format dokumen dengan foto dan layout'),
+              title: const Text('PDF', style: ThemeConstants.bodyMedium),
+              subtitle: const Text('Format dokumen dengan foto dan layout', style: ThemeConstants.bodySmall),
               value: 'pdf',
               groupValue: _selectedFormat,
               onChanged: _isExporting ? null : (value) {
@@ -136,12 +135,13 @@ class _ExportDialogState extends State<ExportDialog> {
                   _selectedFormat = value!;
                 });
               },
+              activeColor: ThemeConstants.primary,
             ),
             
             if (_selectedDataType == 'all') ...[
               RadioListTile<String>(
-                title: const Text('ZIP'),
-                subtitle: const Text('Semua format dalam satu file'),
+                title: const Text('ZIP', style: ThemeConstants.bodyMedium),
+                subtitle: const Text('Semua format dalam satu file', style: ThemeConstants.bodySmall),
                 value: 'zip',
                 groupValue: _selectedFormat,
                 onChanged: _isExporting ? null : (value) {
@@ -149,34 +149,29 @@ class _ExportDialogState extends State<ExportDialog> {
                     _selectedFormat = value!;
                   });
                 },
+                activeColor: ThemeConstants.primary,
               ),
             ],
             
-            const SizedBox(height: 16),
+            const SizedBox(height: ThemeConstants.spacingM),
             
             // Export Info
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(ThemeConstants.spacingM),
               decoration: BoxDecoration(
-                color: Colors.blue[50],
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.blue[200]!),
+                color: ThemeConstants.primary.withOpacity(0.05),
+                borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
+                border: Border.all(color: ThemeConstants.primary.withOpacity(0.2)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Informasi Export:',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blue,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text('• File akan disimpan di folder Documents'),
-                  Text('• Nama file akan otomatis dengan timestamp'),
+                  const Text('Informasi Export:', style: ThemeConstants.bodyLarge),
+                  const SizedBox(height: ThemeConstants.spacingXS),
+                  const Text('• File akan disimpan di folder Documents', style: ThemeConstants.bodySmall),
+                  const Text('• Nama file akan otomatis dengan timestamp', style: ThemeConstants.bodySmall),
                   if (_selectedDataType == 'all' && _selectedFormat == 'zip')
-                    const Text('• File ZIP berisi semua format data'),
+                    const Text('• File ZIP berisi semua format data', style: ThemeConstants.bodySmall),
                 ],
               ),
             ),
@@ -193,8 +188,8 @@ class _ExportDialogState extends State<ExportDialog> {
         ElevatedButton(
           onPressed: _isExporting ? null : _exportData,
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.green[600],
-            foregroundColor: Colors.white,
+            backgroundColor: ThemeConstants.secondary,
+            foregroundColor: ThemeConstants.backgroundWhite,
           ),
           child: _isExporting
               ? const SizedBox(
@@ -202,7 +197,7 @@ class _ExportDialogState extends State<ExportDialog> {
                   height: 16,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    valueColor: AlwaysStoppedAnimation<Color>(ThemeConstants.backgroundWhite),
                   ),
                 )
               : const Text('Export'),
@@ -297,38 +292,34 @@ class _ExportDialogState extends State<ExportDialog> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Row(
-          children: [
-            Icon(Icons.check_circle, color: Colors.green),
+        backgroundColor: ThemeConstants.backgroundWhite,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(ThemeConstants.radiusL)),
+        title: Row(
+          children: const [
+            Icon(Icons.check_circle, color: ThemeConstants.successGreen),
             SizedBox(width: 8),
-            Text('Export Berhasil'),
+            Text('Export Berhasil', style: ThemeConstants.heading3),
           ],
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Data berhasil diekspor ke:'),
-            const SizedBox(height: 8),
+            const Text('Data berhasil diekspor ke:', style: ThemeConstants.bodyMedium),
+            const SizedBox(height: ThemeConstants.spacingS),
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(ThemeConstants.spacingS),
               decoration: BoxDecoration(
-                color: Colors.grey[100],
-                borderRadius: BorderRadius.circular(4),
+                color: ThemeConstants.surfaceGrey,
+                borderRadius: BorderRadius.circular(ThemeConstants.radiusS),
               ),
               child: Text(
                 filePath,
-                style: const TextStyle(
-                  fontFamily: 'monospace',
-                  fontSize: 12,
-                ),
+                style: ThemeConstants.bodySmall,
               ),
             ),
-            const SizedBox(height: 8),
-            const Text(
-              'File dapat diakses melalui file manager di folder Documents.',
-              style: TextStyle(fontSize: 12),
-            ),
+            const SizedBox(height: ThemeConstants.spacingS),
+            const Text('File dapat diakses melalui file manager di folder Documents.', style: ThemeConstants.bodySmall),
           ],
         ),
         actions: [
@@ -344,8 +335,8 @@ class _ExportDialogState extends State<ExportDialog> {
               _copyPathToClipboard(filePath);
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue[600],
-              foregroundColor: Colors.white,
+              backgroundColor: ThemeConstants.primary,
+              foregroundColor: ThemeConstants.backgroundWhite,
             ),
             child: const Text('Copy Path'),
           ),

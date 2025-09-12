@@ -15,7 +15,7 @@ class MainMenuPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFAFBFC),
+      backgroundColor: ThemeConstants.surfaceGrey,
       body: SafeArea(
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
@@ -25,16 +25,8 @@ class MainMenuPage extends StatelessWidget {
               child: Container(
                 margin: const EdgeInsets.fromLTRB(24, 32, 24, 48),
                 padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 32),
-                decoration: BoxDecoration(
-                  color: Colors.white,
+                decoration: ThemeConstants.cardDecoration.copyWith(
                   borderRadius: BorderRadius.circular(24),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.04),
-                      blurRadius: 20,
-                      offset: const Offset(0, 8),
-                    ),
-                  ],
                 ),
                 child: Column(
                   children: [
@@ -42,7 +34,7 @@ class MainMenuPage extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: ThemeConstants.primaryBlue.withOpacity(0.1),
+                        color: ThemeConstants.primary.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Image.asset(
@@ -54,7 +46,7 @@ class MainMenuPage extends StatelessWidget {
                           return Icon(
                             Icons.engineering_outlined,
                             size: 60,
-                            color: ThemeConstants.primaryBlue,
+                            color: ThemeConstants.primary,
                           );
                         },
                       ),
@@ -65,13 +57,7 @@ class MainMenuPage extends StatelessWidget {
                     // Title
                     const Text(
                       'Monitoring Jalan Layang MBZ',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF1A1D29),
-                        letterSpacing: -0.5,
-                        height: 1.2,
-                      ),
+                      style: ThemeConstants.heading1,
                       textAlign: TextAlign.center,
                     ),
                     
@@ -80,12 +66,7 @@ class MainMenuPage extends StatelessWidget {
                     // Subtitle
                     Text(
                       'Sistem pencatatan dan pelaporan terintegrasi',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey.shade600,
-                        fontWeight: FontWeight.w400,
-                        letterSpacing: 0.2,
-                      ),
+                      style: ThemeConstants.bodyMedium.copyWith(color: ThemeConstants.textSecondary),
                       textAlign: TextAlign.center,
                     ),
                   ],
@@ -111,15 +92,7 @@ class MainMenuPage extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Menu Utama',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF1A1D29),
-            letterSpacing: -0.3,
-          ),
-        ),
+        const Text('Menu Utama', style: ThemeConstants.heading3),
         
         const SizedBox(height: 24),
         
@@ -134,7 +107,7 @@ class MainMenuPage extends StatelessWidget {
                     icon: Icons.search_rounded,
                     title: 'Temuan',
                     subtitle: 'Pencatatan anomali',
-                    color: ThemeConstants.primaryBlue,
+                    color: ThemeConstants.primary,
                     onTap: () => _showTemuanOptions(context),
                   ),
                 ),
@@ -145,7 +118,7 @@ class MainMenuPage extends StatelessWidget {
                     icon: Icons.build_rounded,
                     title: 'Perbaikan',
                     subtitle: 'Pencatatan perbaikan',
-                    color: ThemeConstants.secondaryGreen,
+                    color: ThemeConstants.secondary,
                     onTap: () => _showPerbaikanOptions(context),
                   ),
                 ),
@@ -215,17 +188,8 @@ class MainMenuPage extends StatelessWidget {
         child: Container(
           height: 130, // Increased height to accommodate content
           padding: const EdgeInsets.all(16), // Reduced padding
-          decoration: BoxDecoration(
-            color: Colors.white,
+          decoration: ThemeConstants.cardDecoration.copyWith(
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.grey.shade200, width: 0.5),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.04),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
-              ),
-            ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -248,12 +212,7 @@ class MainMenuPage extends StatelessWidget {
               
               Text(
                 title,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF1A1D29),
-                  letterSpacing: -0.2,
-                ),
+                style: ThemeConstants.bodyLarge.copyWith(fontWeight: FontWeight.w600),
                 maxLines: 1, // Added to prevent text overflow
                 overflow: TextOverflow.ellipsis, // Added to handle long text
               ),
@@ -262,13 +221,7 @@ class MainMenuPage extends StatelessWidget {
               
               Text(
                 subtitle,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey.shade600,
-                  fontWeight: FontWeight.w400,
-                  letterSpacing: 0.1,
-                  height: 1.2, // Reduced line height
-                ),
+                style: ThemeConstants.bodySmall.copyWith(height: 1.2),
                 maxLines: 1, // Limit to one line
                 overflow: TextOverflow.ellipsis, // Handle text overflow
               ),
