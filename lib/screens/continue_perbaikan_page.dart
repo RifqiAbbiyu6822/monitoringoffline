@@ -5,6 +5,7 @@ import '../models/perbaikan.dart';
 import '../database/database_helper.dart';
 import '../utils/error_handler.dart';
 import '../constants/theme_constants.dart';
+import '../widgets/reusable_navigation_buttons.dart';
 import 'detail_history_page.dart';
 import 'perbaikan_page.dart';
 import 'perbaikan_progress_page.dart';
@@ -96,13 +97,14 @@ class _ContinuePerbaikanPageState extends State<ContinuePerbaikanPage> {
             ),
           ],
         ),
-        floatingActionButton: FloatingActionButton(
-          heroTag: "back_button",
-          onPressed: () => Navigator.pop(context),
-          backgroundColor: ThemeConstants.textSecondary,
-          mini: true,
-          child: const Icon(Icons.arrow_back, color: ThemeConstants.backgroundWhite),
-          tooltip: 'Kembali',
+        floatingActionButton: ReusableNavigationButtons(
+          onBack: () => Navigator.pop(context),
+          showBack: true,
+          showExport: false,
+          showExportData: false,
+          showFilter: false,
+          showSort: false,
+          backTooltip: 'Kembali',
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
       ),

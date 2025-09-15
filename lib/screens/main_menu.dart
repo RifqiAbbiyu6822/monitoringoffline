@@ -8,6 +8,8 @@ import 'continue_perbaikan_page.dart';
 import '../constants/theme_constants.dart';
 import '../widgets/temuan_option_dialog.dart';
 import '../widgets/perbaikan_option_dialog.dart';
+import '../widgets/reusable_header_widget.dart';
+import '../widgets/reusable_navigation_buttons.dart';
 
 class MainMenuPage extends StatelessWidget {
   const MainMenuPage({super.key});
@@ -22,55 +24,14 @@ class MainMenuPage extends StatelessWidget {
           slivers: [
             // Header Section
             SliverToBoxAdapter(
-              child: Container(
-                margin: const EdgeInsets.fromLTRB(24, 32, 24, 48),
+              child: ReusableHeaderWidget(
+                title: 'Monitoring Jalan Layang MBZ',
+                subtitle: 'Sistem pencatatan dan pelaporan terintegrasi',
+                icon: Icons.engineering_outlined,
+                iconColor: ThemeConstants.primary,
+                backgroundColor: ThemeConstants.backgroundWhite,
                 padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 32),
-                decoration: ThemeConstants.cardDecoration.copyWith(
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                child: Column(
-                  children: [
-                    // Logo
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: ThemeConstants.primary.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Image.asset(
-                        'lib/assets/logo_jjcnormal.png',
-                        height: 60,
-                        width: 100,
-                        fit: BoxFit.contain,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Icon(
-                            Icons.engineering_outlined,
-                            size: 60,
-                            color: ThemeConstants.primary,
-                          );
-                        },
-                      ),
-                    ),
-                    
-                    const SizedBox(height: 24),
-                    
-                    // Title
-                    const Text(
-                      'Monitoring Jalan Layang MBZ',
-                      style: ThemeConstants.heading1,
-                      textAlign: TextAlign.center,
-                    ),
-                    
-                    const SizedBox(height: 12),
-                    
-                    // Subtitle
-                    Text(
-                      'Sistem pencatatan dan pelaporan terintegrasi',
-                      style: ThemeConstants.bodyMedium.copyWith(color: ThemeConstants.textSecondary),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
+                margin: const EdgeInsets.fromLTRB(24, 32, 24, 48),
               ),
             ),
             // Menu Section
@@ -83,7 +44,16 @@ class MainMenuPage extends StatelessWidget {
           ],
         ),
       ),
-      floatingActionButton: _buildExitButton(context),
+      floatingActionButton: ReusableNavigationButtons(
+        onBack: () => _showExitDialog(context),
+        showBack: true,
+        showExport: false,
+        showExportData: false,
+        showFilter: false,
+        showSort: false,
+        backTooltip: 'Keluar Aplikasi',
+        backColor: Colors.grey.shade100,
+      ),
       floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
     );
   }
@@ -299,31 +269,6 @@ class MainMenuPage extends StatelessWidget {
     );
   }
 
-  Widget _buildExitButton(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.grey.shade100,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade300, width: 0.5),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () => _showExitDialog(context),
-          borderRadius: BorderRadius.circular(16),
-          child: Container(
-            width: 56,
-            height: 56,
-            child: Icon(
-              Icons.close_rounded,
-              color: Colors.grey.shade600,
-              size: 24,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 
   void _showExitDialog(BuildContext context) {
     showDialog(

@@ -5,8 +5,12 @@ import '../models/temuan.dart';
 import '../models/perbaikan.dart';
 import '../database/database_helper.dart';
 import '../utils/error_handler.dart';
-import '../widgets/export_dialog.dart';
 import '../constants/theme_constants.dart';
+import '../widgets/reusable_navigation_buttons.dart';
+import '../widgets/reusable_date_card.dart';
+import '../widgets/reusable_filter_dialog.dart';
+import '../widgets/reusable_sort_dialog.dart';
+import '../widgets/reusable_export_functions.dart';
 import 'date_history_page.dart';
 
 class HistoryPage extends StatefulWidget {
@@ -268,74 +272,26 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
           ),
         ],
       ),
-      floatingActionButton: _buildNavigationButtons(),
-    );
-  }
-
-  Widget _buildNavigationButtons() {
-    return Positioned(
-      left: 16,
-      bottom: 16,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Export PDF Button
-          FloatingActionButton(
-            heroTag: "export_pdf",
-            onPressed: _exportToPdf,
-            backgroundColor: ThemeConstants.primary,
-            mini: true,
-            child: const Icon(Icons.picture_as_pdf, color: ThemeConstants.backgroundWhite),
-            tooltip: 'Export PDF',
-          ),
-          const SizedBox(height: 8),
-          
-          // Export Data Button
-          FloatingActionButton(
-            heroTag: "export_data",
-            onPressed: _showExportDialog,
-            backgroundColor: ThemeConstants.secondary,
-            mini: true,
-            child: const Icon(Icons.file_download, color: ThemeConstants.backgroundWhite),
-            tooltip: 'Export Data',
-          ),
-          const SizedBox(height: 8),
-          
-          // Filter Button
-          FloatingActionButton(
-            heroTag: "filter",
-            onPressed: _showFilterDialog,
-            backgroundColor: ThemeConstants.warningOrange,
-            mini: true,
-            child: const Icon(Icons.filter_list, color: ThemeConstants.backgroundWhite),
-            tooltip: 'Filter',
-          ),
-          const SizedBox(height: 8),
-          
-          // Sort Button
-          FloatingActionButton(
-            heroTag: "sort",
-            onPressed: _showSortDialog,
-            backgroundColor: ThemeConstants.textSecondary,
-            mini: true,
-            child: const Icon(Icons.sort, color: ThemeConstants.backgroundWhite),
-            tooltip: 'Sort',
-          ),
-          const SizedBox(height: 8),
-          
-          // Back Button
-          FloatingActionButton(
-            heroTag: "back_button",
-            onPressed: () => Navigator.pop(context),
-            backgroundColor: ThemeConstants.textSecondary,
-            mini: true,
-            child: const Icon(Icons.arrow_back, color: ThemeConstants.backgroundWhite),
-            tooltip: 'Kembali',
-          ),
-        ],
+      floatingActionButton: ReusableNavigationButtons(
+        onBack: () => Navigator.pop(context),
+        onExport: () => ReusableExportFunctions.showExportDialog(context, _filteredTemuanList, _filteredPerbaikanList),
+        onExportData: () => ReusableExportFunctions.showExportDialog(context, _filteredTemuanList, _filteredPerbaikanList),
+        onFilter: _showFilterDialog,
+        onSort: _showSortDialog,
+        showExport: true,
+        showExportData: true,
+        showFilter: true,
+        showSort: true,
+        showBack: true,
+        exportTooltip: 'Export PDF',
+        exportDataTooltip: 'Export Data',
+        filterTooltip: 'Filter',
+        sortTooltip: 'Sort',
+        backTooltip: 'Kembali',
       ),
     );
   }
+
 
   Widget _buildTemuanList() {
     if (_isLoading) {
@@ -379,7 +335,22 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
         final temuanList = groupedTemuan[dateKey]!;
         final date = DateTime.parse(dateKey);
         
-        return _buildDateCard(date, temuanList.length, 'temuan');
+        return ReusableDateCard(
+          date: date,
+          count: temuanList.length,
+          type: 'temuan',
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => DateHistoryPage(
+                  selectedDate: date,
+                  type: 'temuan',
+                ),
+              ),
+            );
+          },
+        );
       },
     );
   }
@@ -426,284 +397,54 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
         final perbaikanList = groupedPerbaikan[dateKey]!;
         final date = DateTime.parse(dateKey);
         
-        return _buildDateCard(date, perbaikanList.length, 'perbaikan');
-      },
-    );
-  }
-
-  Widget _buildDateCard(DateTime date, int count, String type) {
-    final dateFormat = DateFormat('EEEE, dd MMMM yyyy', 'id_ID');
-    final isToday = DateFormat('yyyy-MM-dd').format(date) == DateFormat('yyyy-MM-dd').format(DateTime.now());
-    final isYesterday = DateFormat('yyyy-MM-dd').format(date) == DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(const Duration(days: 1)));
-    
-    String dateText;
-    if (isToday) {
-      dateText = 'Hari Ini';
-    } else if (isYesterday) {
-      dateText = 'Kemarin';
-    } else {
-      dateText = dateFormat.format(date);
-    }
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: ThemeConstants.spacingM),
-      decoration: ThemeConstants.cardDecoration,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
+        return ReusableDateCard(
+          date: date,
+          count: perbaikanList.length,
+          type: 'perbaikan',
           onTap: () {
             Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => DateHistoryPage(
                   selectedDate: date,
-                  type: type,
+                  type: 'perbaikan',
                 ),
               ),
             );
           },
-          borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
-          child: Container(
-            padding: const EdgeInsets.all(ThemeConstants.spacingM),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(ThemeConstants.spacingM),
-                  decoration: BoxDecoration(
-                    color: type == 'temuan' 
-                        ? ThemeConstants.primary.withOpacity(0.1)
-                        : ThemeConstants.secondary.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
-                  ),
-                  child: Icon(
-                    type == 'temuan' ? Icons.search_outlined : Icons.build_outlined,
-                    color: type == 'temuan' ? ThemeConstants.primary : ThemeConstants.secondary,
-                    size: 24,
-                  ),
-                ),
-                const SizedBox(width: ThemeConstants.spacingM),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        dateText,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: type == 'temuan' ? ThemeConstants.primary : ThemeConstants.secondary,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '$count ${type == 'temuan' ? 'temuan' : 'perbaikan'} ditemukan',
-                        style: ThemeConstants.bodyMedium.copyWith(color: ThemeConstants.textSecondary),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: type == 'temuan' ? ThemeConstants.primary : ThemeConstants.secondary,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    '$count',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: ThemeConstants.spacingS),
-                Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  size: 16,
-                  color: ThemeConstants.textSecondary,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
+        );
+      },
     );
   }
 
-
-
-  void _showExportDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => ExportDialog(
-        temuanList: _filteredTemuanList,
-        perbaikanList: _filteredPerbaikanList,
-      ),
-    );
-  }
-
-  Future<void> _exportToPdf() async {
-    // Tampilkan ExportDialog yang sudah diperbaiki
-    _showExportDialog();
-  }
 
 
   void _showFilterDialog() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: ThemeConstants.backgroundWhite,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(ThemeConstants.radiusL),
-        ),
-        title: const Text(
-          'Filter Data',
-          style: ThemeConstants.heading3,
-        ),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Jalur Filter
-              DropdownButtonFormField<String>(
-                value: _filterJalur,
-                decoration: ThemeConstants.inputDecoration('Jalur'),
-                items: ['Semua', 'Jalur A', 'Jalur B'].map((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value, style: ThemeConstants.bodyMedium),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    _filterJalur = value!;
-                  });
-                },
-              ),
-              const SizedBox(height: ThemeConstants.spacingM),
-              
-              // Lajur Filter
-              DropdownButtonFormField<String>(
-                value: _filterLajur,
-                decoration: ThemeConstants.inputDecoration('Lajur'),
-                items: ['Semua', 'Lajur 1', 'Lajur 2', 'Bahu Dalam', 'Bahu Luar'].map((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value, style: ThemeConstants.bodyMedium),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    _filterLajur = value!;
-                  });
-                },
-              ),
-              const SizedBox(height: ThemeConstants.spacingM),
-              
-              // Date From
-              InkWell(
-                onTap: () async {
-                  final date = await showDatePicker(
-                    context: context,
-                    initialDate: _filterDateFrom ?? DateTime.now(),
-                    firstDate: DateTime(2020),
-                    lastDate: DateTime.now(),
-                  );
-                  if (date != null) {
-                    setState(() {
-                      _filterDateFrom = date;
-                    });
-                  }
-                },
-                child: Container(
-                  padding: const EdgeInsets.all(ThemeConstants.spacingM),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: ThemeConstants.primary.withOpacity(0.3)),
-                    borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
-                    color: ThemeConstants.backgroundWhite,
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(Icons.calendar_today, color: ThemeConstants.primary.withOpacity(0.7)),
-                      const SizedBox(width: ThemeConstants.spacingM),
-                      Text(
-                        _filterDateFrom != null
-                            ? DateFormat('dd MMM yyyy').format(_filterDateFrom!)
-                            : 'Tanggal Dari',
-                        style: ThemeConstants.bodyMedium,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: ThemeConstants.spacingM),
-              
-              // Date To
-              InkWell(
-                onTap: () async {
-                  final date = await showDatePicker(
-                    context: context,
-                    initialDate: _filterDateTo ?? DateTime.now(),
-                    firstDate: _filterDateFrom ?? DateTime(2020),
-                    lastDate: DateTime.now(),
-                  );
-                  if (date != null) {
-                    setState(() {
-                      _filterDateTo = date;
-                    });
-                  }
-                },
-                child: Container(
-                  padding: const EdgeInsets.all(ThemeConstants.spacingM),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: ThemeConstants.primary.withOpacity(0.3)),
-                    borderRadius: BorderRadius.circular(ThemeConstants.radiusM),
-                    color: ThemeConstants.backgroundWhite,
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(Icons.calendar_today, color: ThemeConstants.primary.withOpacity(0.7)),
-                      const SizedBox(width: ThemeConstants.spacingM),
-                      Text(
-                        _filterDateTo != null
-                            ? DateFormat('dd MMM yyyy').format(_filterDateTo!)
-                            : 'Tanggal Sampai',
-                        style: ThemeConstants.bodyMedium,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              setState(() {
-                _filterJalur = 'Semua';
-                _filterLajur = 'Semua';
-                _filterDateFrom = null;
-                _filterDateTo = null;
-              });
-              _applyFilters();
-              Navigator.of(context).pop();
-            },
-            child: Text(
-              'Reset',
-              style: TextStyle(color: ThemeConstants.textSecondary),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              _applyFilters();
-              Navigator.of(context).pop();
-            },
-            style: ThemeConstants.primaryButtonStyle,
-            child: const Text('Terapkan'),
-          ),
-        ],
+      builder: (context) => ReusableFilterDialog(
+        filterJalur: _filterJalur,
+        filterLajur: _filterLajur,
+        filterDateFrom: _filterDateFrom,
+        filterDateTo: _filterDateTo,
+        onApply: (jalur, lajur, dateFrom, dateTo) {
+          setState(() {
+            _filterJalur = jalur;
+            _filterLajur = lajur;
+            _filterDateFrom = dateFrom;
+            _filterDateTo = dateTo;
+          });
+          _applyFilters();
+        },
+        onReset: () {
+          setState(() {
+            _filterJalur = 'Semua';
+            _filterLajur = 'Semua';
+            _filterDateFrom = null;
+            _filterDateTo = null;
+          });
+          _applyFilters();
+        },
       ),
     );
   }
@@ -711,115 +452,17 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
   void _showSortDialog() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: ThemeConstants.backgroundWhite,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(ThemeConstants.radiusL),
-        ),
-        title: const Text(
-          'Urutkan Data',
-          style: ThemeConstants.heading3,
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            RadioListTile<String>(
-              title: const Text('Tanggal', style: ThemeConstants.bodyMedium),
-              value: 'tanggal',
-              groupValue: _sortBy,
-              onChanged: (value) {
-                setState(() {
-                  _sortBy = value!;
-                });
-              },
-              activeColor: ThemeConstants.primary,
-            ),
-            RadioListTile<String>(
-              title: const Text('Jenis', style: ThemeConstants.bodyMedium),
-              value: 'jenis',
-              groupValue: _sortBy,
-              onChanged: (value) {
-                setState(() {
-                  _sortBy = value!;
-                });
-              },
-              activeColor: ThemeConstants.primary,
-            ),
-            RadioListTile<String>(
-              title: const Text('Jalur', style: ThemeConstants.bodyMedium),
-              value: 'jalur',
-              groupValue: _sortBy,
-              onChanged: (value) {
-                setState(() {
-                  _sortBy = value!;
-                });
-              },
-              activeColor: ThemeConstants.primary,
-            ),
-            RadioListTile<String>(
-              title: const Text('Lajur', style: ThemeConstants.bodyMedium),
-              value: 'lajur',
-              groupValue: _sortBy,
-              onChanged: (value) {
-                setState(() {
-                  _sortBy = value!;
-                });
-              },
-              activeColor: ThemeConstants.primary,
-            ),
-            RadioListTile<String>(
-              title: const Text('Kilometer', style: ThemeConstants.bodyMedium),
-              value: 'kilometer',
-              groupValue: _sortBy,
-              onChanged: (value) {
-                setState(() {
-                  _sortBy = value!;
-                });
-              },
-              activeColor: ThemeConstants.primary,
-            ),
-            if (_tabController.index == 1) // Perbaikan tab
-              RadioListTile<String>(
-                title: const Text('Status', style: ThemeConstants.bodyMedium),
-                value: 'status',
-                groupValue: _sortBy,
-                onChanged: (value) {
-                  setState(() {
-                    _sortBy = value!;
-                  });
-                },
-                activeColor: ThemeConstants.primary,
-              ),
-            const Divider(),
-            SwitchListTile(
-              title: const Text('Urutan Naik', style: ThemeConstants.bodyMedium),
-              value: _sortAscending,
-              onChanged: (value) {
-                setState(() {
-                  _sortAscending = value;
-                });
-              },
-              activeColor: ThemeConstants.primary,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(
-              'Batal',
-              style: TextStyle(color: ThemeConstants.textSecondary),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              _applyFilters();
-              Navigator.of(context).pop();
-            },
-            style: ThemeConstants.primaryButtonStyle,
-            child: const Text('Terapkan'),
-          ),
-        ],
+      builder: (context) => ReusableSortDialog(
+        sortBy: _sortBy,
+        sortAscending: _sortAscending,
+        isPerbaikanTab: _tabController.index == 1,
+        onApply: (sortBy, sortAscending) {
+          setState(() {
+            _sortBy = sortBy;
+            _sortAscending = sortAscending;
+          });
+          _applyFilters();
+        },
       ),
     );
   }

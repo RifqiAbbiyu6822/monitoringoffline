@@ -2,13 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import '../models/temuan.dart';
-import '../models/pdf_config.dart' as pdf_config;
 import '../database/database_helper.dart';
 import '../utils/error_handler.dart';
 import '../constants/theme_constants.dart';
 import '../widgets/delete_confirmation_dialog.dart';
-import '../widgets/pdf_config_dialog.dart';
-import '../services/pdf_service.dart';
+import '../widgets/reusable_navigation_buttons.dart';
+import '../widgets/reusable_export_functions.dart';
 import 'detail_history_page.dart';
 import 'temuan_page.dart';
 
@@ -83,7 +82,12 @@ class _TodayTemuanPageState extends State<TodayTemuanPage> {
           ),
         ],
       ),
-      floatingActionButton: _buildNavigationButtons(),
+      floatingActionButton: ReusableNavigationButtons(
+        onBack: () => Navigator.pop(context),
+        onExport: () => ReusableExportFunctions.exportTemuanToPdf(context, DateTime.now()),
+        backTooltip: 'Kembali',
+        exportTooltip: 'Export PDF',
+      ),
     );
   }
 
@@ -388,84 +392,4 @@ class _TodayTemuanPageState extends State<TodayTemuanPage> {
     }
   }
 
-  Future<void> _exportToPdf() async {
-    final config = await showDialog<pdf_config.PdfConfig>(
-      context: context,
-      builder: (context) => const PdfConfigDialog(),
-    );
-
-    if (config != null) {
-      try {
-        // Buat informasi tanggal hari ini
-        final dateRange = DateFormat('dd/MM/yyyy').format(DateTime.now());
-        final filterInfo = 'Temuan Hari Ini';
-        
-        if (_todayTemuanList.isNotEmpty) {
-          await PdfService().generateTemuanPdf(_todayTemuanList, config, dateRange: dateRange, filterInfo: filterInfo);
-        } else {
-          _showNoDataMessage('Tidak ada data temuan hari ini untuk diekspor');
-          return;
-        }
-        
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('PDF berhasil diekspor'),
-              backgroundColor: ThemeConstants.successGreen,
-              behavior: SnackBarBehavior.fixed,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(ThemeConstants.radiusM)),
-              ),
-            ),
-          );
-        }
-      } catch (e) {
-        ErrorHandler.handleError(context, e, customMessage: 'Gagal membuat PDF');
-      }
-    }
-  }
-
-  void _showNoDataMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: ThemeConstants.warningOrange,
-              behavior: SnackBarBehavior.fixed,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(ThemeConstants.radiusM)),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNavigationButtons() {
-    return Positioned(
-      left: 16,
-      bottom: 16,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Export PDF Button
-          FloatingActionButton(
-            heroTag: "export_pdf",
-            onPressed: _exportToPdf,
-            backgroundColor: ThemeConstants.primary,
-            mini: true,
-            child: const Icon(Icons.picture_as_pdf, color: ThemeConstants.backgroundWhite),
-            tooltip: 'Export PDF',
-          ),
-          const SizedBox(height: 8),
-          // Back Button
-          FloatingActionButton(
-            heroTag: "back_button",
-            onPressed: () => Navigator.pop(context),
-            backgroundColor: ThemeConstants.textSecondary,
-            mini: true,
-            child: const Icon(Icons.arrow_back, color: ThemeConstants.backgroundWhite),
-            tooltip: 'Kembali',
-          ),
-        ],
-      ),
-    );
-  }
 }

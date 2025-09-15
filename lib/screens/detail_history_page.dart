@@ -6,6 +6,9 @@ import '../models/perbaikan.dart';
 import '../database/database_helper.dart';
 import '../utils/error_handler.dart';
 import '../constants/theme_constants.dart';
+import '../widgets/reusable_header_widget.dart';
+import '../widgets/reusable_loading_dialog.dart';
+import '../widgets/reusable_snackbar_helper.dart';
 
 class DetailHistoryPage extends StatefulWidget {
   final String type;
@@ -32,6 +35,12 @@ class _DetailHistoryPageState extends State<DetailHistoryPage> {
   }
 
   Future<void> _loadData() async {
+    ReusableLoadingDialog.show(
+      context,
+      message: 'Memuat detail data...',
+      indicatorColor: widget.type == 'temuan' ? ThemeConstants.primary : ThemeConstants.secondary,
+    );
+    
     try {
       if (widget.type == 'temuan') {
         final temuanList = await DatabaseHelper().getAllTemuan();
@@ -41,8 +50,10 @@ class _DetailHistoryPageState extends State<DetailHistoryPage> {
         _data = perbaikanList.firstWhere((perbaikan) => perbaikan.id == widget.id);
       }
     } catch (e) {
+      ReusableLoadingDialog.hide(context);
       ErrorHandler.handleError(context, e, customMessage: 'Gagal memuat detail data');
     } finally {
+      ReusableLoadingDialog.hide(context);
       setState(() {
         _isLoading = false;
       });
@@ -64,7 +75,7 @@ class _DetailHistoryPageState extends State<DetailHistoryPage> {
           await DatabaseHelper().deletePerbaikan(widget.id);
         }
 
-        ErrorHandler.showSuccessSnackBar(context, 'Data berhasil dihapus');
+        ReusableSnackbarHelper.showSuccess(context, 'Data berhasil dihapus');
         Navigator.pop(context, true); // Return true to indicate deletion
       } catch (e) {
         ErrorHandler.handleError(context, e, customMessage: 'Gagal menghapus data');
@@ -161,7 +172,13 @@ class _DetailHistoryPageState extends State<DetailHistoryPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             // Header Card
-                            _buildHeaderCard(),
+                            ReusableHeaderWidget(
+                              title: widget.type == 'temuan' ? _data.jenisTemuan : _data.jenisPerbaikan,
+                              subtitle: DateFormat('dd MMMM yyyy').format(_data.tanggal),
+                              icon: widget.type == 'temuan' ? Icons.search_outlined : Icons.build_outlined,
+                              iconColor: widget.type == 'temuan' ? ThemeConstants.primary : ThemeConstants.secondary,
+                              backgroundColor: ThemeConstants.backgroundWhite,
+                            ),
                             
                             const SizedBox(height: ThemeConstants.spacingL),
                             
@@ -194,42 +211,6 @@ class _DetailHistoryPageState extends State<DetailHistoryPage> {
     );
   }
 
-  Widget _buildHeaderCard() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(ThemeConstants.spacingL),
-      decoration: ThemeConstants.cardDecoration,
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(ThemeConstants.spacingL),
-            decoration: BoxDecoration(
-              color: widget.type == 'temuan' 
-                  ? ThemeConstants.primary.withOpacity(0.1)
-                  : ThemeConstants.secondary.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(ThemeConstants.radiusL),
-            ),
-            child: Icon(
-              widget.type == 'temuan' ? Icons.search_outlined : Icons.build_outlined,
-              size: 48,
-              color: widget.type == 'temuan' ? ThemeConstants.primary : ThemeConstants.secondary,
-            ),
-          ),
-          const SizedBox(height: ThemeConstants.spacingM),
-          Text(
-            widget.type == 'temuan' ? _data.jenisTemuan : _data.jenisPerbaikan,
-            style: ThemeConstants.heading2,
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: ThemeConstants.spacingXS),
-          Text(
-            DateFormat('dd MMMM yyyy').format(_data.tanggal),
-            style: ThemeConstants.bodyMedium.copyWith(color: ThemeConstants.textSecondary),
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildInfoCard() {
     return Container(

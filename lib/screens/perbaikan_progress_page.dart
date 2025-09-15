@@ -13,6 +13,7 @@ import '../widgets/pdf_config_dialog.dart';
 import '../constants/theme_constants.dart';
 import '../constants/app_constants.dart';
 import '../utils/error_handler.dart';
+import '../widgets/reusable_navigation_buttons.dart';
 
 class PerbaikanProgressPage extends StatefulWidget {
   final Perbaikan perbaikan;
@@ -84,7 +85,12 @@ class _PerbaikanProgressPageState extends State<PerbaikanProgressPage> {
           ),
         ],
       ),
-      floatingActionButton: _buildNavigationButtons(),
+      floatingActionButton: ReusableNavigationButtons(
+        onBack: () => Navigator.pop(context),
+        onExport: () => _exportToPdf(),
+        backTooltip: 'Kembali',
+        exportTooltip: 'Export PDF',
+      ),
     );
   }
 
@@ -416,46 +422,6 @@ class _PerbaikanProgressPageState extends State<PerbaikanProgressPage> {
     }
   }
 
-  Widget _buildNavigationButtons() {
-    return Positioned(
-      left: 16,
-      bottom: 16,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Export PDF Button
-          FloatingActionButton(
-            heroTag: "export_pdf",
-            onPressed: _exportToPdf,
-            backgroundColor: ThemeConstants.primary,
-            mini: true,
-            child: const Icon(Icons.picture_as_pdf, color: ThemeConstants.backgroundWhite),
-            tooltip: 'Export PDF',
-          ),
-          const SizedBox(height: 8),
-          // Add Progress Button
-          FloatingActionButton(
-            heroTag: "add_progress",
-            onPressed: _showAddProgressDialog,
-            backgroundColor: ThemeConstants.secondary,
-            mini: true,
-            child: const Icon(Icons.add, color: ThemeConstants.backgroundWhite),
-            tooltip: 'Tambah Progress',
-          ),
-          const SizedBox(height: 8),
-          // Back Button
-          FloatingActionButton(
-            heroTag: "back_button",
-            onPressed: () => Navigator.pop(context),
-            backgroundColor: ThemeConstants.textSecondary,
-            mini: true,
-            child: const Icon(Icons.arrow_back, color: ThemeConstants.backgroundWhite),
-            tooltip: 'Kembali',
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 class AddProgressDialog extends StatefulWidget {

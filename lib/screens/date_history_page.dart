@@ -11,6 +11,7 @@ import '../widgets/delete_confirmation_dialog.dart';
 import '../widgets/pdf_config_dialog.dart';
 import '../widgets/export_confirmation_dialog.dart';
 import '../services/pdf_service.dart';
+import '../widgets/reusable_navigation_buttons.dart';
 import 'detail_history_page.dart';
 
 class DateHistoryPage extends StatefulWidget {
@@ -104,7 +105,12 @@ class _DateHistoryPageState extends State<DateHistoryPage> {
           ),
         ],
       ),
-      floatingActionButton: _buildNavigationButtons(),
+      floatingActionButton: ReusableNavigationButtons(
+        onBack: () => Navigator.pop(context),
+        onExport: () => _exportToPdf(),
+        backTooltip: 'Kembali',
+        exportTooltip: 'Export PDF',
+      ),
     );
   }
 
@@ -629,37 +635,5 @@ class _DateHistoryPageState extends State<DateHistoryPage> {
     }
   }
 
-  Widget _buildNavigationButtons() {
-    return Positioned(
-      left: 16,
-      bottom: 16,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Export PDF Button
-          FloatingActionButton(
-            heroTag: "export_pdf",
-            onPressed: _exportToPdf,
-            backgroundColor: widget.type == 'temuan' 
-                ? ThemeConstants.primary 
-                : ThemeConstants.secondary,
-            mini: true,
-            child: const Icon(Icons.picture_as_pdf, color: ThemeConstants.backgroundWhite),
-            tooltip: 'Export PDF',
-          ),
-          const SizedBox(height: 8),
-          // Back Button
-          FloatingActionButton(
-            heroTag: "back_button",
-            onPressed: () => Navigator.pop(context),
-            backgroundColor: ThemeConstants.textSecondary,
-            mini: true,
-            child: const Icon(Icons.arrow_back, color: ThemeConstants.backgroundWhite),
-            tooltip: 'Kembali',
-          ),
-        ],
-      ),
-    );
-  }
 
 }
