@@ -1,160 +1,66 @@
 import 'package:flutter/material.dart';
 
 class ThemeConstants {
-  // Simplified color scheme: primary, secondary, neutral
-  static const Color primary = Color(0xFF0F2B57); // deep blue
-  static const Color secondary = Color(0xFF228B22); // green
-  static const Color neutral = Color(0xFF707070);
-
-  // Extended palette derived from scheme
-  static const Color accentYellow = Color(0xFFFFC107);
-  static const Color backgroundWhite = Color(0xFFFFFFFF);
-  static const Color surfaceGrey = Color(0xFFF8F9FA);
-  static const Color textPrimary = Color(0xFF2C3E50);
-  static const Color textSecondary = Color(0xFF7F8C8D);
-  static const Color errorRed = Color(0xFFE74C3C);
-  static const Color successGreen = Color(0xFF27AE60);
-  static const Color warningOrange = Color(0xFFF39C12);
-  static const Color onPrimary = backgroundWhite;
-  static const Color onSecondary = backgroundWhite;
-
-  // Text styles
-  static const TextStyle heading1 = TextStyle(
-    fontSize: 24,
-    fontWeight: FontWeight.w700,
-    color: textPrimary,
-  );
-
-  static const TextStyle heading2 = TextStyle(
-    fontSize: 20,
-    fontWeight: FontWeight.w600,
-    color: textPrimary,
-  );
-
-  static const TextStyle heading3 = TextStyle(
-    fontSize: 18,
-    fontWeight: FontWeight.w600,
-    color: textPrimary,
-  );
-
-  static const TextStyle bodyLarge = TextStyle(
-    fontSize: 16,
-    fontWeight: FontWeight.w500,
-    color: textPrimary,
-  );
-
-  static const TextStyle bodyMedium = TextStyle(
-    fontSize: 14,
-    fontWeight: FontWeight.w400,
-    color: textPrimary,
-  );
-
-  static const TextStyle bodySmall = TextStyle(
-    fontSize: 12,
-    fontWeight: FontWeight.w400,
-    color: textSecondary,
-  );
-
-  static const TextStyle caption = TextStyle(
-    fontSize: 10,
-    fontWeight: FontWeight.w400,
-    color: textSecondary,
-  );
-
-  // Button styles
-  static ButtonStyle primaryButtonStyle = ElevatedButton.styleFrom(
-    backgroundColor: primary,
-    foregroundColor: backgroundWhite,
-    elevation: 2,
-    shadowColor: primary.withOpacity(0.3),
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(8),
-    ),
-    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-  );
-
-  static ButtonStyle secondaryButtonStyle = ElevatedButton.styleFrom(
-    backgroundColor: secondary,
-    foregroundColor: backgroundWhite,
-    elevation: 2,
-    shadowColor: secondary.withOpacity(0.3),
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(8),
-    ),
-    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-  );
-
-  static ButtonStyle dangerButtonStyle = ElevatedButton.styleFrom(
-    backgroundColor: errorRed,
-    foregroundColor: backgroundWhite,
-    elevation: 2,
-    shadowColor: errorRed.withOpacity(0.3),
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(8),
-    ),
-    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-  );
-
-  // Card styles
-  static BoxDecoration cardDecoration = BoxDecoration(
-    color: backgroundWhite,
-    borderRadius: BorderRadius.circular(12),
-    border: Border.all(color: primary.withOpacity(0.1)),
-    boxShadow: [
-      BoxShadow(
-        color: primary.withOpacity(0.08),
-        blurRadius: 8,
-        offset: const Offset(0, 2),
-      ),
-    ],
-  );
-
-  static BoxDecoration surfaceDecoration = BoxDecoration(
-    color: surfaceGrey,
-    borderRadius: BorderRadius.circular(12),
-    border: Border.all(color: primary.withOpacity(0.1)),
-  );
-
-  // Input field styles
-  static InputDecoration inputDecoration(String label) => InputDecoration(
-    labelText: label,
-    labelStyle: const TextStyle(color: textSecondary),
-    border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(8),
-      borderSide: BorderSide(color: primary.withOpacity(0.3)),
-    ),
-    enabledBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(8),
-      borderSide: BorderSide(color: primary.withOpacity(0.3)),
-    ),
-    focusedBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(8),
-      borderSide: const BorderSide(color: primary, width: 2),
-    ),
-    errorBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(8),
-      borderSide: const BorderSide(color: errorRed),
-    ),
-    focusedErrorBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(8),
-      borderSide: const BorderSide(color: errorRed, width: 2),
-    ),
-    filled: true,
-    fillColor: backgroundWhite,
-    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-  );
-
-  // Spacing constants
-  static const double spacingXS = 4.0;
-  static const double spacingS = 8.0;
-  static const double spacingM = 16.0;
-  static const double spacingL = 24.0;
-  static const double spacingXL = 32.0;
-  static const double spacingXXL = 48.0;
-
-  // Border radius constants
-  static const double radiusS = 4.0;
-  static const double radiusM = 8.0;
-  static const double radiusL = 12.0;
-  static const double radiusXL = 16.0;
+  // Professional Color Palette
+  static const Color primaryBlue = Color(0xFF1A237E); // Dark blue
+  static const Color primaryWhite = Color(0xFFFFFFFF); // White
+  static const Color accentYellow = Color(0xFFFF6F00); // Orange-yellow
+  
+  // Extended Color Palette
+  static const Color lightBlue = Color(0xFF3F51B5);
+  static const Color darkBlue = Color(0xFF0D47A1);
+  static const Color lightYellow = Color(0xFFFFC107);
+  static const Color darkYellow = Color(0xFFE65100);
+  
+  // Neutral Colors
+  static const Color grey50 = Color(0xFFFAFAFA);
+  static const Color grey100 = Color(0xFFF5F5F5);
+  static const Color grey200 = Color(0xFFEEEEEE);
+  static const Color grey300 = Color(0xFFE0E0E0);
+  static const Color grey400 = Color(0xFFBDBDBD);
+  static const Color grey500 = Color(0xFF9E9E9E);
+  static const Color grey600 = Color(0xFF757575);
+  static const Color grey700 = Color(0xFF616161);
+  static const Color grey800 = Color(0xFF424242);
+  static const Color grey900 = Color(0xFF212121);
+  
+  // Status Colors
+  static const Color success = Color(0xFF4CAF50);
+  static const Color warning = Color(0xFFFF9800);
+  static const Color error = Color(0xFFF44336);
+  static const Color info = Color(0xFF2196F3);
+  
+  // Typography
+  static const String fontFamily = 'Roboto';
+  
+  // Spacing
+  static const double spacing4 = 4.0;
+  static const double spacing8 = 8.0;
+  static const double spacing12 = 12.0;
+  static const double spacing16 = 16.0;
+  static const double spacing20 = 20.0;
+  static const double spacing24 = 24.0;
+  static const double spacing32 = 32.0;
+  
+  // Border Radius
+  static const double radiusSmall = 4.0;
+  static const double radiusMedium = 8.0;
+  static const double radiusLarge = 12.0;
+  static const double radiusXLarge = 16.0;
+  
+  // Elevation
+  static const double elevationLow = 2.0;
+  static const double elevationMedium = 4.0;
+  static const double elevationHigh = 8.0;
+  
+  // Icon Sizes
+  static const double iconSmall = 16.0;
+  static const double iconMedium = 24.0;
+  static const double iconLarge = 32.0;
+  static const double iconXLarge = 48.0;
+  
+  // Button Heights
+  static const double buttonHeightSmall = 32.0;
+  static const double buttonHeightMedium = 48.0;
+  static const double buttonHeightLarge = 56.0;
 }

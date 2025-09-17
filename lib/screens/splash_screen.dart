@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'main_menu.dart';
 import '../constants/theme_constants.dart';
+import '../shared/widgets/loading_widget.dart';
+import 'main_menu_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -10,198 +10,91 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _fadeAnimation;
-  late Animation<double> _scaleAnimation;
-  late Animation<double> _slideAnimation;
-
+class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 2500),
-      vsync: this,
-    );
-
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.0, 0.6, curve: Curves.easeOut),
-      ),
-    );
-
-    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.0, 0.6, curve: Curves.easeOutBack),
-      ),
-    );
-
-    _slideAnimation = Tween<double>(begin: 50.0, end: 0.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.2, 0.8, curve: Curves.easeOut),
-      ),
-    );
-
-    // Start the animation
-    _controller.forward();
-
-    // Navigate to main menu after animation
-    Future.delayed(const Duration(seconds: 3), () {
-      if (mounted) {
-        Navigator.of(context).pushReplacement(
-          PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) => const MainMenuPage(),
-            transitionsBuilder: (context, animation, secondaryAnimation, child) {
-              return FadeTransition(
-                opacity: animation,
-                child: SlideTransition(
-                  position: Tween<Offset>(
-                    begin: const Offset(0.0, 0.1),
-                    end: Offset.zero,
-                  ).animate(
-                    CurvedAnimation(
-                      parent: animation,
-                      curve: Curves.easeOut,
-                    ),
-                  ),
-                  child: child,
-                ),
-              );
-            },
-            transitionDuration: const Duration(milliseconds: 600),
-          ),
-        );
-      }
-    });
+    _navigateToMainMenu();
   }
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
+  _navigateToMainMenu() async {
+    await Future.delayed(const Duration(seconds: 3));
+    if (mounted) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const MainMenuScreen()),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    // Set system UI overlay style to match main menu
-    SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.dark,
-        statusBarBrightness: Brightness.light,
-        systemNavigationBarColor: ThemeConstants.surfaceGrey,
-        systemNavigationBarIconBrightness: Brightness.dark,
-      ),
-    );
-
     return Scaffold(
-      backgroundColor: ThemeConstants.surfaceGrey, // Same background as main menu
-      body: SafeArea(
-        child: Center(
-          child: AnimatedBuilder(
-            animation: _controller,
-            builder: (context, child) {
-              return FadeTransition(
-                opacity: _fadeAnimation,
-                child: Transform.translate(
-                  offset: Offset(0, _slideAnimation.value),
-                  child: ScaleTransition(
-                    scale: _scaleAnimation,
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 48),
-                      padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 40),
-                      decoration: ThemeConstants.cardDecoration.copyWith(
-                        borderRadius: BorderRadius.circular(24),
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          // Logo container matching main menu style
-                          Container(
-                            padding: const EdgeInsets.all(20),
-                            decoration: BoxDecoration(
-                              color: ThemeConstants.primary.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Image.asset(
-                              'lib/assets/logo_jjcnormal.png',
-                              height: 80,
-                              width: 120,
-                              fit: BoxFit.contain,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Icon(
-                                  Icons.engineering_outlined,
-                                  size: 80,
-                                  color: ThemeConstants.primary,
-                                );
-                              },
-                            ),
-                          ),
-                          
-                          const SizedBox(height: 32),
-                          
-                          // Main title matching main menu typography
-                          const Text(
-                            'Monitoring Jalan Layang MBZ',
-                            style: ThemeConstants.heading1,
-                            textAlign: TextAlign.center,
-                          ),
-                          
-                          const SizedBox(height: 16),
-                          
-                          // Subtitle matching main menu style
-                          Text(
-                            'Sistem pencatatan dan pelaporan terintegrasi',
-                            style: ThemeConstants.bodyMedium.copyWith(color: ThemeConstants.textSecondary, height: 1.4),
-                            textAlign: TextAlign.center,
-                          ),
-                          
-                          const SizedBox(height: 24),
-                          
-                          // Loading indicator
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: ThemeConstants.primary.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: SizedBox(
-                              width: 24,
-                              height: 24,
-                              child: CircularProgressIndicator(
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  ThemeConstants.primary,
-                                ),
-                                strokeWidth: 2.5,
-                              ),
-                            ),
-                          ),
-                          
-                          const SizedBox(height: 16),
-                          
-                          // Loading text
-                          Text(
-                            'Memuat aplikasi...',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey.shade500,
-                              fontWeight: FontWeight.w500,
-                              letterSpacing: 0.3,
-                            ),
-                          ),
-                        ],
-                      ),
+      backgroundColor: ThemeConstants.primaryBlue,
+      body: Column(
+        children: [
+          Expanded(
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Logo
+                  Container(
+                    width: 120,
+                    height: 120,
+                    decoration: BoxDecoration(
+                      color: ThemeConstants.primaryWhite,
+                      borderRadius: BorderRadius.circular(ThemeConstants.radiusXLarge),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 10,
+                          offset: const Offset(0, 5),
+                        ),
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.construction,
+                      size: ThemeConstants.iconXLarge + 16,
+                      color: ThemeConstants.primaryBlue,
                     ),
                   ),
-                ),
-              );
-            },
+                  
+                  const SizedBox(height: ThemeConstants.spacing32),
+                  
+                  // App Title
+                  Text(
+                    'Monitoring Jalan Layang MBZ',
+                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      color: ThemeConstants.primaryWhite,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  
+                  const SizedBox(height: ThemeConstants.spacing8),
+                  
+                  Text(
+                    'Sistem Pemeliharaan Jalan Tol',
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: ThemeConstants.primaryWhite.withOpacity(0.9),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
           ),
-        ),
+          
+          // Loading indicator
+          const Padding(
+            padding: EdgeInsets.all(ThemeConstants.spacing32),
+            child: LoadingWidget(
+              message: 'Memuat aplikasi...',
+              size: 40,
+            ),
+          ),
+        ],
       ),
     );
   }
