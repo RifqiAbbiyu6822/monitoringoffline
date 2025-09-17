@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'screens/splash_screen.dart';
 import 'constants/app_theme.dart';
+import 'modules/temuan/providers/temuan_provider.dart';
+import 'modules/perbaikan/providers/perbaikan_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,11 +17,17 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Jasa Marga Mobile Offline',
-      theme: AppTheme.light,
-      home: const SplashScreen(),
-      debugShowCheckedModeBanner: false,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => TemuanProvider()),
+        ChangeNotifierProvider(create: (_) => PerbaikanProvider()),
+      ],
+      child: MaterialApp(
+        title: 'Monitoring Jalan Layang MBZ',
+        theme: AppTheme.light,
+        home: const SplashScreen(),
+        debugShowCheckedModeBanner: false,
+      ),
     );
   }
 }
